@@ -56,6 +56,7 @@ Shader::Shader(const char *vertexPath, const char *fragmentPath) {
     // delete the shaders as they're linked into our program now and no longer necessary
     glDeleteShader(vertex);
     glDeleteShader(fragment);
+    nPointLights = 0;
 }
 
 void Shader::use() {
@@ -103,31 +104,42 @@ void Shader::checkCompileErrors(unsigned int shader, std::string type) {
     }
 }
 
-void Shader::addDirLight(glm::vec3 dir, glm::vec3 amb, glm::vec3 diff, glm::vec3 spec) {
-    // directional light
-    setVec3("dirLight.direction", glm::vec3(-0.2f, -1.0f, -0.3f));
-    setVec3("dirLight.ambient",glm::vec3( 0.05f, 0.05f, 0.05f));
-    setVec3("dirLight.diffuse", glm::vec3(0.4f, 0.4f, 0.4f));
-    setVec3("dirLight.specular",glm::vec3( 0.5f, 0.5f, 0.5f));
+void Shader::addLights(std::vector<Light> lights) {
+    for (int i = 0; i < lights.size();i++) {
+        if (lights[i].getType() == PointLight) {
+            this->setVec3("pointLights["+std::to_string(i)+"].position", lights[i].getPosition());
+            this->setVec3("pointLights["+std::to_string(i)+"].ambient",lights[i].getAmbient());
+            this->setVec3("pointLights["+std::to_string(i)+"].diffuse", lights[i].getDiffuse());
+            this->setVec3("pointLights["+std::to_string(i)+"].specular",lights[i].getSpecular());
+            this->setFloat("pointLights["+std::to_string(i)+"].constant", lights[i].getConstant());
+            this->setFloat("pointLights["+std::to_string(i)+"].linear", lights[i].getLinear());
+            this->setFloat("pointLights["+std::to_string(i)+"].quadratic", lights[i].getQuadratic());
+            //lights[i].toString();
+        }
+    }
 }
 
-void
-Shader::addPointLight(unsigned int index, glm::vec3 pos, glm::vec3 amb, glm::vec3 diff, glm::vec3 spec, float constant,
-                      float linear, float quadratic) {
-    std::string pointLight = std::string("pointLights[" + index) + "]";
-    setVec3(pointLight + ".position", pos);
-    setVec3(pointLight + ".ambient",amb);
-    setVec3(pointLight + ".diffuse", diff);
-    setVec3(pointLight + ".specular",spec);
-    setFloat(pointLight + ".constant", constant);
-    setFloat(pointLight + ".linear", linear);
-    setFloat(pointLight + ".quadratic", quadratic);
+void Shader::addSpotLight(Light light, glm::vec3 direction, glm::vec3 position,float cutOff, float outerCutOff) {
+    this->setVec3("spotLight.position", position);
+    this->setVec3("spotLight.direction", direction);
+    this->setVec3("spotLight.ambient", light.getAmbient());
+    this->setVec3("spotLight.diffuse", light.getDiffuse());
+    this->setVec3("spotLight.specular", light.getSpecular());
+    this->setFloat("spotLight.constant", light.getConstant());
+    this->setFloat("spotLight.linear", light.getLinear());
+    this->setFloat("spotLight.quadratic", light.getQuadratic());
+    this->setFloat("spotLight.cutOff", cutOff);
+    this->setFloat("spotLight.outerCutOff", outerCutOff);
 }
 
-void Shader::addSpotLight(unsigned int index, glm::vec3 pos, glm::vec3 amb, glm::vec3 diff, glm::vec3 spec,
-                             float constant, float linear, float quadratic, float cutOff, float outerCutOff) {
-
+void Shader::disableSpotLight() {
+    this->setVec3("spotLight.ambient", glm::vec3(0));
+    this->setVec3("spotLight.diffuse", glm::vec3(0));
+    this->setVec3("spotLight.specular", glm::vec3(0));
+    this->setFloat("spotLight.constant", 0);
+    this->setFloat("spotLight.linear", 0);
+    this->setFloat("spotLight.quadratic", 0);
+    this->setFloat("spotLight.cutOff", 0);
+    this->setFloat("spotLight.outerCutOff", 0);
 }
-
-
 

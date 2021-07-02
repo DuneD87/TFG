@@ -16,7 +16,7 @@
 // settings
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
-
+bool spotLightEnabled = false;
 float lastX = SCR_WIDTH/2, lastY = SCR_HEIGHT/2,pitch = 0, yaw = -90, fov = 45;
 
 Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
@@ -49,6 +49,8 @@ void processInput(GLFWwindow *window)
         camera.ProcessKeyboard(UP,deltaTime);
     if (glfwGetKey(window,GLFW_KEY_C) == GLFW_PRESS)
         camera.ProcessKeyboard(DOWN,deltaTime);
+    if (glfwGetKey(window,GLFW_KEY_L) == GLFW_PRESS)
+        spotLightEnabled = !spotLightEnabled;
 }
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos)
@@ -109,8 +111,7 @@ unsigned int loadTexture(char const * path)
 int main()
 {
     XmlParser parser("../Scenes/Scene1.xml");
-    parser.parseDoc();
-    exit(EXIT_FAILURE);
+    vector<Light> lights = parser.getScene();
     // glfw: initialize and configure
     // ------------------------------
     glfwInit();
@@ -226,6 +227,8 @@ int main()
             glm::vec3( 0.0f,  0.0f, -3.0f)
     };
     Model backpack("../Models/backpack.obj");
+    Light spotLight(SpotLight,glm::vec3(0.0f, 0.0f, 0.0f),glm::vec3(1.0f, 1.0f, 1.0f),
+                    glm::vec3(1.0f, 1.0f, 1.0f),1.0,0.09,0.032);
     while (!glfwWindowShouldClose(window))
     {
         // input
@@ -240,50 +243,13 @@ int main()
         lightShader.use();
         lightShader.setFloat("material.shininess", 64.0f);
         lightShader.setVec3("viewPos",camera.Position);
-
-        // point light 1
-        lightShader.setVec3("pointLights[0].position", pointLightPositions[0]);
-        lightShader.setVec3("pointLights[0].ambient",glm::vec3( 0.05f, 0.05f, 0.05f));
-        lightShader.setVec3("pointLights[0].diffuse", glm::vec3(0.8f, 0.8f, 0.8f));
-        lightShader.setVec3("pointLights[0].specular",glm::vec3( 1.0f, 1.0f, 1.0f));
-        lightShader.setFloat("pointLights[0].constant", 1.0f);
-        lightShader.setFloat("pointLights[0].linear", 0.09);
-        lightShader.setFloat("pointLights[0].quadratic", 0.032);
-        // point light 2
-        lightShader.setVec3("pointLights[1].position", pointLightPositions[1]);
-        lightShader.setVec3("pointLights[1].ambient",glm::vec3( 0.05f, 0.05f, 0.05f));
-        lightShader.setVec3("pointLights[1].diffuse",glm::vec3( 0.8f, 0.8f, 0.8f));
-        lightShader.setVec3("pointLights[1].specular",glm::vec3( 1.0f, 1.0f, 1.0f));
-        lightShader.setFloat("pointLights[1].constant", 1.0f);
-        lightShader.setFloat("pointLights[1].linear", 0.09);
-        lightShader.setFloat("pointLights[1].quadratic", 0.032);
-        // point light 3
-        lightShader.setVec3("pointLights[2].position", pointLightPositions[2]);
-        lightShader.setVec3("pointLights[2].ambient", glm::vec3(0.05f, 0.05f, 0.05f));
-        lightShader.setVec3("pointLights[2].diffuse", glm::vec3(0.8f, 0.8f, 0.8f));
-        lightShader.setVec3("pointLights[2].specular",glm::vec3( 1.0f, 1.0f, 1.0f));
-        lightShader.setFloat("pointLights[2].constant", 1.0f);
-        lightShader.setFloat("pointLights[2].linear", 0.09);
-        lightShader.setFloat("pointLights[2].quadratic", 0.032);
-        // point light 4
-        lightShader.setVec3("pointLights[3].position", pointLightPositions[3]);
-        lightShader.setVec3("pointLights[3].ambient", glm::vec3(0.05f, 0.05f, 0.05f));
-        lightShader.setVec3("pointLights[3].diffuse", glm::vec3(0.8f, 0.8f, 0.8f));
-        lightShader.setVec3("pointLights[3].specular", glm::vec3(1.0f, 1.0f, 1.0f));
-        lightShader.setFloat("pointLights[3].constant", 1.0f);
-        lightShader.setFloat("pointLights[3].linear", 0.09);
-        lightShader.setFloat("pointLights[3].quadratic", 0.032);
+        lightShader.addLights(lights);
         // spotLight
-        lightShader.setVec3("spotLight.position", camera.Position);
-        lightShader.setVec3("spotLight.direction", camera.Front);
-        lightShader.setVec3("spotLight.ambient", glm::vec3(0.0f, 0.0f, 0.0f));
-        lightShader.setVec3("spotLight.diffuse", glm::vec3(1.0f, 1.0f, 1.0f));
-        lightShader.setVec3("spotLight.specular", glm::vec3(1.0f, 1.0f, 1.0f));
-        lightShader.setFloat("spotLight.constant", 1.0f);
-        lightShader.setFloat("spotLight.linear", 0.09);
-        lightShader.setFloat("spotLight.quadratic", 0.032);
-        lightShader.setFloat("spotLight.cutOff", glm::cos(glm::radians(12.5f)));
-        lightShader.setFloat("spotLight.outerCutOff", glm::cos(glm::radians(15.0f)));
+        if (spotLightEnabled)//Bug: la llum es mante quan apagues la llanterna
+            lightShader.addSpotLight(spotLight,camera.Front,camera.Position,glm::cos(glm::radians(12.5f))
+                                 ,glm::cos(glm::radians(15.0f)));
+        else
+            lightShader.disableSpotLight();
 
         //view
         glm::mat4 view;

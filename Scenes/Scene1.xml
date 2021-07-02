@@ -1,18 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Scene>
-    <Brewery name="Founders Brewing Company" location="Grand Rapids, MI">
-        <Beer name="Centennial" description="IPA" rating="A+" dateSampled="01/02/2011">
-            "What an excellent IPA. This is the most delicious beer I have ever tasted!"
-        </Beer>
-    </Brewery>
-    <Brewery name="Brewery Vivant" location="Grand Rapids, MI">
-        <Beer name="Farmhouse Ale" description="Belgian Ale" rating="B" dateSampled="02/07/2015">
-            This beer is not so good... but I am not that big of a fan of english style ales.
-        </Beer>
-    </Brewery>
-    <Brewery name="Bells Brewery" location="Kalamazoo, MI">
-        <Beer name="Two Hearted Ale" description="IPA" rating="A" dateSampled="03/15/2012">
-            Another execllent brew. Two Hearted gives Founders Centennial a run for it's money.
-        </Beer>
-    </Brewery>
+    <Lights>
+        <Light type="pointLight" constant="1.0" linear="0.09" quadratic="0.032">
+            <Position x="0.7" y="0.2" z="2.0"/>
+            <Ambient x="0.05" y="0.05f" z="0.05f"/>
+            <Diffuse x="0.0" y="0.8f" z="0.8"/>
+            <Specular x="1.0" y="1.0" z="1.0"/>
+        </Light>
+        <Light type="pointLight" constant="1.0" linear="0.09" quadratic="0.032">
+            <Position x="2.3" y="-3.3" z="-4.0"/>
+            <Ambient x="0.05" y="0.05f" z="0.05f"/>
+            <Diffuse x="0.8" y="0.8f" z="0.8"/>
+            <Specular x="1.0" y="1.0" z="1.0"/>
+        </Light>
+        <Light type="pointLight" constant="1.0" linear="0.09" quadratic="0.032">
+            <Position x="-4.0" y="2.0" z="-12.0"/>
+            <Ambient x="0.05" y="0.05f" z="0.05f"/>
+            <Diffuse x="0.8" y="0.8f" z="0.8"/>
+            <Specular x="1.0" y="1.0" z="1.0"/>
+        </Light>
+        <Light type="pointLight" constant="1.0" linear="0.09" quadratic="0.032">
+            <Position x="0" y="0" z="-3.0"/>
+            <Ambient x="0.05" y="0.05f" z="0.05f"/>
+            <Diffuse x="0.8" y="0.8f" z="0.8"/>
+            <Specular x="1.0" y="1.0" z="1.0"/>
+        </Light>
+    </Lights>
 </Scene>

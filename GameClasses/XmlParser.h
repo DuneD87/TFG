@@ -6,9 +6,12 @@
 #define OPENGLTEST_XMLPARSER_H
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <map>
+#include "Light.h"
 #include "rapidxml/rapidxml.hpp"
 
 using namespace rapidxml;
@@ -16,9 +19,10 @@ using namespace std;
 class XmlParser {
 public:
     XmlParser(std::string path);
-    void parseDoc();
+    vector<Light> getScene();
 private:
     std::string path;
+    vector<Light> _lights;
 };
 
 
