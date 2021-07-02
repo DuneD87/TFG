@@ -5,8 +5,7 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
-
-#include "stb_image.h"
+#include "GameClasses/Model.h"
 #include "GameClasses/Shader.h"
 #include "GameClasses/Camera.h"
 
@@ -142,6 +141,7 @@ int main()
         std::cout << "Failed to initialize GLAD" << std::endl;
         return -1;
     }
+    stbi_set_flip_vertically_on_load(true);
     glEnable(GL_DEPTH_TEST);
     // build and compile our shader zprogram
     // ------------------------------------
@@ -242,6 +242,7 @@ int main()
             glm::vec3(-4.0f,  2.0f, -12.0f),
             glm::vec3( 0.0f,  0.0f, -3.0f)
     };
+    Model backpack("../Models/backpack.obj");
     while (!glfwWindowShouldClose(window))
     {
         // input
@@ -316,7 +317,7 @@ int main()
         // world transformation
         glm::mat4 model = glm::mat4(1.0f);
         lightShader.setMat4("model", model);
-
+        backpack.Draw(lightShader);
         // bind diffuse map
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, diffuseMap);
