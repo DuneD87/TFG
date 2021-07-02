@@ -2,6 +2,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include "GameClasses/XmlParser.h"
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
@@ -107,6 +108,9 @@ unsigned int loadTexture(char const * path)
 
 int main()
 {
+    XmlParser parser("../Scenes/Scene1.xml");
+    parser.parseDoc();
+    exit(EXIT_FAILURE);
     // glfw: initialize and configure
     // ------------------------------
     glfwInit();
@@ -236,11 +240,7 @@ int main()
         lightShader.use();
         lightShader.setFloat("material.shininess", 64.0f);
         lightShader.setVec3("viewPos",camera.Position);
-        // directional light
-        lightShader.setVec3("dirLight.direction", glm::vec3(-0.2f, -1.0f, -0.3f));
-        lightShader.setVec3("dirLight.ambient",glm::vec3( 0.05f, 0.05f, 0.05f));
-        lightShader.setVec3("dirLight.diffuse", glm::vec3(0.4f, 0.4f, 0.4f));
-        lightShader.setVec3("dirLight.specular",glm::vec3( 0.5f, 0.5f, 0.5f));
+
         // point light 1
         lightShader.setVec3("pointLights[0].position", pointLightPositions[0]);
         lightShader.setVec3("pointLights[0].ambient",glm::vec3( 0.05f, 0.05f, 0.05f));

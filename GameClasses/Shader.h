@@ -29,6 +29,12 @@ public:
     void setFloat(const std::string &name, float value) const;
     void setVec3(const std::string &name, glm::vec3 value) const;
     void setMat4(const std::string &name,glm::mat4 value) const;
+    //HERENCIAAAA classe Light implementa dirLight,pointLight i spotLight
+    void addDirLight(glm::vec3 dir, glm::vec3 amb, glm::vec3 diff, glm::vec3 spec);
+    void addPointLight(unsigned int index, glm::vec3 pos, glm::vec3 amb, glm::vec3 diff, glm::vec3 spec,
+                       float constant, float linear, float quadratic);
+    void addSpotLight(unsigned int index, glm::vec3 pos, glm::vec3 amb, glm::vec3 diff, glm::vec3 spec,
+                         float constant, float linear, float quadratic, float cutOff, float outerCutOff);
 private:
     void checkCompileErrors(unsigned int shader, std::string type);
 };

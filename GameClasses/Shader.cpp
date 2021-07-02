@@ -103,5 +103,31 @@ void Shader::checkCompileErrors(unsigned int shader, std::string type) {
     }
 }
 
+void Shader::addDirLight(glm::vec3 dir, glm::vec3 amb, glm::vec3 diff, glm::vec3 spec) {
+    // directional light
+    setVec3("dirLight.direction", glm::vec3(-0.2f, -1.0f, -0.3f));
+    setVec3("dirLight.ambient",glm::vec3( 0.05f, 0.05f, 0.05f));
+    setVec3("dirLight.diffuse", glm::vec3(0.4f, 0.4f, 0.4f));
+    setVec3("dirLight.specular",glm::vec3( 0.5f, 0.5f, 0.5f));
+}
+
+void
+Shader::addPointLight(unsigned int index, glm::vec3 pos, glm::vec3 amb, glm::vec3 diff, glm::vec3 spec, float constant,
+                      float linear, float quadratic) {
+    std::string pointLight = std::string("pointLights[" + index) + "]";
+    setVec3(pointLight + ".position", pos);
+    setVec3(pointLight + ".ambient",amb);
+    setVec3(pointLight + ".diffuse", diff);
+    setVec3(pointLight + ".specular",spec);
+    setFloat(pointLight + ".constant", constant);
+    setFloat(pointLight + ".linear", linear);
+    setFloat(pointLight + ".quadratic", quadratic);
+}
+
+void Shader::addSpotLight(unsigned int index, glm::vec3 pos, glm::vec3 amb, glm::vec3 diff, glm::vec3 spec,
+                             float constant, float linear, float quadratic, float cutOff, float outerCutOff) {
+
+}
+
 
 
