@@ -8,14 +8,12 @@
 
 #include "../glm/glm.hpp"
 #include "../glm/gtc/matrix_transform.hpp"
-#include "../stb_image.h"
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
 #include "Mesh.h"
 #include "Shader.h"
-
 #include <string>
 #include <fstream>
 #include <sstream>
@@ -33,10 +31,13 @@ public:
 
     // constructor, expects a filepath to a 3D model.
     Model(std::string const &path, bool gamma = false);
+    Model();
     void Draw(Shader &shader);
-    unsigned int TextureFromFile(const char *path, const std::string &directory, bool gamma = false);
     Mesh processMesh(aiMesh *mesh, const aiScene *scene);
     std::vector<Texture> loadMaterialTextures(aiMaterial *mat, aiTextureType type, std::string typeName);
+    void setPosition(glm::vec3 position);
+    void setRotation(float angle, glm::vec3 axis);
+    void setScale(glm::vec3 scale);
 private:
     // loads a model with supported ASSIMP extensions from file and stores the resulting meshes in the meshes vector.
     void loadModel(std::string const &path);

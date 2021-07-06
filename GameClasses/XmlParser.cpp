@@ -8,18 +8,10 @@ XmlParser::XmlParser(std::string path) {
     this->path = path;
 }
 
-vector<Light> XmlParser::getScene() {
+vector<Light> XmlParser::getLights() {
     xml_document<> doc;
-    xml_node<> * root_node;
-    // Read the xml file into a vector
-    ifstream theFile (this->path);
-    vector<char> buffer((istreambuf_iterator<char>(theFile)), istreambuf_iterator<char>());
-    buffer.push_back('\0');
-    // Parse the buffer using the xml file parsing library into doc
-    doc.parse<0>(&buffer[0]);
-    // Find our root node
-    root_node = doc.first_node("Scene");
-    // Iterate over the brewerys
+    xml_node<> * root_node = getRootNode();
+
     for (xml_node<> * lights = root_node->first_node("Lights"); lights; lights = lights->next_sibling())
     {
         //Scene lights parsing
@@ -76,4 +68,30 @@ vector<Light> XmlParser::getScene() {
         }
     }
     return _lights;
+}
+
+vector<Model> XmlParser::getModels() {
+    std::vector<Model> res;
+    xml_node<> * root_node = getRootNode();
+    for (xml_node<> * lights = root_node->first_node("Models"); lights; lights = lights->next_sibling())
+    {
+
+    }
+    return res;
+}
+
+xml_node<> *XmlParser::getRootNode() {
+
+    xml_document<> doc;
+    xml_node<> * root_node;
+    // Read the xml file into a vector
+    ifstream theFile (this->path);
+    vector<char> buffer((istreambuf_iterator<char>(theFile)), istreambuf_iterator<char>());
+    buffer.push_back('\0');
+    // Parse the buffer using the xml file parsing library into doc
+    doc.parse<0>(&buffer[0]);
+    // Find our root node
+    root_node = doc.first_node("Scene");
+    // Iterate over the brewerys
+    return root_node;
 }

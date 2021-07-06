@@ -12,6 +12,7 @@
 #include <vector>
 #include <map>
 #include "Light.h"
+#include "Model.h"
 #include "rapidxml/rapidxml.hpp"
 
 using namespace rapidxml;
@@ -19,8 +20,10 @@ using namespace std;
 class XmlParser {
 public:
     XmlParser(std::string path);
-    vector<Light> getScene();
+    vector<Light> getLights();
+    vector<Model> getModels();
 private:
+    xml_node<> * getRootNode();
     std::string path;
     vector<Light> _lights;
 };

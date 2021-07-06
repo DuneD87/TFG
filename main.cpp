@@ -23,8 +23,6 @@ Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 
 float deltaTime = 0.0f;	// Time between current frame and last frame
 float lastFrame = 0.0f; // Time of last frame
-// lighting
-glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
@@ -76,9 +74,7 @@ void renderLoopCamera(Shader shader)
     glm::mat4 view;
     view = camera.GetViewMatrix();
     //projection
-    glm::mat4 projection;
-    projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH/SCR_HEIGHT, 0.1f, 100.0f);
-    shader.setMat4("projection",projection);
+
     shader.setMat4("view",view);
 }
 
@@ -86,7 +82,7 @@ void renderLoopCamera(Shader shader)
 int main()
 {
     XmlParser parser("../Scenes/Scene1.xml");
-    vector<Light> lights = parser.getScene();
+    vector<Light> lights = parser.getLights();
     // glfw: initialize and configure
     // ------------------------------
     glfwInit();
@@ -131,12 +127,21 @@ int main()
     // ------------------------------------------------------------------
 
     Cube cube;
-    Mesh cubeMesh = procesMesh(cube.vertices, cube.indices,192,36);
+    Mesh cubeMesh = procesMesh(cube.vertices, cube.indices,"container2.png","../Models",208,72);
+    Model capsule;
+    capsule.meshes.push_back(cubeMesh);
+    Cube cube2;
+    Mesh cubeMesh2 = procesMesh(cube.vertices, cube.indices,"container2.png","../Models",208,72);
+    Model capsule2;
+    capsule2.meshes.push_back(cubeMesh2);
+    capsule2.setPosition(glm::vec3(3,0,0));
+    capsule.meshes.push_back(cubeMesh);
     lightShader.use();
-    lightShader.setInt("material.diffuse", 0);
-    lightShader.setInt("material.specular", 1);
+    glm::mat4 projection;
+    projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH/SCR_HEIGHT, 0.1f, 100.0f);
+    lightShader.setMat4("projection",projection);
     //Render loop
-    Model backpack("../Models/backpack.obj");
+    //Model backpack("../Models/cube.obj");
     Light spotLight(SpotLight,glm::vec3(0.0f, 0.0f, 0.0f),glm::vec3(1.0f, 1.0f, 1.0f),
                     glm::vec3(1.0f, 1.0f, 1.0f),1.0,0.09,0.032);
     while (!glfwWindowShouldClose(window))
@@ -162,19 +167,9 @@ int main()
             lightShader.disableSpotLight();
 
         renderLoopCamera(lightShader);
-        // world transformation
-        glm::mat4 model = glm::mat4(1.0f);
-        glm::translate(model,glm::vec3(10000,100000,0));
-        lightShader.setMat4("model", model);
-        //backpack.Draw(lightShader);
-        cubeMesh.Draw(lightShader);
-        cubeLightShader.use();
-        renderLoopCamera(cubeLightShader);
-        model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3( 0.7f,  0.2f,  2.0f));
-        model = glm::scale(model, glm::vec3(0.2f)); // a smaller cube
-        cubeLightShader.setMat4("model", model);
-        cubeMesh.Draw(cubeLightShader);
+        capsule.setPosition(glm::vec3(0,0,glfwGetTime()*10));
+        capsule.Draw(lightShader);
+        capsule2.Draw(lightShader);
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
         float currentFrame = glfwGetTime();

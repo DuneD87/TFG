@@ -8,6 +8,25 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std:
     this->vertices = vertices;
     this->indices = indices;
     this->textures = textures;
+    // now that we have all the required data, set the vertex buffers and its attribute pointers.
+    setupMesh();
+}
+
+Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, const char * path, std::string directory) {
+    this->vertices = vertices;
+    this->indices = indices;
+    this->position = glm::vec3(0);
+    this->scale = glm::vec3(1);
+    this->axis = glm::vec3(0);
+    this->angle = 0;
+    Texture baseText;
+    baseText.path = directory + "/" + path;
+    baseText.type = "texture_specular";
+    baseText.id = TextureFromFile( path,directory,false);
+    std::vector<Texture> textAux;
+    textAux.push_back(baseText);
+    this->textures = textAux;
+
 
     // now that we have all the required data, set the vertex buffers and its attribute pointers.
     setupMesh();
@@ -19,6 +38,7 @@ void Mesh::Draw(Shader &shader) {
     unsigned int specularNr = 1;
     unsigned int normalNr   = 1;
     unsigned int heightNr   = 1;
+
     for(unsigned int i = 0; i < textures.size(); i++)
     {
         glActiveTexture(GL_TEXTURE0 + i); // active proper texture unit before binding
@@ -42,6 +62,12 @@ void Mesh::Draw(Shader &shader) {
 
     // draw mesh
     glBindVertexArray(VAO);
+    //std::cout<<position.z<<std::endl;
+    glm::mat4 meshModel = glm::mat4(1.0f);
+    glm::scale(meshModel,scale);
+    glm::rotate(meshModel,angle,axis);
+    glm::translate(meshModel,position);
+    shader.setMat4("model", meshModel);
     glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 
@@ -85,3 +111,5 @@ void Mesh::setupMesh() {
 
     glBindVertexArray(0);
 }
+
+
