@@ -19,7 +19,7 @@ const unsigned int SCR_HEIGHT = 720;
 bool spotLightEnabled = false;
 float lastX = SCR_WIDTH/2, lastY = SCR_HEIGHT/2,pitch = 0, yaw = -90, fov = 45;
 
-Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+Camera camera(glm::vec3(0.0f, -2.0f, 3.0f));
 
 float deltaTime = 0.0f;	// Time between current frame and last frame
 float lastFrame = 0.0f; // Time of last frame
@@ -73,9 +73,14 @@ void renderLoopCamera(Shader shader)
     //view
     glm::mat4 view;
     view = camera.GetViewMatrix();
-    //projection
-
     shader.setMat4("view",view);
+
+    //projection
+    glm::mat4 projection;
+    projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH/SCR_HEIGHT, 0.1f, 100.0f);
+    shader.setMat4("projection",projection);
+    glm::mat4 cameraModel(1.0f);
+    shader.setMat4("model", cameraModel);
 }
 
 // ---------------------------------------------------
@@ -127,23 +132,23 @@ int main()
     // ------------------------------------------------------------------
 
     Cube cube;
-    Mesh cubeMesh = procesMesh(cube.vertices, cube.indices,"container2.png","../Models",208,72);
-    Model capsule;
+    Mesh cubeMesh = procesMesh(cube.vertices, cube.indices,"wallConcrete.jpg","../Models",208,72);
+    Mesh cubeMesh2 = procesMesh(cube.vertices, cube.indices,"wall.jpg","../Models",208,72);
+    Mesh cubeMesh3 = procesMesh(cube.vertices, cube.indices,"wall.jpg","../Models",208,72);
+    Model capsule,capsule2,capsule3;
     capsule.meshes.push_back(cubeMesh);
-    Cube cube2;
-    Mesh cubeMesh2 = procesMesh(cube.vertices, cube.indices,"container2.png","../Models",208,72);
-    Model capsule2;
+    capsule.setPosition(glm::vec3(0,-3,0));
     capsule2.meshes.push_back(cubeMesh2);
-    capsule2.setPosition(glm::vec3(3,0,0));
-    capsule.meshes.push_back(cubeMesh);
+    capsule2.setPosition(glm::vec3(0,-4,0));
+    capsule2.setScale(glm::vec3(10,1,10));
+    capsule3.meshes.push_back(cubeMesh3);
+    capsule3.setPosition(glm::vec3(2,-3,0));
     lightShader.use();
-    glm::mat4 projection;
-    projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH/SCR_HEIGHT, 0.1f, 100.0f);
-    lightShader.setMat4("projection",projection);
     //Render loop
     //Model backpack("../Models/cube.obj");
     Light spotLight(SpotLight,glm::vec3(0.0f, 0.0f, 0.0f),glm::vec3(1.0f, 1.0f, 1.0f),
                     glm::vec3(1.0f, 1.0f, 1.0f),1.0,0.09,0.032);
+    int angle = 0;
     while (!glfwWindowShouldClose(window))
     {
         // input
@@ -165,11 +170,10 @@ int main()
                                  ,glm::cos(glm::radians(15.0f)));
         else
             lightShader.disableSpotLight();
-
         renderLoopCamera(lightShader);
-        capsule.setPosition(glm::vec3(0,0,glfwGetTime()*10));
-        capsule.Draw(lightShader);
         capsule2.Draw(lightShader);
+        capsule.Draw(lightShader);
+        capsule3.Draw(lightShader);
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
         float currentFrame = glfwGetTime();

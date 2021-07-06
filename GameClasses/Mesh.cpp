@@ -17,7 +17,7 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, cons
     this->indices = indices;
     this->position = glm::vec3(0);
     this->scale = glm::vec3(1);
-    this->axis = glm::vec3(0);
+    this->axis = glm::vec3(1);
     this->angle = 0;
     Texture baseText;
     baseText.path = directory + "/" + path;
@@ -61,18 +61,20 @@ void Mesh::Draw(Shader &shader) {
     }
 
     // draw mesh
+
     glBindVertexArray(VAO);
     //std::cout<<position.z<<std::endl;
     glm::mat4 meshModel = glm::mat4(1.0f);
-    glm::scale(meshModel,scale);
-    glm::rotate(meshModel,angle,axis);
-    glm::translate(meshModel,position);
+    meshModel = glm::translate(meshModel,position);
+    meshModel = glm::rotate(meshModel,angle,axis);
+    meshModel = glm::scale(meshModel,scale);
     shader.setMat4("model", meshModel);
     glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 
     // always good practice to set everything back to defaults once configured.
     glActiveTexture(GL_TEXTURE0);
+
 }
 
 void Mesh::setupMesh() {
