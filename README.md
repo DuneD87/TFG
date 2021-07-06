@@ -1,6 +1,6 @@
 
 # Tutorial OpenGL
-Instalar glad, glfw i assimp: \
+Instalar glad, glfw, assimp i rapidxml: \
 sudo mkdir /usr/local/include/glad \
 sudo cp glad.h /usr/local/include/glad \
 sudo cp khrplatform.h /usr/local/include/glad \
