@@ -16,7 +16,7 @@
 // settings
 const unsigned int SCR_WIDTH = 1024;
 const unsigned int SCR_HEIGHT = 720;
-bool spotLightEnabled = false;
+bool spotLightEnabled = false, enableCursor = true;
 float lastX = SCR_WIDTH/2, lastY = SCR_HEIGHT/2,pitch = 0, yaw = -90, fov = 45;
 
 Camera camera(glm::vec3(0.0f, -2.0f, 3.0f));
@@ -83,11 +83,8 @@ void renderLoopCamera(Shader shader)
     shader.setMat4("model", cameraModel);
 }
 
-// ---------------------------------------------------
-int main()
+GLFWwindow * createWindow()
 {
-    XmlParser parser("../Scenes/Scene1.xml");
-
     // glfw: initialize and configure
     // ------------------------------
     glfwInit();
@@ -106,7 +103,7 @@ int main()
     {
         std::cout << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
-        return -1;
+        return NULL;
     }
 
 
@@ -114,29 +111,39 @@ int main()
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    if (!enableCursor)
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     // glad: load all OpenGL function pointers
     // ---------------------------------------
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
         std::cout << "Failed to initialize GLAD" << std::endl;
-        return -1;
+        return NULL;
     }
     stbi_set_flip_vertically_on_load(true);
     glEnable(GL_DEPTH_TEST);
+    return window;
+}
+
+// ---------------------------------------------------
+int main()
+{
+    XmlParser parser("../Scenes/Scene1.xml");
+    GLFWwindow *window = createWindow();
+
     // build and compile our shader zprogram
     // ------------------------------------
     Shader lightShader("../Shaders/lightingShader.vs", "../Shaders/lightingShader.fs");
-    Shader cubeLightShader("../Shaders/lightingShader.vs", "../Shaders/noLightObjects/lightingShader.fs");
+
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
-
-    vector<Light> lights = parser.getLights();
     vector<Model> drawables = parser.getModels();
+    vector<Light> lights = parser.getLights();
+
 
     lightShader.use();
     //Render loop
-    //Model backpack("../Models/cube.obj");
+    //Model backpack("../Models/backpack.obj");
     Light spotLight(SpotLight,glm::vec3(0.0f, 0.0f, 0.0f),glm::vec3(1.0f, 1.0f, 1.0f),
                     glm::vec3(1.0f, 1.0f, 1.0f),1.0,0.09,0.032);
 
@@ -162,7 +169,7 @@ int main()
         else
             lightShader.disableSpotLight();
         renderLoopCamera(lightShader);
-
+        //backpack.Draw(lightShader);
         //Draw objects
         for (int i = 0; i < drawables.size();i++)
         {

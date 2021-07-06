@@ -24,6 +24,7 @@ public:
     vector<Model> getModels();
 private:
     xml_node<> * getRootNode();
+    xml_node<> * _rootNode;
     std::string path;
     vector<Light> _lights;
 };
