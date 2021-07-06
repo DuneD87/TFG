@@ -105,45 +105,44 @@ vector<Model> XmlParser::getModels() {
     for (xml_node<> * model = models->first_node("Model");model;model = model->next_sibling() )
     {
         std::string typePre = model->first_attribute("type")->value();
-        if (model != NULL)
-        {
-            if (typePre == "Cube") {
-                const char * path = (const char * )model->first_attribute("path")->value();
-                std::string directory = model->first_attribute("directory")->value();
-                Model modelRes;
-                Cube cube;
-                std::cout<<"Text: "<< path<<"dir: "<<directory<<std::endl;
-                Mesh cubeMesh = procesMesh(cube.vertices, cube.indices,path,directory,192,36);
-                modelRes.meshes.push_back(cubeMesh);
 
-                i++;
-                xml_node<> * pos = model->first_node("Position");
-                float xPos = strtof(pos->first_attribute("x")->value(),NULL);
-                float yPos = strtof(pos->first_attribute("y")->value(),NULL);
-                float zPos = strtof(pos->first_attribute("z")->value(),NULL);
+        xml_node<> * pos = model->first_node("Position");
+        float xPos = strtof(pos->first_attribute("x")->value(),NULL);
+        float yPos = strtof(pos->first_attribute("y")->value(),NULL);
+        float zPos = strtof(pos->first_attribute("z")->value(),NULL);
 
-                xml_node<> * rot = model->first_node("Rotation");
-                float xRot = strtof(rot->first_attribute("x")->value(),NULL);
-                float yRot = strtof(rot->first_attribute("y")->value(),NULL);
-                float zRot = strtof(rot->first_attribute("z")->value(),NULL);
-                float angle = strtof(rot->first_attribute("angle")->value(),NULL);
+        xml_node<> * rot = model->first_node("Rotation");
+        float xRot = strtof(rot->first_attribute("x")->value(),NULL);
+        float yRot = strtof(rot->first_attribute("y")->value(),NULL);
+        float zRot = strtof(rot->first_attribute("z")->value(),NULL);
+        float angle = strtof(rot->first_attribute("angle")->value(),NULL);
 
-                xml_node<> * scale = model->first_node("Scale");
-                float xSize = strtof(scale->first_attribute("x")->value(),NULL);
-                float ySize = strtof(scale->first_attribute("y")->value(),NULL);
-                float zSize = strtof(scale->first_attribute("z")->value(),NULL);
+        xml_node<> * scale = model->first_node("Scale");
+        float xSize = strtof(scale->first_attribute("x")->value(),NULL);
+        float ySize = strtof(scale->first_attribute("y")->value(),NULL);
+        float zSize = strtof(scale->first_attribute("z")->value(),NULL);
+        Model modelRes;
+        if (typePre == "Cube") {
+            const char * path = (const char * )model->first_attribute("path")->value();
+            std::string directory = model->first_attribute("directory")->value();
+            Cube cube;
+            Mesh cubeMesh = procesMesh(cube.vertices, cube.indices,path,directory,192,36);
+            modelRes.meshes.push_back(cubeMesh);
 
-
-
-                modelRes.setPosition(glm::vec3(xPos,yPos,zPos));
-                modelRes.setRotation(angle,glm::vec3(xRot,yRot,zRot));
-                modelRes.setScale(glm::vec3(xSize,ySize,zSize));
-
-                res.push_back(modelRes);
-            }
         }
+        else if (typePre == "AModel")
+        {
+            const char * path = (const char * )model->first_attribute("path")->value();
+            modelRes = Model(path);
+        }
+        modelRes.setPosition(glm::vec3(xPos,yPos,zPos));
+        modelRes.setRotation(angle,glm::vec3(xRot,yRot,zRot));
+        modelRes.setScale(glm::vec3(xSize,ySize,zSize));
 
+        res.push_back(modelRes);
     }
+
+
 
     return res;
 }
