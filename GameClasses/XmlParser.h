@@ -14,7 +14,7 @@
 #include "Light.h"
 #include "Model.h"
 #include "rapidxml/rapidxml.hpp"
-
+#include "BasicShapeBuilder.h"
 using namespace rapidxml;
 using namespace std;
 class XmlParser {

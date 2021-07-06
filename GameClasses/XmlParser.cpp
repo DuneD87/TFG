@@ -24,9 +24,9 @@ vector<Light> XmlParser::getLights() {
                 type = PointLight;
             else
                 type = DirLight;
-            float constant = strtod(light->first_attribute("constant")->value(),NULL);;
-            float linear = strtod(light->first_attribute("linear")->value(),NULL);;
-            float quadratic = strtod(light->first_attribute("quadratic")->value(),NULL);;
+            float constant = strtof(light->first_attribute("constant")->value(),NULL);;
+            float linear = strtof(light->first_attribute("linear")->value(),NULL);;
+            float quadratic = strtof(light->first_attribute("quadratic")->value(),NULL);;
             printf("Light found with type %s and:\n\tConstant: %f\n\tLinear: %f\n\tQuadratic: %f\n" ,
                    typePre.c_str(),
                    constant,
@@ -73,8 +73,45 @@ vector<Light> XmlParser::getLights() {
 vector<Model> XmlParser::getModels() {
     std::vector<Model> res;
     xml_node<> * root_node = getRootNode();
-    for (xml_node<> * lights = root_node->first_node("Models"); lights; lights = lights->next_sibling())
+    for (xml_node<> * models = root_node->first_node("Models"); models; models = models->next_sibling())
     {
+        //Scene model parsing
+        for (xml_node<> * model = models->first_node("Model");model;model = model->next_sibling() )
+        {
+            string typePre = model->first_attribute("type")->value();
+            if (typePre == "Cube") {
+                xml_node<> * pos = model->first_node("Position");
+                xml_node<> * rot = model->first_node("Rotation");
+                xml_node<> * scale = model->first_node("Scale");
+                xml_node<> * textureInfo = model->first_node("Texture");
+                const char * path = (const char * )textureInfo->first_attribute("path")->value();
+                std::string directory = textureInfo->first_attribute("directory")->value();
+                Model modelRes;
+                Cube cube;
+                Mesh cubeMesh = procesMesh(cube.vertices, cube.indices,path,directory,192,36);
+                modelRes.meshes.push_back(cubeMesh);
+
+                float x = strtof(pos->first_attribute("x")->value(),NULL);
+                float y = strtof(pos->first_attribute("y")->value(),NULL);
+                float z = strtof(pos->first_attribute("z")->value(),NULL);
+                modelRes.setPosition(glm::vec3(x,y,z));
+
+
+                x = strtof(rot->first_attribute("x")->value(),NULL);
+                y = strtof(rot->first_attribute("y")->value(),NULL);
+                z = strtof(rot->first_attribute("z")->value(),NULL);
+                float angle = strtof(rot->first_attribute("angle")->value(),NULL);
+                modelRes.setRotation(angle,glm::vec3(x,y,z));
+
+
+                x = strtof(scale->first_attribute("x")->value(),NULL);
+                y = strtof(scale->first_attribute("y")->value(),NULL);
+                z = strtof(scale->first_attribute("z")->value(),NULL);
+                modelRes.setScale(glm::vec3(x,y,z));
+
+                res.push_back(modelRes);
+            }
+        }
 
     }
     return res;

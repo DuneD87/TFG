@@ -28,10 +28,22 @@
     </Lights>
     <Models>
         <Model type="Cube">
-            <Position x="0" y="0" z="1"/>
-            <Rotation x="0" y="0" z="0"/>
-            <Scale x="1" y="1" z="1"/>
-            <Texture path="container2.png" directory="../Models/"/>
+            <Position x="0.0" y="-3.0" z="0.0"/>
+            <Rotation x="1.0" y="1.0" z="1.0" angle="0.0"/>
+            <Scale x="1.0" y="1.0" z="1.0"/>
+            <Texture path="wallConcrete.jpg" directory="../Models/"/>
+        </Model>
+        <Model type="Cube">
+            <Position x="0.0" y="-4.0" z="0.0"/>
+            <Rotation x="1.0" y="1.0" z="1.0" angle="0.0"/>
+            <Scale x="10.0" y="1.0" z="10.0"/>
+            <Texture path="wall.jpg" directory="../Models/"/>
+        </Model>
+        <Model type="Cube">
+            <Position x="2.0" y="-3.0" z="0.0"/>
+            <Rotation x="1.0" y="1.0" z="1.0" angle="0.0"/>
+            <Scale x="1.0" y="1.0" z="1.0"/>
+            <Texture path="wall.jpg" directory="../Models/"/>
         </Model>
     </Models>
 </Scene>

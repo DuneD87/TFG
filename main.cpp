@@ -87,7 +87,7 @@ void renderLoopCamera(Shader shader)
 int main()
 {
     XmlParser parser("../Scenes/Scene1.xml");
-    vector<Light> lights = parser.getLights();
+
     // glfw: initialize and configure
     // ------------------------------
     glfwInit();
@@ -131,24 +131,15 @@ int main()
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
 
-    Cube cube;
-    Mesh cubeMesh = procesMesh(cube.vertices, cube.indices,"wallConcrete.jpg","../Models",208,72);
-    Mesh cubeMesh2 = procesMesh(cube.vertices, cube.indices,"wall.jpg","../Models",208,72);
-    Mesh cubeMesh3 = procesMesh(cube.vertices, cube.indices,"wall.jpg","../Models",208,72);
-    Model capsule,capsule2,capsule3;
-    capsule.meshes.push_back(cubeMesh);
-    capsule.setPosition(glm::vec3(0,-3,0));
-    capsule2.meshes.push_back(cubeMesh2);
-    capsule2.setPosition(glm::vec3(0,-4,0));
-    capsule2.setScale(glm::vec3(10,1,10));
-    capsule3.meshes.push_back(cubeMesh3);
-    capsule3.setPosition(glm::vec3(2,-3,0));
+    vector<Light> lights = parser.getLights();
+    vector<Model> drawables = parser.getModels();
+
     lightShader.use();
     //Render loop
     //Model backpack("../Models/cube.obj");
     Light spotLight(SpotLight,glm::vec3(0.0f, 0.0f, 0.0f),glm::vec3(1.0f, 1.0f, 1.0f),
                     glm::vec3(1.0f, 1.0f, 1.0f),1.0,0.09,0.032);
-    int angle = 0;
+
     while (!glfwWindowShouldClose(window))
     {
         // input
@@ -171,9 +162,13 @@ int main()
         else
             lightShader.disableSpotLight();
         renderLoopCamera(lightShader);
-        capsule2.Draw(lightShader);
-        capsule.Draw(lightShader);
-        capsule3.Draw(lightShader);
+
+        //Draw objects
+        for (int i = 0; i < drawables.size();i++)
+        {
+            drawables[i].Draw(lightShader);
+        }
+
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
         float currentFrame = glfwGetTime();
