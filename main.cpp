@@ -150,8 +150,9 @@ int main()
     lightShader.use();
     //Render loop
     //Model backpack("../Models/backpack.obj");
-    Light spotLight(SpotLight,glm::vec3(0.0f, 0.0f, 0.0f),glm::vec3(1.0f, 1.0f, 1.0f),
+    Light spotLight("spotLight",glm::vec3(0.0f, 0.0f, 0.0f),glm::vec3(1.0f, 1.0f, 1.0f),
                     glm::vec3(1.0f, 1.0f, 1.0f),1.0,0.09,0.032);
+
     srand( (unsigned)time( NULL ) );
     while (!glfwWindowShouldClose(window))
     {

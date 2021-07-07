@@ -24,10 +24,12 @@ public:
     vector<Model> getModels();
     vector<Mesh> getSprites();
 private:
-    xml_node<> * getRootNode();
     xml_node<> * _rootNode;
     std::string path;
     vector<Light> _lights;
+
+    glm::vec3 getValues3(xml_node<> *pos);
+    glm::vec4 getValues4(xml_node<> *rot);
 };
 
 

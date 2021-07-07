@@ -4,14 +4,15 @@
 
 #include "Light.h"
 
-Light::Light(Type type, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular, float constant,
-float linear, float quadratic) {
+Light::Light(std::string lightType, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular, float constant,
+             float linear, float quadratic) {
     this->ambient = ambient;
     this->diffuse = diffuse;
     this->specular = specular;
     this->constant = constant;
     this->linear = linear;
     this->quadratic = quadratic;
+    this->type = lightType;
 }
 
 void Light::setPosition(glm::vec3 position) {
@@ -30,7 +31,7 @@ void Light::setSpecular(glm::vec3 specular) {
     this->specular = specular;
 }
 
-Type Light::getType() {
+std::string Light::getType() {
     return this->type;
 }
 
@@ -80,7 +81,7 @@ glm::vec3 Light::getPosition() {
 
 std::string Light::toString() {
     printf("Light found with type %s and:\n\tConstant: %f\n\tLinear: %f\n\tQuadratic: %f\n" ,
-           type,
+           type.c_str(),
            constant,
            linear,
            quadratic

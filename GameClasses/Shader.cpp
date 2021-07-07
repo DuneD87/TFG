@@ -107,7 +107,7 @@ void Shader::checkCompileErrors(unsigned int shader, std::string type) {
 
 void Shader::addLights(std::vector<Light> lights) {
     for (int i = 0; i < lights.size();i++) {
-        if (lights[i].getType() == PointLight) {
+        if (lights[i].getType() == "pointLight") {
             this->setVec3("pointLights["+std::to_string(i)+"].position", lights[i].getPosition());
             this->setVec3("pointLights["+std::to_string(i)+"].ambient",lights[i].getAmbient());
             this->setVec3("pointLights["+std::to_string(i)+"].diffuse", lights[i].getDiffuse());

@@ -7,16 +7,12 @@
 #include <iostream>
 #include "../glm/glm.hpp"
 #include "../glm/gtc/matrix_transform.hpp"
-enum Type {
-    PointLight,
-    SpotLight,
-    DirLight
-};
+
 class Light {
 public:
-    Light(Type type,glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular, float constant,
+    Light(std::string lightType, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular, float constant,
           float linear, float quadratic);
-    Type getType();
+    std::string getType();
     glm::vec3 getPosition();
     glm::vec3 getDirection();
     glm::vec3 getAmbient();
@@ -35,7 +31,7 @@ public:
     std::string toString();
 private:
     glm::vec3 position,ambient,diffuse,specular,direction;
-    Type type;
+    std::string type;
     float constant,linear,quadratic,cutOff,outerCutOff;
 };
 
