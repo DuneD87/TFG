@@ -22,6 +22,7 @@ public:
     XmlParser(std::string path);
     vector<Light> getLights();
     vector<Model> getModels();
+    vector<Mesh> getSprites();
 private:
     xml_node<> * getRootNode();
     xml_node<> * _rootNode;

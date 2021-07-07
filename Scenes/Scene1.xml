@@ -13,7 +13,7 @@
         </Model>
         <Model type="Cube" path="wall.jpg" directory="../Models/">
             <Position x="0.0" y="-4.0" z="0.0"/>
-            <Rotation x="1.0" y="1.0" z="1.0" angle="0.0"/>
+            <Rotation x="0" y="1.0" z="1" angle="0.0"/>
             <Scale x="10.0" y="1.0" z="10.0"/>
         </Model>
         <Model type="AModel" path="../Models/backpack.obj">
@@ -48,5 +48,32 @@
             <Specular x="1.0" y="1.0" z="1.0"/>
         </Light>
     </Lights>
+    <Effects>
+        <Effect type="Sprite" path="grass.png" directory="../Models/">
+            <Position x="3" y="-3.0" z="0.0"/>
+            <Rotation x="1" y="1" z="1" angle="0"/>
+            <Scale x="1.0" y="1.0" z="1.0"/>
+        </Effect>
+        <Effect type="Sprite" path="grass.png" directory="../Models/">
+            <Position x="1" y="-3.0" z="1.0"/>
+            <Rotation x="1" y="1" z="1" angle="0"/>
+            <Scale x="1.0" y="1.0" z="1.0"/>
+        </Effect>
+        <Effect type="Sprite" path="grass.png" directory="../Models/">
+            <Position x="2" y="-3.0" z="-1.0"/>
+            <Rotation x="1" y="1" z="1" angle="0"/>
+            <Scale x="1.0" y="1.0" z="1.0"/>
+        </Effect>
+        <Effect type="Sprite" path="grass.png" directory="../Models/">
+            <Position x="0" y="-3.0" z="-1.5"/>
+            <Rotation x="1" y="1" z="1" angle="0"/>
+            <Scale x="1.0" y="1.0" z="1.0"/>
+        </Effect>
+        <Effect type="Sprite" path="grass.png" directory="../Models/">
+            <Position x="3" y="-3.0" z="0.0"/>
+            <Rotation x="1" y="1" z="1" angle="0"/>
+            <Scale x="1.0" y="1.0" z="1.0"/>
+        </Effect>
+    </Effects>
 
 </Scene>

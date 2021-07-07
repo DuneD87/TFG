@@ -7,6 +7,17 @@
 #include <iostream>
 #include <vector>
 #include "Mesh.h"
+struct Quad {
+    float vertices[32] = {
+            -0.5, -0.5, 0.0,   0.0, 1.0, 0.0,   0.0, 0.0,
+            -0.5, 0.5, 0.0,   0.0, 1.0, 0.0,   0.0, 1.0,
+            0.5, -0.5,-0.0,   0.0, 1.0, 0.0,   1.0, 0.0,
+            0.5, 0.5,0.0,   0.0, 1.0, 0.0,   1.0, 1.0
+    };
+    unsigned int indices[6] = {
+            0, 1, 2, 1, 3, 2
+    };
+};
 struct Cube {
     float vertices[192] = {
             -0.5, -0.5,  0.5,   0.0,  0.0,  1.0,   0.0, 0.0,

@@ -139,4 +139,8 @@ void Mesh::outlineMesh(Shader &outlineShader, glm::vec3 scale) {
     glEnable(GL_DEPTH_TEST);
 }
 
+Mesh::Mesh() {
+
+}
+
 

@@ -138,13 +138,14 @@ int main()
     // build and compile our shader zprogram
     // ------------------------------------
     Shader lightShader("../Shaders/lightingShader.vs", "../Shaders/lightingShader.fs");
+    Shader spriteShader("../Shaders/lightingShader.vs","../Shaders/alphaTextureTest.fs");
     Shader outlineShader = Shader("../Shaders/lightingShader.vs", "../Shaders/singleColorShader.fs");
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
     XmlParser parser("../Scenes/Scene1.xml");
     vector<Model> drawables = parser.getModels();
     vector<Light> lights = parser.getLights();
-
+    vector<Mesh> effects = parser.getSprites();
 
     lightShader.use();
     //Render loop
@@ -167,7 +168,10 @@ int main()
 
         outlineShader.use();
         renderLoopCamera(outlineShader);
+        spriteShader.use();
+        renderLoopCamera(spriteShader);
         lightShader.use();
+        renderLoopCamera(lightShader);
         lightShader.setFloat("material.shininess", 64.0f);
         lightShader.setVec3("viewPos",camera.Position);
         lightShader.addLights(lights);
@@ -177,21 +181,18 @@ int main()
                                  ,glm::cos(glm::radians(15.0f)));
         else
             lightShader.disableSpotLight();
-        renderLoopCamera(lightShader);
+        //Draw
         vector<int> selectedeItems;
         for (int i = 0; i < drawables.size();i++)
         {
-            if (i == 1 || i == 0)
-            {
-                drawables[i].Draw(lightShader,true);
-                selectedeItems.push_back(i);
-            }
-            else
-            {
-                drawables[i].Draw(lightShader,false);
-            }
-        }
+            drawables[i].Draw(lightShader,false);
 
+        }
+        spriteShader.use();
+        for (int i = 0; i < effects.size();i++)
+        {
+            effects[i].Draw(spriteShader,false);
+        }
         //drawables[1].outlineObject(outlineShader,glm::vec3(1.1));
         for (int i = 0; i < selectedeItems.size();i++)
             drawables[selectedeItems[i]].outlineObject(outlineShader,glm::vec3(1.1));
