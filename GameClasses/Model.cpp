@@ -4,14 +4,14 @@
 
 #include "Model.h"
 
-Model::Model(const std::string &path, bool gamma) : gammaCorrection(gamma)
+Model::Model(std::string const &path, bool gamma) : gammaCorrection(gamma)
 {
     loadModel(path);
 }
 
-void Model::Draw(Shader &shader) {
+void Model::Draw(Shader &shader, bool outlined, Shader outlinedShader) {
     for (int i = 0; i < meshes.size();i++)
-        meshes[i].Draw(shader);
+        meshes[i].Draw(shader, outlined,outlinedShader);
 }
 
 void Model::loadModel(const std::string &path) {
@@ -173,4 +173,11 @@ void Model::setScale(glm::vec3 scale) {
 
 Model::Model() {
 
+}
+
+void Model::outlineObject(Shader &outline, glm::vec3 scale) {
+    for (int i = 0; i < meshes.size();i++)
+    {
+        meshes[i].outlineMesh(outline,scale);
+    }
 }

@@ -12,7 +12,7 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std:
     setupMesh();
 }
 
-Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, const char * path, std::string directory) {
+Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, const char *path, std::string directory) {
     this->vertices = vertices;
     this->indices = indices;
     this->position = glm::vec3(0);
@@ -27,17 +27,25 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, cons
     textAux.push_back(baseText);
     this->textures = textAux;
 
-
     // now that we have all the required data, set the vertex buffers and its attribute pointers.
     setupMesh();
 }
 
-void Mesh::Draw(Shader &shader) {
+void Mesh::Draw(Shader &shader, bool outlined, Shader outlineShader) {
     // bind appropriate textures
     unsigned int diffuseNr  = 1;
     unsigned int specularNr = 1;
     unsigned int normalNr   = 1;
     unsigned int heightNr   = 1;
+    if (outlined)
+    {
+        glStencilFunc(GL_ALWAYS, 1, 0xFF);
+        glStencilMask(0xFF);
+    }
+    else
+    {
+        glStencilMask(0x00);
+    }
 
     for(unsigned int i = 0; i < textures.size(); i++)
     {
@@ -59,7 +67,6 @@ void Mesh::Draw(Shader &shader) {
         // and finally bind the texture
         glBindTexture(GL_TEXTURE_2D, textures[i].id);
     }
-
     // draw mesh
 
     glBindVertexArray(VAO);
@@ -69,12 +76,36 @@ void Mesh::Draw(Shader &shader) {
     meshModel = glm::rotate(meshModel,angle,axis);
     meshModel = glm::scale(meshModel,scale);
     shader.setMat4("model", meshModel);
+
     glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
-    glBindVertexArray(0);
+
+
+    if (outlined)
+    {
+
+        glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+        glStencilMask(0x00);
+        glDisable(GL_DEPTH_TEST);
+        glm::vec3 scaled = this->scale * 1.2f;
+        outlineShader.use();
+        //glBindVertexArray(VAO);
+        meshModel = glm::mat4(1.0f);
+        meshModel = glm::translate(meshModel,position);
+        meshModel = glm::rotate(meshModel,angle,axis);
+        meshModel = glm::scale(meshModel,scaled);
+        outlineShader.setMat4("model", meshModel);
+        glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+        glBindVertexArray(0);
+        glStencilMask(0xFF);
+        glStencilFunc(GL_ALWAYS, 0, 0xFF);
+        glEnable(GL_DEPTH_TEST);
+    } else
+        glBindVertexArray(0);
+
 
     // always good practice to set everything back to defaults once configured.
     glActiveTexture(GL_TEXTURE0);
-
+    shader.use();
 }
 
 void Mesh::setupMesh() {
@@ -112,6 +143,10 @@ void Mesh::setupMesh() {
     glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Bitangent));
 
     glBindVertexArray(0);
+}
+
+void Mesh::outlineMesh(Shader &outline, glm::vec3 scale) {
+
 }
 
 

@@ -123,21 +123,25 @@ GLFWwindow * createWindow()
     stbi_set_flip_vertically_on_load(true);
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
+    glEnable(GL_STENCIL_TEST);
+    glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
     return window;
 }
 
 // ---------------------------------------------------
 int main()
 {
-    XmlParser parser("../Scenes/Scene1.xml");
+
     GLFWwindow *window = createWindow();
 
     // build and compile our shader zprogram
     // ------------------------------------
     Shader lightShader("../Shaders/lightingShader.vs", "../Shaders/lightingShader.fs");
-
+    Shader outlineShader = Shader("../Shaders/lightingShader.vs", "../Shaders/singleColorShader.fs");
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
+    XmlParser parser("../Scenes/Scene1.xml");
     vector<Model> drawables = parser.getModels();
     vector<Light> lights = parser.getLights();
 
@@ -158,7 +162,11 @@ int main()
         // ------
 
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+        // set uniforms
+
+        outlineShader.use();
+        renderLoopCamera(outlineShader);
         lightShader.use();
         lightShader.setFloat("material.shininess", 64.0f);
         lightShader.setVec3("viewPos",camera.Position);
@@ -170,11 +178,18 @@ int main()
         else
             lightShader.disableSpotLight();
         renderLoopCamera(lightShader);
-        //backpack.Draw(lightShader);
-        //Draw objects
+
         for (int i = 0; i < drawables.size();i++)
         {
-            drawables[i].Draw(lightShader);
+            if (i == 1)
+            {
+                drawables[i].Draw(lightShader,true,outlineShader);
+            }
+            else
+            {
+                drawables[i].Draw(lightShader,false);
+            }
+
         }
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)

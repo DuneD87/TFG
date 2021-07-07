@@ -32,12 +32,14 @@ public:
     // constructor, expects a filepath to a 3D model.
     Model(std::string const &path, bool gamma = false);
     Model();
-    void Draw(Shader &shader);
+    void Draw(Shader &shader, bool outlined = false, Shader outlinedShader = Shader());
     Mesh processMesh(aiMesh *mesh, const aiScene *scene);
     std::vector<Texture> loadMaterialTextures(aiMaterial *mat, aiTextureType type, std::string typeName);
     void setPosition(glm::vec3 position);
     void setRotation(float angle, glm::vec3 axis);
     void setScale(glm::vec3 scale);
+
+    void outlineObject(Shader &outline, glm::vec3 scale);
 private:
     // loads a model with supported ASSIMP extensions from file and stores the resulting meshes in the meshes vector.
     void loadModel(std::string const &path);

@@ -90,9 +90,12 @@ public:
 
     unsigned int VAO;
     Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures);
-    Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices,const char * path, std::string directory);
-    void Draw(Shader &shader);
+    Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, const char *path, std::string directory);
+    void Draw(Shader &shader, bool outlined, Shader outlineShader);
+
+    void outlineMesh(Shader &outline, glm::vec3 scale);
 private:
+
     unsigned int VBO, EBO;
     void setupMesh();
 };

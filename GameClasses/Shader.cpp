@@ -31,7 +31,8 @@ Shader::Shader(const char *vertexPath, const char *fragmentPath) {
     }
     catch (std::ifstream::failure& e)
     {
-        std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ" << std::endl;
+        std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ::" <<vertexPath<<"::"<<fragmentPath
+        << std::endl;
     }
     const char* vShaderCode = vertexCode.c_str();
     const char * fShaderCode = fragmentCode.c_str();
@@ -141,5 +142,9 @@ void Shader::disableSpotLight() {
     this->setFloat("spotLight.quadratic", 0);
     this->setFloat("spotLight.cutOff", 0);
     this->setFloat("spotLight.outerCutOff", 0);
+}
+
+Shader::Shader() {
+
 }
 

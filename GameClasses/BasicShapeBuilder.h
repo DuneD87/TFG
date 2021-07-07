@@ -147,7 +147,7 @@ static Mesh procesMesh(float vertices[], unsigned int indices[],const char * pat
         actualVertex.TexCoords = glm::vec2(vertices[i+6],vertices[i+7]);
         vertexes.push_back(actualVertex);
     }
-    Mesh res(vertexes,indexes,path,dir);
+    Mesh res(vertexes, indexes, path, dir);
     return res;
 }
 
