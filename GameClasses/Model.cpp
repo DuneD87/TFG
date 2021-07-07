@@ -9,9 +9,9 @@ Model::Model(std::string const &path, bool gamma) : gammaCorrection(gamma)
     loadModel(path);
 }
 
-void Model::Draw(Shader &shader, bool outlined, Shader outlinedShader) {
+void Model::Draw(Shader &shader, bool outlined) {
     for (int i = 0; i < meshes.size();i++)
-        meshes[i].Draw(shader, outlined,outlinedShader);
+        meshes[i].Draw(shader, outlined);
 }
 
 void Model::loadModel(const std::string &path) {

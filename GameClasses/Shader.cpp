@@ -144,7 +144,4 @@ void Shader::disableSpotLight() {
     this->setFloat("spotLight.outerCutOff", 0);
 }
 
-Shader::Shader() {
-
-}
 

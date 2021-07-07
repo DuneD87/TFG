@@ -151,7 +151,7 @@ int main()
     //Model backpack("../Models/backpack.obj");
     Light spotLight(SpotLight,glm::vec3(0.0f, 0.0f, 0.0f),glm::vec3(1.0f, 1.0f, 1.0f),
                     glm::vec3(1.0f, 1.0f, 1.0f),1.0,0.09,0.032);
-
+    srand( (unsigned)time( NULL ) );
     while (!glfwWindowShouldClose(window))
     {
         // input
@@ -178,19 +178,23 @@ int main()
         else
             lightShader.disableSpotLight();
         renderLoopCamera(lightShader);
-
+        vector<int> selectedeItems;
         for (int i = 0; i < drawables.size();i++)
         {
-            if (i == 1)
+            if (i == 1 || i == 0)
             {
-                drawables[i].Draw(lightShader,true,outlineShader);
+                drawables[i].Draw(lightShader,true);
+                selectedeItems.push_back(i);
             }
             else
             {
                 drawables[i].Draw(lightShader,false);
             }
-
         }
+
+        //drawables[1].outlineObject(outlineShader,glm::vec3(1.1));
+        for (int i = 0; i < selectedeItems.size();i++)
+            drawables[selectedeItems[i]].outlineObject(outlineShader,glm::vec3(1.1));
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
