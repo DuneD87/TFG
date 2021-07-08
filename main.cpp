@@ -132,7 +132,7 @@ int main()
 {
 
     GLFWwindow *window = createWindow();
-    Scene scene1("../Scenes/Scene1.xml",SCR_WIDTH,SCR_HEIGHT,camera);
+    Scene scene1("../Scenes/Scene1.xml",SCR_WIDTH,SCR_HEIGHT,camera,"../Textures/SkyBox/space1/");
     //scene1.setPostProcess(0);
     //Render loop
     while (!glfwWindowShouldClose(window))
