@@ -55,14 +55,8 @@ void Scene::renderScene() {
     for (int i = 0; i < models.size();i++)
     {
         models[i].Draw(shaders[0],false);
+    }
 
-    }
-    shaders[1].use();
-    for (int i = 0; i < effects.size();i++)
-    {
-        //Render should be a function, handle semi-transparent objects sorting them to draw in order ( pre-render function? )
-        effects[i].Draw(shaders[1],false);
-    }
     //drawables[1].outlineObject(outlineShader,glm::vec3(1.1));
     for (int i = 0; i < selectedeItems.size();i++)
         models[selectedeItems[i]].outlineObject(shaders[2],glm::vec3(1.1));
@@ -76,7 +70,12 @@ void Scene::renderScene() {
     glDrawArrays(GL_TRIANGLES, 0, 36);
     glBindVertexArray(0);
     glDepthFunc(GL_LESS); // set depth function back to default
-
+    shaders[1].use();
+    for (int i = 0; i < effects.size();i++)
+    {
+        //Render should be a function, handle semi-transparent objects sorting them to draw in order ( pre-render function? )
+        effects[i].Draw(shaders[1],false);
+    }
     // now bind back to default framebuffer and draw a quad plane with the attached framebuffer color texture
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glDisable(GL_DEPTH_TEST); // disable depth test so screen-space quad isn't discarded due to depth test.
@@ -88,8 +87,6 @@ void Scene::renderScene() {
     glBindVertexArray(quadVAO);
     glBindTexture(GL_TEXTURE_2D, textColorBuffer);	// use the color attachment texture as the texture of the quad plane
     glDrawArrays(GL_TRIANGLES, 0, 6);
-
-
 }
 
 void Scene::renderLoopCamera(Shader shader,bool skybox) {
