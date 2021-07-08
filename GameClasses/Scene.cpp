@@ -5,7 +5,7 @@
 #include "Scene.h"
 
 
-Scene::Scene(const char * path,unsigned int frameBuffer,unsigned int scrWidth, unsigned int scrHeight, Camera &camera) {
+Scene::Scene(const char * path,unsigned int scrWidth, unsigned int scrHeight, Camera &camera) {
     this->scrWidth = scrWidth;
     this->scrHeight = scrHeight;
     this->camera = camera;
@@ -16,18 +16,24 @@ Scene::Scene(const char * path,unsigned int frameBuffer,unsigned int scrWidth, u
     Shader lightShader("../Shaders/lightingShader.vs", "../Shaders/lightingShader.fs");
     Shader spriteShader("../Shaders/lightingShader.vs","../Shaders/alphaTextureTest.fs");
     Shader outlineShader = Shader("../Shaders/lightingShader.vs", "../Shaders/singleColorShader.fs");
+    Shader screenShader = Shader("../Shaders/PostProcess/screenShader.vs","../Shaders/PostProcess/screenShader.fs");
     shaders.push_back(lightShader);
     shaders.push_back(spriteShader);
     shaders.push_back(outlineShader);
+    shaders.push_back(screenShader);
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
-    XmlParser parser("../Scenes/Scene1.xml");
+    XmlParser parser(path);
     models = parser._models;
     lights = parser._lights;
     effects = parser._effects;
+    setupFrameBuffer();
 }
 
 void Scene::renderScene() {
+    glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
+    glEnable(GL_DEPTH_TEST); // enable depth testing (is disabled for rendering screen-space quad)
+
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     // set uniforms
@@ -58,6 +64,17 @@ void Scene::renderScene() {
     for (int i = 0; i < selectedeItems.size();i++)
         models[selectedeItems[i]].outlineObject(shaders[2],glm::vec3(1.1));
 
+    // now bind back to default framebuffer and draw a quad plane with the attached framebuffer color texture
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glDisable(GL_DEPTH_TEST); // disable depth test so screen-space quad isn't discarded due to depth test.
+    // clear all relevant buffers
+    glClearColor(1.0f, 1.0f, 1.0f, 1.0f); // set clear color to white (not really necessary actually, since we won't be able to see behind the quad anyways)
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+    shaders[3].use();
+    glBindVertexArray(quadVAO);
+    glBindTexture(GL_TEXTURE_2D, textColorBuffer);	// use the color attachment texture as the texture of the quad plane
+    glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
 void Scene::renderLoopCamera(Shader shader) {
@@ -72,4 +89,57 @@ void Scene::renderLoopCamera(Shader shader) {
     shader.setMat4("projection",projection);
     glm::mat4 cameraModel(1.0f);
     shader.setMat4("model", cameraModel);
+}
+
+void Scene::setupFrameBuffer() {
+    float quadVertices[] = { // vertex attributes for a quad that fills the entire screen in Normalized Device Coordinates.
+            // positions   // texCoords
+            -1.0f,  1.0f,  0.0f, 1.0f,
+            -1.0f, -1.0f,  0.0f, 0.0f,
+            1.0f, -1.0f,  1.0f, 0.0f,
+
+            -1.0f,  1.0f,  0.0f, 1.0f,
+            1.0f, -1.0f,  1.0f, 0.0f,
+            1.0f,  1.0f,  1.0f, 1.0f
+    };
+    // screen quad VAO
+    glGenVertexArrays(1, &quadVAO);
+    glGenBuffers(1, &quadVBO);
+    glBindVertexArray(quadVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+
+    shaders[3].use();
+    shaders[3].setInt("screenTexture",0);
+
+    // frameBuffer configuration
+    // -------------------------
+    glGenFramebuffers(1, &frameBuffer);
+    glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
+
+    // create a color attachment texture
+    glGenTextures(1, &textColorBuffer);
+    glBindTexture(GL_TEXTURE_2D, textColorBuffer);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, scrWidth, scrHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textColorBuffer, 0);
+
+    // create a renderbuffer object for depth and stencil attachment (we won't be sampling these)
+    glGenRenderbuffers(1, &rbo);
+    glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, scrWidth, scrHeight); // use a single renderbuffer object for both a depth AND stencil buffer.
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo); // now actually attach it
+    // now that we actually created the frameBuffer and added all attachments we want to check if it is actually complete now
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+        cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << endl;
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void Scene::setPostProcess(unsigned int index) {
+    shaders[3] = Shader("../Shaders/PostProcess/screenShader.vs",postProcessPath[index].c_str());
 }

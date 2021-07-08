@@ -25,7 +25,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
     glViewport(0, 0, width, height);
 }
 
-void processInput(GLFWwindow *window)
+void processInput(GLFWwindow *window,Scene &scene1)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
@@ -43,6 +43,18 @@ void processInput(GLFWwindow *window)
         camera.ProcessKeyboard(DOWN,deltaTime);
     if (glfwGetKey(window,GLFW_KEY_L) == GLFW_PRESS)
         spotLightEnabled = !spotLightEnabled;
+    if (glfwGetKey(window,GLFW_KEY_0) == GLFW_PRESS)
+        scene1.setPostProcess(5);
+    if (glfwGetKey(window,GLFW_KEY_1) == GLFW_PRESS)
+        scene1.setPostProcess(0);
+    if (glfwGetKey(window,GLFW_KEY_2) == GLFW_PRESS)
+        scene1.setPostProcess(1);
+    if (glfwGetKey(window,GLFW_KEY_3) == GLFW_PRESS)
+        scene1.setPostProcess(2);
+    if (glfwGetKey(window,GLFW_KEY_4) == GLFW_PRESS)
+        scene1.setPostProcess(3);
+    if (glfwGetKey(window,GLFW_KEY_5) == GLFW_PRESS)
+        scene1.setPostProcess(4);
 }
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos)
@@ -120,14 +132,14 @@ int main()
 {
 
     GLFWwindow *window = createWindow();
-    Scene scene1("../Scenes/Scene1.xml",0,SCR_WIDTH,SCR_HEIGHT,camera);
-
+    Scene scene1("../Scenes/Scene1.xml",SCR_WIDTH,SCR_HEIGHT,camera);
+    //scene1.setPostProcess(0);
     //Render loop
     while (!glfwWindowShouldClose(window))
     {
         // input
         // -----
-        processInput(window);
+        processInput(window,scene1);
         scene1.camera = camera;
         scene1.renderScene();
 
