@@ -126,6 +126,13 @@ GLFWwindow * createWindow()
     glEnable(GL_STENCIL_TEST);
     glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
     glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    /* -- USE IT ON OBJECTS THAT YOU KNOW CAN BE CULLED+
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
+    glFrontFace(GL_CW);
+    */
     return window;
 }
 
@@ -148,12 +155,10 @@ int main()
     vector<Mesh> effects = parser.getSprites();
 
     lightShader.use();
-    //Render loop
-    //Model backpack("../Models/backpack.obj");
     Light spotLight("spotLight",glm::vec3(0.0f, 0.0f, 0.0f),glm::vec3(1.0f, 1.0f, 1.0f),
                     glm::vec3(1.0f, 1.0f, 1.0f),1.0,0.09,0.032);
 
-    srand( (unsigned)time( NULL ) );
+    //Render loop
     while (!glfwWindowShouldClose(window))
     {
         // input
@@ -192,6 +197,7 @@ int main()
         spriteShader.use();
         for (int i = 0; i < effects.size();i++)
         {
+            //Render should be a function, handle semi-transparent objects sorting them to draw in order ( pre-render function? )
             effects[i].Draw(spriteShader,false);
         }
         //drawables[1].outlineObject(outlineShader,glm::vec3(1.1));

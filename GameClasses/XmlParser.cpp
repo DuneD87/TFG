@@ -103,7 +103,7 @@ vector<Mesh> XmlParser::getSprites() {
         xml_node<> * scale = effect->first_node("Scale");
 
         Mesh cubeMesh;
-        if (typePre == "Sprite") {
+        if (typePre == "Sprite" || typePre == "Window") {
             const char * path = (const char * )effect->first_attribute("path")->value();
             std::string directory = effect->first_attribute("directory")->value();
             Quad quad;
