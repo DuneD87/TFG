@@ -15,6 +15,9 @@ XmlParser::XmlParser(std::string path) {
     doc.parse<0>(&buffer[0]);
     // Find our root node
     _rootNode = doc.first_node("Scene");
+    _lights = getLights();
+    _models = getModels();
+    _effects = getSprites();
 }
 
 vector<Light> XmlParser::getLights() {

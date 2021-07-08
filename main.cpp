@@ -1,22 +1,16 @@
 
 #define STB_IMAGE_IMPLEMENTATION
+#include <iostream>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include "GameClasses/XmlParser.h"
-#include "glm/glm.hpp"
-#include "glm/gtc/matrix_transform.hpp"
-#include "glm/gtc/type_ptr.hpp"
-#include "GameClasses/Model.h"
-#include "GameClasses/Shader.h"
-#include "GameClasses/Camera.h"
-#include "GameClasses/BasicShapeBuilder.h"
-#include <iostream>
+#include "GameClasses/Scene.h"
+
 
 
 // settings
 const unsigned int SCR_WIDTH = 1024;
 const unsigned int SCR_HEIGHT = 720;
-bool spotLightEnabled = false, enableCursor = true;
+bool spotLightEnabled = false, enableCursor = false;
 float lastX = SCR_WIDTH/2, lastY = SCR_HEIGHT/2,pitch = 0, yaw = -90, fov = 45;
 
 Camera camera(glm::vec3(0.0f, -2.0f, 3.0f));
@@ -66,21 +60,6 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
     camera.ProcessMouseScroll(yoffset);
-}
-
-void renderLoopCamera(Shader shader)
-{
-    //view
-    glm::mat4 view;
-    view = camera.GetViewMatrix();
-    shader.setMat4("view",view);
-
-    //projection
-    glm::mat4 projection;
-    projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH/SCR_HEIGHT, 0.1f, 100.0f);
-    shader.setMat4("projection",projection);
-    glm::mat4 cameraModel(1.0f);
-    shader.setMat4("model", cameraModel);
 }
 
 GLFWwindow * createWindow()
@@ -141,22 +120,7 @@ int main()
 {
 
     GLFWwindow *window = createWindow();
-
-    // build and compile our shader zprogram
-    // ------------------------------------
-    Shader lightShader("../Shaders/lightingShader.vs", "../Shaders/lightingShader.fs");
-    Shader spriteShader("../Shaders/lightingShader.vs","../Shaders/alphaTextureTest.fs");
-    Shader outlineShader = Shader("../Shaders/lightingShader.vs", "../Shaders/singleColorShader.fs");
-    // set up vertex data (and buffer(s)) and configure vertex attributes
-    // ------------------------------------------------------------------
-    XmlParser parser("../Scenes/Scene1.xml");
-    vector<Model> drawables = parser.getModels();
-    vector<Light> lights = parser.getLights();
-    vector<Mesh> effects = parser.getSprites();
-
-    lightShader.use();
-    Light spotLight("spotLight",glm::vec3(0.0f, 0.0f, 0.0f),glm::vec3(1.0f, 1.0f, 1.0f),
-                    glm::vec3(1.0f, 1.0f, 1.0f),1.0,0.09,0.032);
+    Scene scene1("../Scenes/Scene1.xml",0,SCR_WIDTH,SCR_HEIGHT,camera);
 
     //Render loop
     while (!glfwWindowShouldClose(window))
@@ -164,45 +128,8 @@ int main()
         // input
         // -----
         processInput(window);
-
-        // render
-        // ------
-
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-        // set uniforms
-
-        outlineShader.use();
-        renderLoopCamera(outlineShader);
-        spriteShader.use();
-        renderLoopCamera(spriteShader);
-        lightShader.use();
-        renderLoopCamera(lightShader);
-        lightShader.setFloat("material.shininess", 64.0f);
-        lightShader.setVec3("viewPos",camera.Position);
-        lightShader.addLights(lights);
-        // spotLight
-        if (spotLightEnabled)
-            lightShader.addSpotLight(spotLight,camera.Front,camera.Position,glm::cos(glm::radians(12.5f))
-                                 ,glm::cos(glm::radians(15.0f)));
-        else
-            lightShader.disableSpotLight();
-        //Draw
-        vector<int> selectedeItems;
-        for (int i = 0; i < drawables.size();i++)
-        {
-            drawables[i].Draw(lightShader,false);
-
-        }
-        spriteShader.use();
-        for (int i = 0; i < effects.size();i++)
-        {
-            //Render should be a function, handle semi-transparent objects sorting them to draw in order ( pre-render function? )
-            effects[i].Draw(spriteShader,false);
-        }
-        //drawables[1].outlineObject(outlineShader,glm::vec3(1.1));
-        for (int i = 0; i < selectedeItems.size();i++)
-            drawables[selectedeItems[i]].outlineObject(outlineShader,glm::vec3(1.1));
+        scene1.camera = camera;
+        scene1.renderScene();
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------

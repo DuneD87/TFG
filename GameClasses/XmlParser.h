@@ -19,14 +19,19 @@ using namespace rapidxml;
 using namespace std;
 class XmlParser {
 public:
+    vector<Light> _lights;
+    vector<Model> _models;
+    vector<Mesh> _effects;
+
     XmlParser(std::string path);
-    vector<Light> getLights();
-    vector<Model> getModels();
-    vector<Mesh> getSprites();
+
 private:
     xml_node<> * _rootNode;
     std::string path;
-    vector<Light> _lights;
+
+    vector<Light> getLights();
+    vector<Model> getModels();
+    vector<Mesh> getSprites();
 
     glm::vec3 getValues3(xml_node<> *pos);
     glm::vec4 getValues4(xml_node<> *rot);
