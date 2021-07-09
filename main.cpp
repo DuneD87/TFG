@@ -10,7 +10,7 @@
 // settings
 const unsigned int SCR_WIDTH = 1024;
 const unsigned int SCR_HEIGHT = 720;
-bool spotLightEnabled = false, enableCursor = false;
+bool spotLightEnabled = false, enableCursor = true;
 float lastX = SCR_WIDTH/2, lastY = SCR_HEIGHT/2,pitch = 0, yaw = -90, fov = 45;
 
 Camera camera(glm::vec3(0.0f, -2.0f, 3.0f));

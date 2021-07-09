@@ -181,3 +181,10 @@ void Model::outlineObject(Shader &outline, glm::vec3 scale) {
         meshes[i].outlineMesh(outline,scale);
     }
 }
+
+void Model::setModel(glm::mat4 *model) {
+    for (int i = 0; i < meshes.size();i++)
+    {
+        meshes[i].setModel(model);
+    }
+}

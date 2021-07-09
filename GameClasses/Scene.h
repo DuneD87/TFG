@@ -35,6 +35,9 @@ private:
     std::vector<Mesh> effects;
     std::vector<Shader> shaders;
 
+    Model asteroid;
+    glm::mat4* modelMatrices;
+
     Light spotLight = Light("", glm::vec3(), glm::vec3(), glm::vec3(), 0, 0, 0);
     unsigned int scrWidth,scrHeight,frameBuffer,textColorBuffer,rbo,quadVAO,quadVBO,skyboxVAO,skyboxVBO,cubemapTexture;
     std::string postProcessPath[6] = {

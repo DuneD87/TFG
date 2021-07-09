@@ -43,9 +43,8 @@ vector<Light> XmlParser::getLights() {
         glm::vec3 diffuse = getValues3(diff);
         glm::vec3 specular = getValues3(spec);
         Light lightAux(typePre,ambient,diffuse,specular,constant,linear,quadratic);
-        if (typePre == "pointLight")
-            lightAux.setPosition(position);
-        else
+        lightAux.setPosition(position);
+        if (typePre == "dirLight")
             lightAux.setDirection(direction);
         res.push_back(lightAux);
     }
