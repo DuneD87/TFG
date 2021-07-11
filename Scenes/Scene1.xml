@@ -1,41 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Scene>
     <Models>
-
-
+        <Model type="Cube"  path="wallConcrete.jpg" directory="../Models/">
+            <Position x="0.0" y="-3.0" z="0.0"/>
+            <Rotation x="1.0" y="1.0" z="1.0" angle="0.0"/>
+            <Scale x="1.0" y="1.0" z="1.0"/>
+        </Model>
+        <Model type="Cube" path="wall.jpg" directory="../Models/">
+            <Position x="2.0" y="-3.0" z="0.0"/>
+            <Rotation x="1.0" y="1.0" z="1.0" angle="0.0"/>
+            <Scale x="1.0" y="1.0" z="1.0"/>
+        </Model>
+        <Model type="Cube" path="wall.jpg" directory="../Models/">
+            <Position x="0.0" y="-4.0" z="0.0"/>
+            <Rotation x="0" y="1.0" z="1" angle="0.0"/>
+            <Scale x="10.0" y="1.0" z="10.0"/>
+        </Model>
+        <Model type="AModel" path="../Models/backpack.obj">
+            <Position x="-2.0" y="-2.0" z="0.0"/>
+            <Rotation x="1.0" y="1.0" z="1.0" angle="0.0"/>
+            <Scale x="0.5" y="0.5" z="0.5"/>
+        </Model>
     </Models>
     <Lights>
-        <Light type="dirLight" constant="1.0" linear="0.09" quadratic="0.032">
-            <Position x="1.6" y="-1" z="2.0"/>
-            <Direction  x="-0.2f" y="-1.0f" z="-0.3f"/>
+        <Light type="dirLight">
+            <Direction  x="-0.2" y="-1.0" z="-0.3"/>
             <Ambient x="0.05" y="0.05f" z="0.05f"/>
             <Diffuse x="0.8" y="0.8f" z="0.8"/>
             <Specular x="1.0" y="1.0" z="1.0"/>
         </Light>
-        <Light type="pointLight" constant="1.0" linear="0.09" quadratic="0.032">
-            <Position x="1.6" y="-1" z="2.0"/>
-            <Ambient x="0.05" y="0.05f" z="0.05f"/>
-            <Diffuse x="0.8" y="0.8f" z="0.8"/>
-            <Specular x="1.0" y="1.0" z="1.0"/>
-        </Light>
-        <Light type="pointLight" constant="1.0" linear="0.09" quadratic="0.032">
-            <Position x="2.3" y="-3.3" z="-4.0"/>
-            <Ambient x="0.05" y="0.05f" z="0.05f"/>
-            <Diffuse x="0.8" y="0.8f" z="0.8"/>
-            <Specular x="1.0" y="1.0" z="1.0"/>
-        </Light>
-        <Light type="pointLight" constant="1.0" linear="0.09" quadratic="0.032">
-            <Position x="-4.0" y="2.0" z="-12.0"/>
-            <Ambient x="0.05" y="0.05f" z="0.05f"/>
-            <Diffuse x="0.8" y="0.8f" z="0.8"/>
-            <Specular x="1.0" y="1.0" z="1.0"/>
-        </Light>
-        <Light type="pointLight" constant="1.0" linear="0.09" quadratic="0.032">
-            <Position x="0" y="0" z="-3.0"/>
-            <Ambient x="0.05" y="0.05f" z="0.05f"/>
-            <Diffuse x="0.8" y="0.8f" z="0.8"/>
-            <Specular x="1.0" y="1.0" z="1.0"/>
-        </Light>
+
     </Lights>
     <Effects>
 

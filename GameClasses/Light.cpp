@@ -15,6 +15,15 @@ Light::Light(std::string lightType, glm::vec3 ambient, glm::vec3 diffuse, glm::v
     this->type = lightType;
 }
 
+Light::Light(std::string lightType, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular, glm::vec3 direction) {
+    this->type = lightType;
+    this->ambient = ambient;
+    this->diffuse = diffuse;
+    this->specular = specular;
+    this->direction = direction;
+}
+
+
 void Light::setPosition(glm::vec3 position) {
     this->position = position;
 }
@@ -80,16 +89,28 @@ glm::vec3 Light::getPosition() {
 }
 
 std::string Light::toString() {
-    printf("Light found with type %s and:\n\tConstant: %f\n\tLinear: %f\n\tQuadratic: %f\n" ,
-           type.c_str(),
-           constant,
-           linear,
-           quadratic
-    );
-    printf("\tPosition:\n\t\tX:%f\n\t\tY:%f\n\t\tZ:%f\n",position.x,position.y,position.z);
-    printf("\tAmbient:\n\t\tX:%f\n\t\tY:%f\n\t\tZ:%f\n",ambient.x,ambient.y,ambient.z);
-    printf("\tDiffuse:\n\t\tX:%f\n\t\tY:%f\n\t\tZ:%f\n",diffuse.x,diffuse.y,diffuse.z);
-    printf("\tSpecular:\n\t\tX:%f\n\t\tY:%f\n\t\tZ:%f\n",specular.x,specular.y,specular.z);
+    if (type == "pointLight")
+    {
+        printf("Light found with type %s and:\n\tConstant: %f\n\tLinear: %f\n\tQuadratic: %f\n" ,
+               type.c_str(),
+               constant,
+               linear,
+               quadratic
+        );
+        printf("\tPosition:\n\t\tX:%f\n\t\tY:%f\n\t\tZ:%f\n",position.x,position.y,position.z);
+        printf("\tAmbient:\n\t\tX:%f\n\t\tY:%f\n\t\tZ:%f\n",ambient.x,ambient.y,ambient.z);
+        printf("\tDiffuse:\n\t\tX:%f\n\t\tY:%f\n\t\tZ:%f\n",diffuse.x,diffuse.y,diffuse.z);
+        printf("\tSpecular:\n\t\tX:%f\n\t\tY:%f\n\t\tZ:%f\n",specular.x,specular.y,specular.z);
+    }
+    else if (type == "dirLight")
+    {
+        printf("\tDirection:\n\t\tX:%f\n\t\tY:%f\n\t\tZ:%f\n",direction.x,direction.y,direction.z);
+        printf("\tAmbient:\n\t\tX:%f\n\t\tY:%f\n\t\tZ:%f\n",ambient.x,ambient.y,ambient.z);
+        printf("\tDiffuse:\n\t\tX:%f\n\t\tY:%f\n\t\tZ:%f\n",diffuse.x,diffuse.y,diffuse.z);
+        printf("\tSpecular:\n\t\tX:%f\n\t\tY:%f\n\t\tZ:%f\n",specular.x,specular.y,specular.z);
+    }
+
 }
+
 
 

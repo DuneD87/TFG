@@ -12,6 +12,7 @@ class Light {
 public:
     Light(std::string lightType, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular, float constant,
           float linear, float quadratic);
+    Light(std::string lightType, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular,glm::vec3 direction);
     std::string getType();
     glm::vec3 getPosition();
     glm::vec3 getDirection();

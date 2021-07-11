@@ -71,18 +71,13 @@ void Mesh::Draw(Shader &shader, bool outlined) {
 
     glBindVertexArray(VAO);
     //std::cout<<position.z<<std::endl;
-    if (this->model)
-    {
-        shader.setMat4("model",*this->model);
-    }
-    else
-    {
+
         glm::mat4 meshModel = glm::mat4(1.0f);
         meshModel = glm::translate(meshModel,position);
         meshModel = glm::rotate(meshModel,angle,axis);
         meshModel = glm::scale(meshModel,scale);
         shader.setMat4("model", meshModel);
-    }
+
 
 
     glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);

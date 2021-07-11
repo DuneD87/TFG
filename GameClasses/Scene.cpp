@@ -86,11 +86,7 @@ void Scene::renderScene() {
     {
         models[i].Draw(shaders[0],false);
     }
-    for (unsigned int i = 0; i < 1000; i++)
-    {
-        asteroid.setModel(&modelMatrices[i]);
-        asteroid.Draw(shaders[0],false);
-    }
+
     //drawables[1].outlineObject(outlineShader,glm::vec3(1.1));
     for (int i = 0; i < selectedeItems.size();i++)
         models[selectedeItems[i]].outlineObject(shaders[2],glm::vec3(1.1));

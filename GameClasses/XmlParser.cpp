@@ -27,26 +27,35 @@ vector<Light> XmlParser::getLights() {
     for (xml_node<> * light = lights->first_node("Light");light;light = light->next_sibling() )
     {
         string typePre = light->first_attribute("type")->value();
-
-        float constant = strtof(light->first_attribute("constant")->value(),NULL);;
-        float linear = strtof(light->first_attribute("linear")->value(),NULL);;
-        float quadratic = strtof(light->first_attribute("quadratic")->value(),NULL);;
-
-        xml_node<> * pos = light->first_node("Position");
         xml_node<> * amb = light->first_node("Ambient");
         xml_node<> * diff = light->first_node("Diffuse");
         xml_node<> * spec = light->first_node("Specular");
-        glm::vec3 direction;//To implement
-
-        glm::vec3 position = getValues3(pos);
         glm::vec3 ambient = getValues3(amb);
         glm::vec3 diffuse = getValues3(diff);
         glm::vec3 specular = getValues3(spec);
-        Light lightAux(typePre,ambient,diffuse,specular,constant,linear,quadratic);
-        lightAux.setPosition(position);
-        if (typePre == "dirLight")
+        if (typePre == "pointLight")
+        {
+            float constant = strtof(light->first_attribute("constant")->value(),NULL);;
+            float linear = strtof(light->first_attribute("linear")->value(),NULL);;
+            float quadratic = strtof(light->first_attribute("quadratic")->value(),NULL);;
+
+            xml_node<> * pos = light->first_node("Position");
+            glm::vec3 position = getValues3(pos);
+
+            Light lightAux(typePre,ambient,diffuse,specular,constant,linear,quadratic);
+            lightAux.setPosition(position);
+            res.push_back(lightAux);
+        } else if (typePre == "dirLight")
+        {
+            xml_node<> * dir = light->first_node("Direction");
+
+            glm::vec3 direction = getValues3(dir);
+            Light lightAux(typePre,ambient,diffuse,specular,direction);
             lightAux.setDirection(direction);
-        res.push_back(lightAux);
+            res.push_back(lightAux);
+        }
+
+
     }
 
     return res;
