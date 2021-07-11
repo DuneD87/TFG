@@ -8,8 +8,8 @@
 
 
 // settings
-const unsigned int SCR_WIDTH = 1024;
-const unsigned int SCR_HEIGHT = 720;
+const unsigned int SCR_WIDTH = 1920;
+const unsigned int SCR_HEIGHT = 1080;
 bool spotLightEnabled = false, enableCursor = true;
 float lastX = SCR_WIDTH/2, lastY = SCR_HEIGHT/2,pitch = 0, yaw = -90, fov = 45;
 
@@ -23,6 +23,12 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
     // make sure the viewport matches the new window dimensions; note that width and
     // height will be significantly larger than specified on retina displays.
     glViewport(0, 0, width, height);
+}
+
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+    if(action == GLFW_RELEASE) return; //only handle press events
+    if(key == GLFW_KEY_L) spotLightEnabled = !spotLightEnabled;
 }
 
 void processInput(GLFWwindow *window,Scene &scene1)
@@ -41,8 +47,6 @@ void processInput(GLFWwindow *window,Scene &scene1)
         camera.ProcessKeyboard(UP,deltaTime);
     if (glfwGetKey(window,GLFW_KEY_C) == GLFW_PRESS)
         camera.ProcessKeyboard(DOWN,deltaTime);
-    if (glfwGetKey(window,GLFW_KEY_L) == GLFW_PRESS)
-        spotLightEnabled = !spotLightEnabled;
     if (glfwGetKey(window,GLFW_KEY_0) == GLFW_PRESS)
         scene1.setPostProcess(5);
     if (glfwGetKey(window,GLFW_KEY_1) == GLFW_PRESS)
@@ -97,7 +101,7 @@ GLFWwindow * createWindow()
         return NULL;
     }
 
-
+    glfwSetKeyCallback(window,key_callback);
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
@@ -141,6 +145,7 @@ int main()
         // -----
         processInput(window,scene1);
         scene1.camera = camera;
+        scene1.enableSpotLight = spotLightEnabled;
         scene1.renderScene();
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)

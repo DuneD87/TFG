@@ -76,6 +76,16 @@ void Scene::renderScene() {
     renderLoopCamera(shaders[1]);
     shaders[0].use();
     renderLoopCamera(shaders[0]);
+    if (enableSpotLight)
+    {
+        shaders[0].addSpotLight(spotLight,camera.Front,camera.Position,
+                                glm::cos(glm::radians(12.5f)),
+                                glm::cos(glm::radians(17.5f)));
+    } else
+    {
+        shaders[0].disableSpotLight();
+    }
+
     shaders[0].setFloat("material.shininess", 64.0f);
     shaders[0].setVec3("viewPos",camera.Position);
     shaders[0].addLights(lights);

@@ -18,7 +18,7 @@
 class Scene {
 public:
     Camera camera;
-
+    bool enableSpotLight = false;
     Scene(const char * path,unsigned int scrWidth, unsigned int scrHeight, Camera &camera, const char* skyboxPath);
     void renderScene();
     void setPostProcess(unsigned int index);

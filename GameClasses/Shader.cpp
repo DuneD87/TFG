@@ -108,7 +108,7 @@ void Shader::checkCompileErrors(unsigned int shader, std::string type) {
 void Shader::addLights(std::vector<Light> lights) {
     for (int i = 0; i < lights.size();i++) {
         if (lights[i].getType() == "pointLight") {
-
+            //SORTING LIGHTS IN SCENE1.XML IS NOT A SOLUTION!!!!
             this->setVec3("pointLights["+std::to_string(i)+"].position", lights[i].getPosition());
             this->setVec3("pointLights["+std::to_string(i)+"].ambient",lights[i].getAmbient());
             this->setVec3("pointLights["+std::to_string(i)+"].diffuse", lights[i].getDiffuse());
@@ -124,7 +124,6 @@ void Shader::addLights(std::vector<Light> lights) {
             this->setVec3("dirLight.ambient",lights[i].getAmbient());
             this->setVec3("dirLight.diffuse", lights[i].getDiffuse());
             this->setVec3("dirLight.specular",lights[i].getSpecular());
-            std::cout<<lights[i].getDirection().y<<std::endl;
         }
     }
 }
