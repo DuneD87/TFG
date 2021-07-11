@@ -36,7 +36,7 @@ private:
     std::vector<Shader> shaders;
 
     Model asteroid;
-    glm::mat4* modelMatrices;
+    vector<vector<glm::vec3>> modelMatrices;
 
     Light spotLight = Light("", glm::vec3(), glm::vec3(), glm::vec3(), 0, 0, 0);
     unsigned int scrWidth,scrHeight,frameBuffer,textColorBuffer,rbo,quadVAO,quadVBO,skyboxVAO,skyboxVBO,cubemapTexture;

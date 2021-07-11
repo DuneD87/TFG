@@ -25,7 +25,7 @@ Scene::Scene(const char * path,unsigned int scrWidth, unsigned int scrHeight, Ca
     shaders.push_back(skyboxShader);
     asteroid = Model("../Models/rock.obj");
     unsigned int amount = 1000;
-    modelMatrices = new glm::mat4[amount];
+
     srand(glfwGetTime()); // initialize random seed
     float radius = 50.0;
     float offset = 2.5f;
@@ -47,11 +47,15 @@ Scene::Scene(const char * path,unsigned int scrWidth, unsigned int scrHeight, Ca
         model = glm::scale(model, glm::vec3(scale));
 
         // 3. rotation: add random rotation around a (semi)randomly picked rotation axis vector
-        float rotAngle = (rand() % 360);
-        model = glm::rotate(model, rotAngle, glm::vec3(0.4f, 0.6f, 0.8f));
 
+        //model = glm::rotate(model, rotAngle, glm::vec3(0.4f, 0.6f, 0.8f));
+        vector<glm::vec3> aux = {
+                glm::vec3(x,y,z),
+                glm::vec3(scale),
+                glm::vec3(0.4f, 0.6f, 0.8f)
+        };
         // 4. now add to list of matrices
-        modelMatrices[i] = model;
+        modelMatrices.push_back(aux);
     }
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
@@ -96,7 +100,14 @@ void Scene::renderScene() {
     {
         models[i].Draw(shaders[0],false);
     }
-
+    for (unsigned int i = 0; i < 1000; i++)
+    {
+        float rotAngle = i;
+        asteroid.setPosition(modelMatrices[i][0]);
+        asteroid.setScale(modelMatrices[i][1]);
+        asteroid.setRotation(rotAngle,modelMatrices[i][2]);
+        asteroid.Draw(shaders[0],false);
+    }
     //drawables[1].outlineObject(outlineShader,glm::vec3(1.1));
     for (int i = 0; i < selectedeItems.size();i++)
         models[selectedeItems[i]].outlineObject(shaders[2],glm::vec3(1.1));

@@ -72,11 +72,11 @@ void Mesh::Draw(Shader &shader, bool outlined) {
     glBindVertexArray(VAO);
     //std::cout<<position.z<<std::endl;
 
-        glm::mat4 meshModel = glm::mat4(1.0f);
-        meshModel = glm::translate(meshModel,position);
-        meshModel = glm::rotate(meshModel,angle,axis);
-        meshModel = glm::scale(meshModel,scale);
-        shader.setMat4("model", meshModel);
+    glm::mat4 meshModel = glm::mat4(1.0f);
+    meshModel = glm::translate(meshModel,position);
+    meshModel = glm::rotate(meshModel,angle,axis);
+    meshModel = glm::scale(meshModel,scale);
+    shader.setMat4("model", meshModel);
 
 
 
@@ -146,7 +146,7 @@ Mesh::Mesh() {
 
 }
 
-void Mesh::setModel(glm::mat4 *model) {
+void Mesh::setModel(glm::mat4 model) {
     this->model = model;
 }
 

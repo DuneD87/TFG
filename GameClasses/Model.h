@@ -38,7 +38,7 @@ public:
     void setPosition(glm::vec3 position);
     void setRotation(float angle, glm::vec3 axis);
     void setScale(glm::vec3 scale);
-    void setModel(glm::mat4 *model);
+    void setModel(glm::mat4 model);
     void outlineObject(Shader &outline, glm::vec3 scale);
 private:
     // loads a model with supported ASSIMP extensions from file and stores the resulting meshes in the meshes vector.

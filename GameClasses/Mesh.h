@@ -92,12 +92,12 @@ public:
     Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures);
     Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, const char *path, std::string directory);
     Mesh();
-    void setModel(glm::mat4 * model);
+    void setModel(glm::mat4 model);
     void Draw(Shader &shader, bool outlined);
 
     void outlineMesh(Shader &outline, glm::vec3 scale);
 private:
-    glm::mat4 *model;
+    glm::mat4 model;
     unsigned int VBO, EBO;
     void setupMesh();
 };
