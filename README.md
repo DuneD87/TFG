@@ -6,9 +6,6 @@ git clone https://github.com/Dav1dde/glad.git \
 cd glad \
 cmake ./ \
 sudo make install \
-sudo mkdir /usr/local/include/glad \
-sudo cp glad.h /usr/local/include/glad \
-sudo cp khrplatform.h /usr/local/include/glad \
 sudo apt-get install libglfw3-dev \
 sudo apt-get install libassimp-dev \
 sudo apt install librapidxml-dev -y \
