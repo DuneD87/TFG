@@ -106,16 +106,18 @@ void Shader::checkCompileErrors(unsigned int shader, std::string type) {
 }
 
 void Shader::addLights(std::vector<Light> lights) {
+    nPointLights = 0;
     for (int i = 0; i < lights.size();i++) {
         if (lights[i].getType() == "pointLight") {
             //SORTING LIGHTS IN SCENE1.XML IS NOT A SOLUTION!!!!
-            this->setVec3("pointLights["+std::to_string(i)+"].position", lights[i].getPosition());
-            this->setVec3("pointLights["+std::to_string(i)+"].ambient",lights[i].getAmbient());
-            this->setVec3("pointLights["+std::to_string(i)+"].diffuse", lights[i].getDiffuse());
-            this->setVec3("pointLights["+std::to_string(i)+"].specular",lights[i].getSpecular());
-            this->setFloat("pointLights["+std::to_string(i)+"].constant", lights[i].getConstant());
-            this->setFloat("pointLights["+std::to_string(i)+"].linear", lights[i].getLinear());
-            this->setFloat("pointLights["+std::to_string(i)+"].quadratic", lights[i].getQuadratic());
+            this->setVec3("pointLights["+std::to_string(nPointLights)+"].position", lights[i].getPosition());
+            this->setVec3("pointLights["+std::to_string(nPointLights)+"].ambient",lights[i].getAmbient());
+            this->setVec3("pointLights["+std::to_string(nPointLights)+"].diffuse", lights[i].getDiffuse());
+            this->setVec3("pointLights["+std::to_string(nPointLights)+"].specular",lights[i].getSpecular());
+            this->setFloat("pointLights["+std::to_string(nPointLights)+"].constant", lights[i].getConstant());
+            this->setFloat("pointLights["+std::to_string(nPointLights)+"].linear", lights[i].getLinear());
+            this->setFloat("pointLights["+std::to_string(nPointLights)+"].quadratic", lights[i].getQuadratic());
+            nPointLights++;
             //lights[i].toString();
         }
         else if (lights[i].getType() == "dirLight") {
@@ -126,6 +128,7 @@ void Shader::addLights(std::vector<Light> lights) {
             this->setVec3("dirLight.specular",lights[i].getSpecular());
         }
     }
+    this->setInt("nPointLights",nPointLights);
 }
 
 void Shader::addSpotLight(Light light, glm::vec3 direction, glm::vec3 position,float cutOff, float outerCutOff) {

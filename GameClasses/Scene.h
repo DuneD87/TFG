@@ -17,6 +17,7 @@
 
 class Scene {
 public:
+    const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
     Camera camera;
     bool enableSpotLight = false;
     Scene(const char * path,unsigned int scrWidth, unsigned int scrHeight, Camera &camera, const char* skyboxPath);
@@ -25,6 +26,7 @@ public:
 
 
 private:
+    void renderShadowMap();
     void renderLoopCamera(Shader shader,bool skybox = false);
     void setupFrameBuffer();
     void setupSkyBox(const char * path);
@@ -34,12 +36,12 @@ private:
     std::vector<Light> lights;
     std::vector<Mesh> effects;
     std::vector<Shader> shaders;
-
-    Model asteroid;
-    vector<vector<glm::vec3>> modelMatrices;
+    glm::vec3 lightPos = glm::vec3(2.0f, 0.0f, 4.0f);
+    glm::mat4 lightSpaceMatrix;
 
     Light spotLight = Light("", glm::vec3(), glm::vec3(), glm::vec3(), 0, 0, 0);
-    unsigned int scrWidth,scrHeight,frameBuffer,textColorBuffer,rbo,quadVAO,quadVBO,skyboxVAO,skyboxVBO,cubemapTexture;
+    unsigned int scrWidth,scrHeight,frameBuffer,textColorBuffer,rbo,quadVAO,quadVBO,skyboxVAO,skyboxVBO,cubemapTexture,
+            depthMapFBO,depthMap;
     std::string postProcessPath[6] = {
             "../Shaders/PostProcess/blurShader.fs",
             "../Shaders/PostProcess/edgeShader.fs",

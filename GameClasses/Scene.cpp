@@ -13,50 +13,18 @@ Scene::Scene(const char * path,unsigned int scrWidth, unsigned int scrHeight, Ca
                                  glm::vec3(1.0f, 1.0f, 1.0f),1.0,0.09,0.032);
     // build and compile our shader zprogram
     // ------------------------------------
-    Shader lightShader("../Shaders/lightingShader.vs", "../Shaders/lightingShader.fs");
-    Shader spriteShader("../Shaders/lightingShader.vs","../Shaders/alphaTextureTest.fs");
-    Shader outlineShader = Shader("../Shaders/lightingShader.vs", "../Shaders/singleColorShader.fs");
+    Shader lightShader("../Shaders/lightingShaderVertex.shader", "../Shaders/lightingShaderFragment.shader");
+    Shader spriteShader("../Shaders/lightingShaderVertex.shader","../Shaders/alphaTextureTest.fs");
+    Shader outlineShader = Shader("../Shaders/lightingShaderVertex.shader", "../Shaders/singleColorShader.fs");
     Shader screenShader = Shader("../Shaders/PostProcess/screenShader.vs","../Shaders/PostProcess/screenShader.fs");
     Shader skyboxShader = Shader("../Shaders/skyboxShader.vs","../Shaders/skyboxShader.fs");
-    shaders.push_back(lightShader);
-    shaders.push_back(spriteShader);
-    shaders.push_back(outlineShader);
-    shaders.push_back(screenShader);
-    shaders.push_back(skyboxShader);
-    asteroid = Model("../Models/rock.obj");
-    unsigned int amount = 1000;
-
-    srand(glfwGetTime()); // initialize random seed
-    float radius = 50.0;
-    float offset = 2.5f;
-    for (unsigned int i = 0; i < amount; i++)
-    {
-        glm::mat4 model = glm::mat4(1.0f);
-        // 1. translation: displace along circle with 'radius' in range [-offset, offset]
-        float angle = (float)i / (float)amount * 360.0f;
-        float displacement = (rand() % (int)(2 * offset * 100)) / 100.0f - offset;
-        float x = sin(angle) * radius + displacement;
-        displacement = (rand() % (int)(2 * offset * 100)) / 100.0f - offset;
-        float y = displacement * 0.4f; // keep height of asteroid field smaller compared to width of x and z
-        displacement = (rand() % (int)(2 * offset * 100)) / 100.0f - offset;
-        float z = cos(angle) * radius + displacement;
-        model = glm::translate(model, glm::vec3(x, y, z));
-
-        // 2. scale: Scale between 0.05 and 0.25f
-        float scale = (rand() % 20) / 100.0f + 0.05;
-        model = glm::scale(model, glm::vec3(scale));
-
-        // 3. rotation: add random rotation around a (semi)randomly picked rotation axis vector
-
-        //model = glm::rotate(model, rotAngle, glm::vec3(0.4f, 0.6f, 0.8f));
-        vector<glm::vec3> aux = {
-                glm::vec3(x,y,z),
-                glm::vec3(scale),
-                glm::vec3(0.4f, 0.6f, 0.8f)
-        };
-        // 4. now add to list of matrices
-        modelMatrices.push_back(aux);
-    }
+    Shader depthSMapShader = Shader("../Shaders/depthShadowMappingVertex.shader","../Shaders/depthShadowMappingFragment.shader");
+    shaders.push_back(lightShader);//0
+    shaders.push_back(spriteShader);//1
+    shaders.push_back(outlineShader);//2
+    shaders.push_back(screenShader);//3
+    shaders.push_back(skyboxShader);//4
+    shaders.push_back(depthSMapShader);//5
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
     XmlParser parser(path);
@@ -68,12 +36,11 @@ Scene::Scene(const char * path,unsigned int scrWidth, unsigned int scrHeight, Ca
 }
 
 void Scene::renderScene() {
-    glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
     glEnable(GL_DEPTH_TEST); // enable depth testing (is disabled for rendering screen-space quad)
-
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-    // set uniforms
+    renderShadowMap();
+    glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
+    shaders[5].use();
+    renderLoopCamera(shaders[5]);
     shaders[2].use();
     renderLoopCamera(shaders[2]);
     shaders[1].use();
@@ -89,26 +56,24 @@ void Scene::renderScene() {
     {
         shaders[0].disableSpotLight();
     }
-
+    glViewport(0, 0, scrWidth, scrHeight);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     shaders[0].setFloat("material.shininess", 64.0f);
     shaders[0].setVec3("viewPos",camera.Position);
     shaders[0].addLights(lights);
+    shaders[0].setVec3("lightPos", lightPos);
+    shaders[0].setMat4("lightSpaceMatrix", lightSpaceMatrix);
+
 
     //Draw
     std::vector<int> selectedeItems;
     for (int i = 0; i < models.size();i++)
     {
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, depthMap);
         models[i].Draw(shaders[0],false);
     }
-    for (unsigned int i = 0; i < 1000; i++)
-    {
-        float rotAngle = i;
-        asteroid.setPosition(modelMatrices[i][0]);
-        asteroid.setScale(modelMatrices[i][1]);
-        asteroid.setRotation(rotAngle,modelMatrices[i][2]);
-        asteroid.Draw(shaders[0],false);
-    }
-    //drawables[1].outlineObject(outlineShader,glm::vec3(1.1));
+
     for (int i = 0; i < selectedeItems.size();i++)
         models[selectedeItems[i]].outlineObject(shaders[2],glm::vec3(1.1));
 
@@ -153,6 +118,7 @@ void Scene::renderLoopCamera(Shader shader,bool skybox) {
     glm::mat4 projection;
     projection = glm::perspective(glm::radians(this->camera.Zoom), (float)scrWidth/scrHeight, 0.1f, 100.0f);
     shader.setMat4("projection",projection);
+
     glm::mat4 cameraModel(1.0f);
     shader.setMat4("model", cameraModel);
 }
@@ -204,11 +170,31 @@ void Scene::setupFrameBuffer() {
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << endl;
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    // configure depth map FBO
+    // -----------------------
+    glGenFramebuffers(1, &depthMapFBO);
+    // create depth texture
+    glGenTextures(1, &depthMap);
+    glBindTexture(GL_TEXTURE_2D, depthMap);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    // attach depth texture as FBO's depth buffer
+    glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
+    glDrawBuffer(GL_NONE);
+    glReadBuffer(GL_NONE);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
 }
 
 void Scene::setPostProcess(unsigned int index) {
     shaders[3] = Shader("../Shaders/PostProcess/screenShader.vs",postProcessPath[index].c_str());
 }
+
 unsigned int Scene::loadCubemap(vector<std::string> faces)
 {
     unsigned int textureID;
@@ -305,4 +291,35 @@ void Scene::setupSkyBox(const char * path) {
     cubemapTexture = loadCubemap(faces);
     shaders[4].use();
     shaders[4].setInt("skybox",0);
+}
+
+void Scene::renderShadowMap() {
+    // render
+    // ------
+    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    // 1. render depth of scene to texture (from light's perspective)
+    // --------------------------------------------------------------
+    glm::mat4 lightProjection, lightView;
+    float near_plane = 1.0f, far_plane = 7.5f;
+    lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+    lightView = glm::lookAt(lightPos, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
+    lightSpaceMatrix = lightProjection * lightView;
+    // render scene from light's point of view
+    shaders[5].use();
+    shaders[5].setMat4("lightSpaceMatrix", lightSpaceMatrix);
+
+    glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+    glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+    glClear(GL_DEPTH_BUFFER_BIT);
+    std::vector<int> selectedeItems;
+    for (int i = 0; i < models.size();i++)
+    {
+        models[i].Draw(shaders[5],false);
+    }
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glViewport(0, 0, scrWidth, scrHeight);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
 }
