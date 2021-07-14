@@ -39,13 +39,13 @@ void Scene::renderScene() {
     glEnable(GL_DEPTH_TEST); // enable depth testing (is disabled for rendering screen-space quad)
     renderShadowMap();
     glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
-    shaders[5].use();
-    renderLoopCamera(shaders[5]);
+
     shaders[2].use();
     renderLoopCamera(shaders[2]);
     shaders[1].use();
     renderLoopCamera(shaders[1]);
     shaders[0].use();
+
     renderLoopCamera(shaders[0]);
     if (enableSpotLight)
     {
@@ -61,7 +61,7 @@ void Scene::renderScene() {
     shaders[0].setFloat("material.shininess", 64.0f);
     shaders[0].setVec3("viewPos",camera.Position);
     shaders[0].addLights(lights);
-    shaders[0].setVec3("lightPos", lightPos);
+    shaders[0].setVec3("sunPos", sunPos);
     shaders[0].setMat4("lightSpaceMatrix", lightSpaceMatrix);
 
 
@@ -69,9 +69,7 @@ void Scene::renderScene() {
     std::vector<int> selectedeItems;
     for (int i = 0; i < models.size();i++)
     {
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, depthMap);
-        models[i].Draw(shaders[0],false);
+        models[i].Draw(shaders[0],false,depthMap);
     }
 
     for (int i = 0; i < selectedeItems.size();i++)
@@ -90,7 +88,7 @@ void Scene::renderScene() {
     for (int i = 0; i < effects.size();i++)
     {
         //Render should be a function, handle semi-transparent objects sorting them to draw in order ( pre-render function? )
-        effects[i].Draw(shaders[1],false);
+        effects[i].Draw(shaders[1],false,-1);
     }
     // now bind back to default framebuffer and draw a quad plane with the attached framebuffer color texture
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -188,6 +186,9 @@ void Scene::setupFrameBuffer() {
     glDrawBuffer(GL_NONE);
     glReadBuffer(GL_NONE);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    shaders[0].use();
+    shaders[0].setInt("diffuseTexture", 0);
+    shaders[0].setInt("shadowMap", 1);
 
 }
 
@@ -304,7 +305,7 @@ void Scene::renderShadowMap() {
     glm::mat4 lightProjection, lightView;
     float near_plane = 1.0f, far_plane = 7.5f;
     lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
-    lightView = glm::lookAt(lightPos, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
+    lightView = glm::lookAt(sunPos, glm::vec3(0.0f,-10.0,0.0), glm::vec3(0.0, 1.0, 0.0));
     lightSpaceMatrix = lightProjection * lightView;
     // render scene from light's point of view
     shaders[5].use();

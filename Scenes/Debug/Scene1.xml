@@ -2,7 +2,7 @@
 <Scene>
     <Models>
         <Model type="Cube"  path="wallConcrete.jpg" directory="../Models/">
-            <Position x="0.0" y="-1.0" z="0.0"/>
+            <Position x="0.0" y="-2.0" z="0.0"/>
             <Rotation x="1.0" y="1.0" z="1.0" angle="0.0"/>
             <Scale x="1.0" y="1.0" z="1.0"/>
         </Model>
@@ -16,11 +16,7 @@
             <Rotation x="0" y="1.0" z="1" angle="0.0"/>
             <Scale x="10.0" y="1.0" z="10.0"/>
         </Model>
-        <Model type="AModel" path="../Models/backpack.obj">
-            <Position x="-2.0" y="-2.0" z="0.0"/>
-            <Rotation x="1.0" y="1.0" z="1.0" angle="0.0"/>
-            <Scale x="0.5" y="0.5" z="0.5"/>
-        </Model>
+
     </Models>
     <Lights>
         <Light type="dirLight">

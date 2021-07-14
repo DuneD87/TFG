@@ -31,7 +31,7 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, cons
     setupMesh();
 }
 
-void Mesh::Draw(Shader &shader, bool outlined) {
+void Mesh::Draw(Shader &shader, bool outlined,unsigned int depthMap) {
     // bind appropriate textures
     unsigned int diffuseNr  = 1;
     unsigned int specularNr = 1;
@@ -46,8 +46,8 @@ void Mesh::Draw(Shader &shader, bool outlined) {
     {
         glStencilMask(0x00);
     }
-
-    for(unsigned int i = 0; i < textures.size(); i++)
+    unsigned int i = 0;
+    for(i; i < textures.size(); i++)
     {
         glActiveTexture(GL_TEXTURE0 + i); // active proper texture unit before binding
         // retrieve texture number (the N in diffuse_textureN)
@@ -68,7 +68,11 @@ void Mesh::Draw(Shader &shader, bool outlined) {
         glBindTexture(GL_TEXTURE_2D, textures[i].id);
     }
     // draw mesh
-
+    if (depthMap != -1)
+    {
+        glActiveTexture(GL_TEXTURE0+i);
+        glBindTexture(GL_TEXTURE_2D, depthMap);
+    }
     glBindVertexArray(VAO);
     //std::cout<<position.z<<std::endl;
 
