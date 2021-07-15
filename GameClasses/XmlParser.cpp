@@ -23,7 +23,7 @@ XmlParser::XmlParser(std::string path) {
 vector<Light> XmlParser::getLights() {
     vector<Light> res;
     xml_node<> * lights = _rootNode->first_node("Lights");
-    //Scene lights parsing
+    //Renderer lights parsing
     for (xml_node<> * light = lights->first_node("Light");light;light = light->next_sibling() )
     {
         string typePre = light->first_attribute("type")->value();
@@ -65,7 +65,7 @@ vector<Model> XmlParser::getModels() {
     std::vector<Model> res;
     xml_node<> * models = _rootNode->first_node("Models");
 
-    //Scene model parsing
+    //Renderer model parsing
     for (xml_node<> * model = models->first_node("Model");model;model = model->next_sibling() )
     {
         std::string typePre = model->first_attribute("type")->value();
@@ -103,7 +103,7 @@ vector<Mesh> XmlParser::getSprites() {
     std::vector<Mesh> res;
     xml_node<> * models = _rootNode->first_node("Effects");
 
-    //Scene model parsing
+    //Renderer model parsing
     int i = 0;
     for (xml_node<> * effect = models->first_node("Effect"); effect; effect = effect->next_sibling() )
     {

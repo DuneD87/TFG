@@ -6,7 +6,7 @@
 #define OPENGLTEST_BASICSHAPEBUILDER_H
 #include <iostream>
 #include <vector>
-#include "Mesh.h"
+#include "Basic/Mesh.h"
 struct Quad {
     float vertices[32] = {
             -0.5, -0.5, 0.0,   0.0, 1.0, 0.0,   0.0, 0.0,

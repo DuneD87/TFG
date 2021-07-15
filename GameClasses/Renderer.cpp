@@ -2,10 +2,10 @@
 // Created by drive on 8/7/21.
 //
 
-#include "Scene.h"
+#include "Renderer.h"
 
 
-Scene::Scene(const char * path,unsigned int scrWidth, unsigned int scrHeight, Camera &camera, const char* skyboxPath) {
+Renderer::Renderer(const char * path,unsigned int scrWidth, unsigned int scrHeight, Camera &camera, const char* skyboxPath) {
     this->scrWidth = scrWidth;
     this->scrHeight = scrHeight;
     this->camera = camera;
@@ -35,7 +35,7 @@ Scene::Scene(const char * path,unsigned int scrWidth, unsigned int scrHeight, Ca
     setupSkyBox(skyboxPath);
 }
 
-void Scene::renderScene() {
+void Renderer::renderScene() {
     glEnable(GL_DEPTH_TEST); // enable depth testing (is disabled for rendering screen-space quad)
     renderShadowMap();
     glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
@@ -103,7 +103,7 @@ void Scene::renderScene() {
     glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
-void Scene::renderLoopCamera(Shader shader,bool skybox) {
+void Renderer::renderLoopCamera(Shader shader,bool skybox) {
     //view
     glm::mat4 view;
     if (skybox)
@@ -121,7 +121,7 @@ void Scene::renderLoopCamera(Shader shader,bool skybox) {
     shader.setMat4("model", cameraModel);
 }
 
-void Scene::setupFrameBuffer() {
+void Renderer::setupFrameBuffer() {
     float quadVertices[] = { // vertex attributes for a quad that fills the entire screen in Normalized Device Coordinates.
             // positions   // texCoords
             -1.0f,  1.0f,  0.0f, 1.0f,
@@ -192,11 +192,11 @@ void Scene::setupFrameBuffer() {
 
 }
 
-void Scene::setPostProcess(unsigned int index) {
+void Renderer::setPostProcess(unsigned int index) {
     shaders[3] = Shader("../Shaders/PostProcess/screenShader.vs",postProcessPath[index].c_str());
 }
 
-unsigned int Scene::loadCubemap(vector<std::string> faces)
+unsigned int Renderer::loadCubemap(vector<std::string> faces)
 {
     unsigned int textureID;
     glGenTextures(1, &textureID);
@@ -226,7 +226,7 @@ unsigned int Scene::loadCubemap(vector<std::string> faces)
     return textureID;
 }
 
-void Scene::setupSkyBox(const char * path) {
+void Renderer::setupSkyBox(const char * path) {
     float skyboxVertices[] = {
             // positions
             -1.0f,  1.0f, -1.0f,
@@ -294,7 +294,7 @@ void Scene::setupSkyBox(const char * path) {
     shaders[4].setInt("skybox",0);
 }
 
-void Scene::renderShadowMap() {
+void Renderer::renderShadowMap() {
     // render
     // ------
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
@@ -323,4 +323,15 @@ void Scene::renderShadowMap() {
     glViewport(0, 0, scrWidth, scrHeight);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
+}
+
+void Renderer::addShader(Shader &shader) {
+    shaders.push_back(shader);
+}
+
+void Renderer::removeShader(int shaderId) {
+    std::vector<Shader>::iterator  it;
+    for (it = shaders.begin(); it < shaders.end(); it++)
+        if (it->ID == shaderId)
+            shaders.erase(it);
 }

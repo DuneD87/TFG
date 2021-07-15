@@ -5,10 +5,11 @@
 #ifndef OPENGLTEST_LIGHT_H
 #define OPENGLTEST_LIGHT_H
 #include <iostream>
-#include "../glm/glm.hpp"
-#include "../glm/gtc/matrix_transform.hpp"
+#include "../../glm/glm.hpp"
+#include "../../glm/gtc/matrix_transform.hpp"
+#include "Entity.h"
 
-class Light {
+class Light : public Entity{
 public:
     Light(std::string lightType, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular, float constant,
           float linear, float quadratic);

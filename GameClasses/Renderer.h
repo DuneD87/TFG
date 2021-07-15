@@ -2,28 +2,29 @@
 // Created by drive on 8/7/21.
 //
 
-#ifndef OPENGLTEST_SCENE_H
-#define OPENGLTEST_SCENE_H
+#ifndef OPENGLTEST_RENDERER_H
+#define OPENGLTEST_RENDERER_H
 #include<iostream>
 #include<vector>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include "Light.h"
-#include "Model.h"
-#include "Camera.h"
-#include "Shader.h"
+#include "Entities/Light.h"
+#include "Basic/Model.h"
+#include "Basic/Camera.h"
+#include "Basic/Shader.h"
 #include "XmlParser.h"
 #include "BasicShapeBuilder.h"
 
-class Scene {
+class Renderer {
 public:
     const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
     Camera camera;
     bool enableSpotLight = false;
-    Scene(const char * path,unsigned int scrWidth, unsigned int scrHeight, Camera &camera, const char* skyboxPath);
+    Renderer(const char * path,unsigned int scrWidth, unsigned int scrHeight, Camera &camera, const char* skyboxPath);
     void renderScene();
     void setPostProcess(unsigned int index);
-
+    void addShader(Shader &shader);
+    void removeShader(int shaderId);
 
 private:
     void renderShadowMap();
@@ -53,4 +54,4 @@ private:
 };
 
 
-#endif //OPENGLTEST_SCENE_H
+#endif //OPENGLTEST_RENDERER_H

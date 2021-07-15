@@ -4,7 +4,7 @@
 #include <iostream>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include "GameClasses/Scene.h"
+#include "GameClasses/Renderer.h"
 
 
 
@@ -32,7 +32,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     if(key == GLFW_KEY_L) spotLightEnabled = !spotLightEnabled;
 }
 
-void processInput(GLFWwindow *window,Scene &scene1)
+void processInput(GLFWwindow *window,Renderer &scene1)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
@@ -137,7 +137,7 @@ int main()
 {
 
     GLFWwindow *window = createWindow();
-    Scene scene1("../Scenes/Scene1.xml",SCR_WIDTH,SCR_HEIGHT,camera,"../Textures/SkyBox/space1/");
+    Renderer scene1("../Scenes/Scene1.xml",SCR_WIDTH,SCR_HEIGHT,camera,"../Textures/SkyBox/space1/");
     //scene1.setPostProcess(0);
     //Render loop
     while (!glfwWindowShouldClose(window))

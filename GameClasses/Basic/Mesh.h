@@ -7,9 +7,9 @@
 
 #include <glad/glad.h> // holds all OpenGL type declarations
 
-#include "../glm/glm.hpp"
-#include "../glm/gtc/matrix_transform.hpp"
-#include "../stb_image.h"
+#include "../../glm/glm.hpp"
+#include "../../glm/gtc/matrix_transform.hpp"
+#include "../../libs/stb_image.h"
 #include "Shader.h"
 
 #include <string>
