@@ -112,5 +112,25 @@ std::string Light::toString() {
 
 }
 
+void Light::draw(Shader &shader) {
+    if (this->getType() == "pointLight") {
+        shader.setVec3("pointLights["+std::to_string(this->lightIndex)+"].position", this->.getPosition());
+        shader.setVec3("pointLights["+std::to_string(this->lightIndex)+"].ambient",this->getAmbient());
+        shader.setVec3("pointLights["+std::to_string(this->lightIndex)+"].diffuse", this->getDiffuse());
+        shader.setVec3("pointLights["+std::to_string(this->lightIndex)+"].specular",this->getSpecular());
+        shader.setFloat("pointLights["+std::to_string(this->lightIndex)+"].constant", this->getConstant());
+        shader.setFloat("pointLights["+std::to_string(this->lightIndex)+"].linear", this->getLinear());
+        shader.setFloat("pointLights["+std::to_string(this->lightIndex)+"].quadratic", this->getQuadratic());
+        //lights[i].toString();
+    }
+    else if (this->getType() == "dirLight") {
+
+        shader.setVec3("dirLight.direction", this->getDirection());
+        shader.setVec3("dirLight.ambient",this->getAmbient());
+        shader.setVec3("dirLight.diffuse", this->getDiffuse());
+        shader.setVec3("dirLight.specular",this->getSpecular());
+    }
+}
+
 
 

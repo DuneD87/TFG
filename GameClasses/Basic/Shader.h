@@ -9,7 +9,6 @@
 #include "../../glm/glm.hpp"
 #include "../../glm/gtc/matrix_transform.hpp"
 #include "../../glm/gtc/type_ptr.hpp"
-#include "../Entities/Light.h"
 #include <string>
 #include <vector>
 #include <fstream>
@@ -31,9 +30,7 @@ public:
     void setFloat(const std::string &name, float value) const;
     void setVec3(const std::string &name, glm::vec3 value) const;
     void setMat4(const std::string &name,glm::mat4 value) const;
-    void addLights(std::vector<Light> lights);
-    void addSpotLight(Light light, glm::vec3 direction, glm::vec3 position,float cutOff, float outerCutOff);
-    void disableSpotLight();
+
 private:
     int nPointLights;
     void checkCompileErrors(unsigned int shader, std::string type);

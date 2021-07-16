@@ -10,21 +10,19 @@
 
 class Entity {
 public:
-    Entity(const char * path);
-    Entity(int type, const char * path = "");
-
     Model getModel();
-
+    virtual void setModel(const char * path);
     virtual glm::vec3 getPosition();
     virtual glm::vec4 getRotation();
     virtual glm::vec3 getScale();
 
+    virtual void draw(Shader &shader);
+
     virtual void setPosition(glm::vec3 position);
-    void setRotation(glm::vec4 rotation);
-    void setScale(glm::vec3 scale);
+    virtual void setRotation(glm::vec4 rotation);
+    virtual void setScale(glm::vec3 scale);
 private:
     Model entityModel;
-    reactphysics3d::RigidBody* body;
     int id;
     /*
     * Types:

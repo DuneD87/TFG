@@ -4,14 +4,10 @@
 
 #include "Entity.h"
 
-Entity::Entity(const char *path) {
-    entityModel = Model(path);
-    type = 0;//Deco
+void Entity::setModel(const char *path) {
+    this->entityModel = Model(path);
 }
 
-Entity::Entity(int type, const char * path) {
-
-}
 
 Model Entity::getModel() {
     return Model();
@@ -40,3 +36,8 @@ void Entity::setRotation(glm::vec4 rotation) {
 void Entity::setScale(glm::vec3 scale) {
 
 }
+
+void Entity::draw(Shader &shader) {
+
+}
+
