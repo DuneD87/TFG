@@ -22,13 +22,13 @@ public:
     bool enableSpotLight = false;
     Renderer();
     Renderer(unsigned int scrWidth, unsigned int scrHeight, Camera &camera, const char* skyboxPath);
-    void renderScene(vector<Entity> worldEnts);
+    void renderScene(vector<Entity*> worldEnts);
     void setPostProcess(unsigned int index);
     void addShader(Shader &shader);
     void removeShader(int shaderId);
 
 private:
-    void renderShadowMap(vector<Entity> worldEnts);
+    void renderShadowMap(vector<Entity*> worldEnts);
     void renderLoopCamera(Shader shader,bool skybox = false);
     void setupFrameBuffer();
     void setupSkyBox(const char * path);

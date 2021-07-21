@@ -34,7 +34,7 @@ XmlParser::XmlParser(std::string path) {
     }
 }
 
-Light XmlParser::getLight(xml_node<> *light) {
+Light* XmlParser::getLight(xml_node<> *light) {
 
         string typePre = light->first_attribute("type")->value();
         xml_node<> * amb = light->first_node("Ambient");
@@ -52,21 +52,21 @@ Light XmlParser::getLight(xml_node<> *light) {
             xml_node<> * pos = light->first_node("Position");
             glm::vec3 position = getValues3(pos);
 
-            Light lightAux(typePre,ambient,diffuse,specular,constant,linear,quadratic,entIndex);
-            lightAux.setPosition(position);
+            auto lightAux = new Light(typePre,ambient,diffuse,specular,constant,linear,quadratic,entIndex);
+            lightAux->setPosition(position);
             return lightAux;
         } else if (typePre == "dirLight")
         {
             xml_node<> * dir = light->first_node("Direction");
 
             glm::vec3 direction = getValues3(dir);
-            Light lightAux(typePre,ambient,diffuse,specular,direction,entIndex);
-            lightAux.setDirection(direction);
+            auto lightAux = new Light(typePre,ambient,diffuse,specular,direction,entIndex);
+            lightAux->setDirection(direction);
             return lightAux;
         }
 }
 
-PhysicsObject XmlParser::getObject(xml_node<> * model) {
+PhysicsObject* XmlParser::getObject(xml_node<> * model) {
     std::string typePre = model->first_attribute("type")->value();
 
     xml_node<> * pos = model->first_node("Position");
@@ -81,21 +81,21 @@ PhysicsObject XmlParser::getObject(xml_node<> * model) {
         Mesh cubeMesh = procesMesh(cube.vertices, cube.indices,path,directory,192,36);
         modelRes.meshes.push_back(cubeMesh);
 
-        PhysicsObject obj(entIndex,1,modelRes);
-        obj.setPosition(getValues3(pos));
+        auto *obj = new PhysicsObject(entIndex,1,modelRes);
+        obj->setPosition(getValues3(pos));
         glm::vec4 rotation = getValues4(rot);
-        obj.setRotation(rotation);
-        obj.setScale(getValues3(scale));
+        obj->setRotation(rotation);
+        obj->setScale(getValues3(scale));
         return obj;
     }
     else if (typePre == "AModel")
     {
         const char * path = (const char * )model->first_attribute("path")->value();
-        PhysicsObject obj(entIndex,1,path);
-        obj.setPosition(getValues3(pos));
+        auto obj = new PhysicsObject(entIndex,1,path);
+        obj->setPosition(getValues3(pos));
         glm::vec4 rotation = getValues4(rot);
-        obj.setRotation(rotation);
-        obj.setScale(getValues3(scale));
+        obj->setRotation(rotation);
+        obj->setScale(getValues3(scale));
         return obj;
     }
 }

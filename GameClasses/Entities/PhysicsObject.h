@@ -11,7 +11,7 @@ public:
     PhysicsObject(int entId,int type,const char * path);
     PhysicsObject(int entId,int type,Model &model);
 
-    void draw(Shader &shader, bool outlined, int depthMap) override;
+    void draw(Shader &shader, bool outlined, int depthMap);
 };
 
 

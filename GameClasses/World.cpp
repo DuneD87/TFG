@@ -12,7 +12,7 @@ World::World(const char *scenePath, const char *skyBoxPath, unsigned int scrWidt
     renderer.camera = camera;
 }
 
-void World::addEntity(Entity entity) {
+void World::addEntity(Entity *entity) {
 
 }
 

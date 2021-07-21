@@ -4,12 +4,16 @@
 
 #include "PhysicsObject.h"
 
-PhysicsObject::PhysicsObject(int entId,int type, const char *path) : Entity(entId,type,path) {
-
+PhysicsObject::PhysicsObject(int entId,int type, const char *path){
+    this->id = id;
+    this->type = 1;
+    this->entityModel = Model(path);
 }
 
-PhysicsObject::PhysicsObject(int entId,int type, Model &model) : Entity(entId,type,model) {
-
+PhysicsObject::PhysicsObject(int entId,int type, Model &model){
+    this->id = id;
+    this->type = 1;
+    this->entityModel = model;
 }
 
 void PhysicsObject::draw(Shader &shader, bool outlined, int depthMap) {

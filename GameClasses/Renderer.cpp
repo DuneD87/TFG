@@ -35,7 +35,7 @@ Renderer::Renderer(unsigned int scrWidth, unsigned int scrHeight, Camera &camera
     setupSkyBox(skyboxPath);
 }
 
-void Renderer::renderScene(vector<Entity> worldEnts) {
+void Renderer::renderScene(vector<Entity*> worldEnts) {
     glEnable(GL_DEPTH_TEST); // enable depth testing (is disabled for rendering screen-space quad)
     renderShadowMap(worldEnts);
     glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
@@ -60,12 +60,8 @@ void Renderer::renderScene(vector<Entity> worldEnts) {
     std::vector<int> selectedeItems;
     for (int i = 0; i < worldEnts.size();i++)
     {
-        if (worldEnts[i].getType() == 1)
-            worldEnts[i].draw(shaders[0],false,depthMap);
-        else if (worldEnts[i].getType() == 2)
-        {
-            worldEnts[i].draw(shaders[0]);
-        }
+        worldEnts[i]->draw(shaders[0],false,depthMap);
+
     }
 
     for (int i = 0; i < selectedeItems.size();i++)
@@ -290,7 +286,7 @@ void Renderer::setupSkyBox(const char * path) {
     shaders[4].setInt("skybox",0);
 }
 
-void Renderer::renderShadowMap(vector<Entity> worldEnts) {
+void Renderer::renderShadowMap(vector<Entity*> worldEnts) {
     // render
     // ------
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
@@ -312,8 +308,8 @@ void Renderer::renderShadowMap(vector<Entity> worldEnts) {
     glClear(GL_DEPTH_BUFFER_BIT);
     for (int i = 0; i < worldEnts.size();i++)
     {
-        if (worldEnts[i].getType() == 1)
-            worldEnts[i].draw(shaders[5],false);
+        if (worldEnts[i]->getType() == 1)
+            worldEnts[i]->draw(shaders[5],false);
     }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glViewport(0, 0, scrWidth, scrHeight);

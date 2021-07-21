@@ -30,11 +30,11 @@ public:
     void setDirection(glm::vec3 direction);
     void setCutOff(float cutOff);
     void setOuterCutOff(float outerCutOff);
-    void draw(Shader &shader,bool outlined, int depthMap) override;
+    void draw(Shader &shader,bool outlined, int depthMap);
     std::string toString();
 private:
     glm::vec3 position,ambient,diffuse,specular,direction;
-    std::string type;
+    std::string subType;
     int lightIndex;
     float constant,linear,quadratic,cutOff,outerCutOff;
 };

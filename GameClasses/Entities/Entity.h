@@ -13,18 +13,15 @@ class Entity {
 public:
     int id;
 
-    Entity(int id, int type);
-    Entity(int id, int type, Model model);
-    Entity(int id, int type, const char * modelPath);
 
     Model getModel();
     void setModel(const char * path);
     virtual glm::vec3 getPosition();
     virtual glm::vec4 getRotation();
     virtual glm::vec3 getScale();
-    virtual int getType();
+    int getType();
 
-    virtual void draw(Shader &shader, bool outlined = false, int depthMap = -1);
+    virtual void draw(Shader &shader, bool outlined = false, int depthMap = -1) = 0;
 
     virtual void setPosition(glm::vec3 position);
     virtual void setRotation(glm::vec4 rotation);

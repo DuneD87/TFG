@@ -24,7 +24,7 @@ public:
     vector<Model> _models;
     vector<Mesh> _effects;
 
-    vector<Entity> _ents;
+    vector<Entity*> _ents;
 
     int entIndex;
     XmlParser(std::string path);
@@ -33,8 +33,8 @@ private:
     xml_node<> * _rootNode;
     std::string path;
 
-    Light getLight(xml_node<> *light);
-    PhysicsObject getObject(xml_node<> *model);
+    Light* getLight(xml_node<> *light);
+    PhysicsObject* getObject(xml_node<> *model);
     vector<Mesh> getSprites();
 
     glm::vec3 getValues3(xml_node<> *pos);

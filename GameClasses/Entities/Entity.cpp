@@ -36,30 +36,8 @@ void Entity::setScale(glm::vec3 scale) {
     this->_scale = scale;
 }
 
-
-Entity::Entity(int id, int type) {
-    this->id = id;
-    this->type = type;
-}
-
-Entity::Entity(int id, int type, const char *modelPath) {
-    this->id = id;
-    this->type = type;
-    this->entityModel = Model(modelPath);
-}
-
-
-Entity::Entity(int id, int type, Model model) {
-    this->id = id;
-    this->type = type;
-    this->entityModel = model;
-}
-
 int Entity::getType() {
     return type;
 }
 
-void Entity::draw(Shader &shader, bool outlined, int depthMap) {
-    //FIND A WAY TO CALL CHILD METHOD
-}
 

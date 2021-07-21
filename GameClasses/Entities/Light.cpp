@@ -5,23 +5,27 @@
 #include "Light.h"
 
 Light::Light(std::string lightType, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular, float constant,
-             float linear, float quadratic, int entId) : Entity(entId,2) {
+             float linear, float quadratic, int entId) {
     this->ambient = ambient;
     this->diffuse = diffuse;
     this->specular = specular;
     this->constant = constant;
     this->linear = linear;
     this->quadratic = quadratic;
-    this->type = lightType;
+    this->subType = lightType;
+    this->id = entId;
+    this->type = 2;
 }
 
 Light::Light(std::string lightType, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular, glm::vec3 direction,
-             int entId): Entity(entId,2){
-    this->type = lightType;
+             int entId){
+    this->subType = lightType;
     this->ambient = ambient;
     this->diffuse = diffuse;
     this->specular = specular;
     this->direction = direction;
+    this->id = entId;
+    this->type = 2;
 }
 
 
@@ -42,7 +46,7 @@ void Light::setSpecular(glm::vec3 specular) {
 }
 
 std::string Light::getSubType() {
-    return this->type;
+    return this->subType;
 }
 
 void Light::setDirection(glm::vec3 direction) {
@@ -90,10 +94,10 @@ glm::vec3 Light::getPosition() {
 }
 
 std::string Light::toString() {
-    if (type == "pointLight")
+    if (subType == "pointLight")
     {
         printf("Light found with type %s and:\n\tConstant: %f\n\tLinear: %f\n\tQuadratic: %f\n" ,
-               type.c_str(),
+               subType.c_str(),
                constant,
                linear,
                quadratic
@@ -103,7 +107,7 @@ std::string Light::toString() {
         printf("\tDiffuse:\n\t\tX:%f\n\t\tY:%f\n\t\tZ:%f\n",diffuse.x,diffuse.y,diffuse.z);
         printf("\tSpecular:\n\t\tX:%f\n\t\tY:%f\n\t\tZ:%f\n",specular.x,specular.y,specular.z);
     }
-    else if (type == "dirLight")
+    else if (subType == "dirLight")
     {
         printf("\tDirection:\n\t\tX:%f\n\t\tY:%f\n\t\tZ:%f\n",direction.x,direction.y,direction.z);
         printf("\tAmbient:\n\t\tX:%f\n\t\tY:%f\n\t\tZ:%f\n",ambient.x,ambient.y,ambient.z);
