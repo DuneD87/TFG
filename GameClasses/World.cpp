@@ -6,8 +6,10 @@
 
 World::World(const char *scenePath, const char *skyBoxPath, unsigned int scrWidth, unsigned int scrHeight,
              Camera &camera) {
-    Light light("dirLight",glm::vec3(0,0,0),glm::vec3(0,0,0),glm::vec3(0,0,0) , glm::vec3(0,0,0));
-    worldEntities.push_back(light);
+    renderer = Renderer(scrWidth,scrHeight,camera,skyBoxPath);
+    XmlParser parser(scenePath);
+    worldEntities = parser._ents;
+    renderer.camera = camera;
 }
 
 void World::addEntity(Entity entity) {
@@ -24,4 +26,9 @@ void World::setSunPosition(glm::vec3 position) {
 
 void World::addLightToWorld(Light &light) {
 
+}
+
+void World::renderWorld() {
+    renderer.camera = this->camera;
+    renderer.renderScene(worldEntities);
 }

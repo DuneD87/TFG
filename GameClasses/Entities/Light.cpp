@@ -5,7 +5,7 @@
 #include "Light.h"
 
 Light::Light(std::string lightType, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular, float constant,
-             float linear, float quadratic) {
+             float linear, float quadratic, int entId) : Entity(entId,2) {
     this->ambient = ambient;
     this->diffuse = diffuse;
     this->specular = specular;
@@ -15,7 +15,8 @@ Light::Light(std::string lightType, glm::vec3 ambient, glm::vec3 diffuse, glm::v
     this->type = lightType;
 }
 
-Light::Light(std::string lightType, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular, glm::vec3 direction) {
+Light::Light(std::string lightType, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular, glm::vec3 direction,
+             int entId): Entity(entId,2){
     this->type = lightType;
     this->ambient = ambient;
     this->diffuse = diffuse;
@@ -40,7 +41,7 @@ void Light::setSpecular(glm::vec3 specular) {
     this->specular = specular;
 }
 
-std::string Light::getType() {
+std::string Light::getSubType() {
     return this->type;
 }
 
@@ -112,9 +113,9 @@ std::string Light::toString() {
 
 }
 
-void Light::draw(Shader &shader) {
-    if (this->getType() == "pointLight") {
-        shader.setVec3("pointLights["+std::to_string(this->lightIndex)+"].position", this->.getPosition());
+void Light::draw(Shader &shader,bool outlined, int depthMap) {
+    if (this->getSubType() == "pointLight") {
+        shader.setVec3("pointLights["+std::to_string(this->lightIndex)+"].position", this->getPosition());
         shader.setVec3("pointLights["+std::to_string(this->lightIndex)+"].ambient",this->getAmbient());
         shader.setVec3("pointLights["+std::to_string(this->lightIndex)+"].diffuse", this->getDiffuse());
         shader.setVec3("pointLights["+std::to_string(this->lightIndex)+"].specular",this->getSpecular());
@@ -123,7 +124,7 @@ void Light::draw(Shader &shader) {
         shader.setFloat("pointLights["+std::to_string(this->lightIndex)+"].quadratic", this->getQuadratic());
         //lights[i].toString();
     }
-    else if (this->getType() == "dirLight") {
+    else if (this->getSubType() == "dirLight") {
 
         shader.setVec3("dirLight.direction", this->getDirection());
         shader.setVec3("dirLight.ambient",this->getAmbient());

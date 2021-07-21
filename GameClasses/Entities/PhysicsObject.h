@@ -7,7 +7,11 @@
 
 #include "Entity.h"
 class PhysicsObject : public Entity {
-    PhysicsObject(int type,const char * path);
+public:
+    PhysicsObject(int entId,int type,const char * path);
+    PhysicsObject(int entId,int type,Model &model);
+
+    void draw(Shader &shader, bool outlined, int depthMap) override;
 };
 
 

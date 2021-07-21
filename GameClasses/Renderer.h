@@ -17,17 +17,18 @@
 
 class Renderer {
 public:
-    const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
+    unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
     Camera camera;
     bool enableSpotLight = false;
-    Renderer(const char * path,unsigned int scrWidth, unsigned int scrHeight, Camera &camera, const char* skyboxPath);
-    void renderScene();
+    Renderer();
+    Renderer(unsigned int scrWidth, unsigned int scrHeight, Camera &camera, const char* skyboxPath);
+    void renderScene(vector<Entity> worldEnts);
     void setPostProcess(unsigned int index);
     void addShader(Shader &shader);
     void removeShader(int shaderId);
 
 private:
-    void renderShadowMap();
+    void renderShadowMap(vector<Entity> worldEnts);
     void renderLoopCamera(Shader shader,bool skybox = false);
     void setupFrameBuffer();
     void setupSkyBox(const char * path);
@@ -40,7 +41,7 @@ private:
     glm::vec3 sunPos = glm::vec3(2.0f, -1.0f, 2.0f);
     glm::mat4 lightSpaceMatrix;
 
-    Light spotLight = Light("", glm::vec3(), glm::vec3(), glm::vec3(), 0, 0, 0);
+    Light spotLight = Light("", glm::vec3(), glm::vec3(), glm::vec3(), 0, 0, 0,-1);
     unsigned int scrWidth,scrHeight,frameBuffer,textColorBuffer,rbo,quadVAO,quadVBO,skyboxVAO,skyboxVBO,cubemapTexture,
             depthMapFBO,depthMap;
     std::string postProcessPath[6] = {

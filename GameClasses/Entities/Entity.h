@@ -8,30 +8,42 @@
 #include "../Basic/Model.h"
 #include <reactphysics3d/reactphysics3d.h>
 
+
 class Entity {
 public:
+    int id;
+
+    Entity(int id, int type);
+    Entity(int id, int type, Model model);
+    Entity(int id, int type, const char * modelPath);
+
     Model getModel();
-    virtual void setModel(const char * path);
+    void setModel(const char * path);
     virtual glm::vec3 getPosition();
     virtual glm::vec4 getRotation();
     virtual glm::vec3 getScale();
+    virtual int getType();
 
-    virtual void draw(Shader &shader);
+    virtual void draw(Shader &shader, bool outlined = false, int depthMap = -1);
 
     virtual void setPosition(glm::vec3 position);
     virtual void setRotation(glm::vec4 rotation);
     virtual void setScale(glm::vec3 scale);
-private:
+protected:
+    glm::vec3 _position;
+    glm::vec4 _rotation;
+    glm::vec3 _scale;
     Model entityModel;
-    int id;
     /*
-    * Types:
-     * 0-> LIGHT
-     * 1-> DECORATION
-     * 2-> EFFECTS
-     * 3-> TERRAIN
-    */
+   * Types:
+    * 0-> LIGHT
+    * 1-> PHYSICSOBJECT
+    * 2-> EFFECTS
+    * 3-> TERRAIN
+   */
     int type;
+private:
+
 
 };
 

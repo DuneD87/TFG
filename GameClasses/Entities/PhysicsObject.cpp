@@ -4,6 +4,17 @@
 
 #include "PhysicsObject.h"
 
-PhysicsObject::PhysicsObject(int type, const char *path) {
+PhysicsObject::PhysicsObject(int entId,int type, const char *path) : Entity(entId,type,path) {
 
+}
+
+PhysicsObject::PhysicsObject(int entId,int type, Model &model) : Entity(entId,type,model) {
+
+}
+
+void PhysicsObject::draw(Shader &shader, bool outlined, int depthMap) {
+    this->entityModel.setPosition(_position);
+    this->entityModel.setRotation(_rotation.w,glm::vec3(_rotation));
+    this->entityModel.setScale(_scale);
+    this->entityModel.Draw(shader,outlined,depthMap);
 }

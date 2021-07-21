@@ -105,14 +105,7 @@ void Shader::checkCompileErrors(unsigned int shader, std::string type) {
     }
 }
 
-void Shader::addLights(std::vector<Light> lights) {
-    nPointLights = 0;
-    for (int i = 0; i < lights.size();i++) {
-
-    }
-    this->setInt("nPointLights",nPointLights);
-}
-
+/*
 void Shader::addSpotLight(Light light, glm::vec3 direction, glm::vec3 position,float cutOff, float outerCutOff) {
     this->setVec3("spotLight.position", position);
     this->setVec3("spotLight.direction", direction);
@@ -136,5 +129,5 @@ void Shader::disableSpotLight() {
     this->setFloat("spotLight.cutOff", 0);
     this->setFloat("spotLight.outerCutOff", 0);
 }
-
+*/
 

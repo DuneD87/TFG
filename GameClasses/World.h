@@ -10,17 +10,18 @@
 
 class World {
 public:
+    Camera camera;
     World(const char * scenePath, const char * skyBoxPath, unsigned int scrWidth, unsigned int scrHeight, Camera &camera);
 
     void addEntity(Entity entity);
     void removeEntity(int id);
-
+    void renderWorld();
     void setSunPosition(glm::vec3 position);
 private:
     void addLightToWorld(Light &light);
 
     vector<Entity> worldEntities;
-
+    Renderer renderer;
 };
 
 

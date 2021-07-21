@@ -4,13 +4,16 @@
 
 #include "Renderer.h"
 
+Renderer::Renderer() {
 
-Renderer::Renderer(const char * path,unsigned int scrWidth, unsigned int scrHeight, Camera &camera, const char* skyboxPath) {
+}
+
+Renderer::Renderer(unsigned int scrWidth, unsigned int scrHeight, Camera &camera, const char* skyboxPath) {
     this->scrWidth = scrWidth;
     this->scrHeight = scrHeight;
     this->camera = camera;
     spotLight =  Light("spotLight",glm::vec3(0.0f, 0.0f, 0.0f),glm::vec3(1.0f, 1.0f, 1.0f),
-                                 glm::vec3(1.0f, 1.0f, 1.0f),1.0,0.09,0.032);
+                                 glm::vec3(1.0f, 1.0f, 1.0f),1.0,0.09,0.032,-1);
     // build and compile our shader zprogram
     // ------------------------------------
     Shader lightShader("../Shaders/lightingShaderVertex.shader", "../Shaders/lightingShaderFragment.shader");
@@ -27,17 +30,14 @@ Renderer::Renderer(const char * path,unsigned int scrWidth, unsigned int scrHeig
     shaders.push_back(depthSMapShader);//5
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
-    XmlParser parser(path);
-    models = parser._models;
-    lights = parser._lights;
-    effects = parser._effects;
+
     setupFrameBuffer();
     setupSkyBox(skyboxPath);
 }
 
-void Renderer::renderScene() {
+void Renderer::renderScene(vector<Entity> worldEnts) {
     glEnable(GL_DEPTH_TEST); // enable depth testing (is disabled for rendering screen-space quad)
-    renderShadowMap();
+    renderShadowMap(worldEnts);
     glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
 
     shaders[2].use();
@@ -47,29 +47,25 @@ void Renderer::renderScene() {
     shaders[0].use();
 
     renderLoopCamera(shaders[0]);
-    if (enableSpotLight)
-    {
-        shaders[0].addSpotLight(spotLight,camera.Front,camera.Position,
-                                glm::cos(glm::radians(12.5f)),
-                                glm::cos(glm::radians(17.5f)));
-    } else
-    {
-        shaders[0].disableSpotLight();
-    }
+
     glViewport(0, 0, scrWidth, scrHeight);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     shaders[0].setFloat("material.shininess", 64.0f);
     shaders[0].setVec3("viewPos",camera.Position);
-    shaders[0].addLights(lights);
     shaders[0].setVec3("sunPos", sunPos);
     shaders[0].setMat4("lightSpaceMatrix", lightSpaceMatrix);
 
 
     //Draw
     std::vector<int> selectedeItems;
-    for (int i = 0; i < models.size();i++)
+    for (int i = 0; i < worldEnts.size();i++)
     {
-        models[i].Draw(shaders[0],false,depthMap);
+        if (worldEnts[i].getType() == 1)
+            worldEnts[i].draw(shaders[0],false,depthMap);
+        else if (worldEnts[i].getType() == 2)
+        {
+            worldEnts[i].draw(shaders[0]);
+        }
     }
 
     for (int i = 0; i < selectedeItems.size();i++)
@@ -294,7 +290,7 @@ void Renderer::setupSkyBox(const char * path) {
     shaders[4].setInt("skybox",0);
 }
 
-void Renderer::renderShadowMap() {
+void Renderer::renderShadowMap(vector<Entity> worldEnts) {
     // render
     // ------
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
@@ -314,10 +310,10 @@ void Renderer::renderShadowMap() {
     glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
     glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
     glClear(GL_DEPTH_BUFFER_BIT);
-    std::vector<int> selectedeItems;
-    for (int i = 0; i < models.size();i++)
+    for (int i = 0; i < worldEnts.size();i++)
     {
-        models[i].Draw(shaders[5],false);
+        if (worldEnts[i].getType() == 1)
+            worldEnts[i].draw(shaders[5],false);
     }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glViewport(0, 0, scrWidth, scrHeight);

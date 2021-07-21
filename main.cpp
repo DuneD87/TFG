@@ -5,13 +5,14 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include "GameClasses/Renderer.h"
-
+#include "GameClasses/World.h"
 
 
 // settings
 const unsigned int SCR_WIDTH = 1920;
 const unsigned int SCR_HEIGHT = 1080;
 bool spotLightEnabled = false, enableCursor = true;
+
 float lastX = SCR_WIDTH/2, lastY = SCR_HEIGHT/2,pitch = 0, yaw = -90, fov = 45;
 
 Camera camera(glm::vec3(0.0f, -2.0f, 3.0f));
@@ -32,7 +33,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     if(key == GLFW_KEY_L) spotLightEnabled = !spotLightEnabled;
 }
 
-void processInput(GLFWwindow *window,Renderer &scene1)
+void processInput(GLFWwindow *window/*,Renderer &scene1*/)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
@@ -48,6 +49,7 @@ void processInput(GLFWwindow *window,Renderer &scene1)
         camera.ProcessKeyboard(UP,deltaTime);
     if (glfwGetKey(window,GLFW_KEY_C) == GLFW_PRESS)
         camera.ProcessKeyboard(DOWN,deltaTime);
+    /*
     if (glfwGetKey(window,GLFW_KEY_0) == GLFW_PRESS)
         scene1.setPostProcess(5);
     if (glfwGetKey(window,GLFW_KEY_1) == GLFW_PRESS)
@@ -60,6 +62,7 @@ void processInput(GLFWwindow *window,Renderer &scene1)
         scene1.setPostProcess(3);
     if (glfwGetKey(window,GLFW_KEY_5) == GLFW_PRESS)
         scene1.setPostProcess(4);
+    */
 }
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos)
@@ -137,17 +140,17 @@ int main()
 {
 
     GLFWwindow *window = createWindow();
-    Renderer scene1("../Scenes/Scene1.xml",SCR_WIDTH,SCR_HEIGHT,camera,"../Textures/SkyBox/space1/");
+    World world("../Scenes/Scene1.xml","../Textures/SkyBox/space1/",SCR_WIDTH,SCR_HEIGHT,camera);
     //scene1.setPostProcess(0);
     //Render loop
     while (!glfwWindowShouldClose(window))
     {
         // input
         // -----
-        processInput(window,scene1);
-        scene1.camera = camera;
-        scene1.enableSpotLight = spotLightEnabled;
-        scene1.renderScene();
+        processInput(window);
+
+        world.renderWorld();
+        world.camera = camera;
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------

@@ -12,6 +12,7 @@
 #include <vector>
 #include <map>
 #include "Entities/Light.h"
+#include "Entities/PhysicsObject.h"
 #include "Basic/Model.h"
 #include "rapidxml/rapidxml.hpp"
 #include "BasicShapeBuilder.h"
@@ -23,14 +24,17 @@ public:
     vector<Model> _models;
     vector<Mesh> _effects;
 
+    vector<Entity> _ents;
+
+    int entIndex;
     XmlParser(std::string path);
 
 private:
     xml_node<> * _rootNode;
     std::string path;
 
-    vector<Light> getLights();
-    vector<Model> getModels();
+    Light getLight(xml_node<> *light);
+    PhysicsObject getObject(xml_node<> *model);
     vector<Mesh> getSprites();
 
     glm::vec3 getValues3(xml_node<> *pos);

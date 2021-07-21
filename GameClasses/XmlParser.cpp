@@ -15,17 +15,27 @@ XmlParser::XmlParser(std::string path) {
     doc.parse<0>(&buffer[0]);
     // Find our root node
     _rootNode = doc.first_node("Scene");
-    _lights = getLights();
-    _models = getModels();
-    _effects = getSprites();
+    entIndex = 0;
+    xml_node<> * entities = _rootNode->first_node("Entities");
+    for (xml_node<> * ent = entities->first_node("Entity");ent;ent = ent->next_sibling())
+    {
+        string entType = ent->first_attribute("type")->value();
+        if (entType == "PhysicsObject")
+        {
+            xml_node<> *model = ent->first_node("Model");
+            _ents.push_back(getObject(model));
+
+        } else if (entType == "Light")
+        {
+            xml_node<> *light = ent->first_node("Light");
+            _ents.push_back(getLight(light));
+        }
+        entIndex++;
+    }
 }
 
-vector<Light> XmlParser::getLights() {
-    vector<Light> res;
-    xml_node<> * lights = _rootNode->first_node("Lights");
-    //Renderer lights parsing
-    for (xml_node<> * light = lights->first_node("Light");light;light = light->next_sibling() )
-    {
+Light XmlParser::getLight(xml_node<> *light) {
+
         string typePre = light->first_attribute("type")->value();
         xml_node<> * amb = light->first_node("Ambient");
         xml_node<> * diff = light->first_node("Diffuse");
@@ -42,61 +52,52 @@ vector<Light> XmlParser::getLights() {
             xml_node<> * pos = light->first_node("Position");
             glm::vec3 position = getValues3(pos);
 
-            Light lightAux(typePre,ambient,diffuse,specular,constant,linear,quadratic);
+            Light lightAux(typePre,ambient,diffuse,specular,constant,linear,quadratic,entIndex);
             lightAux.setPosition(position);
-            res.push_back(lightAux);
+            return lightAux;
         } else if (typePre == "dirLight")
         {
             xml_node<> * dir = light->first_node("Direction");
 
             glm::vec3 direction = getValues3(dir);
-            Light lightAux(typePre,ambient,diffuse,specular,direction);
+            Light lightAux(typePre,ambient,diffuse,specular,direction,entIndex);
             lightAux.setDirection(direction);
-            res.push_back(lightAux);
+            return lightAux;
         }
-
-
-    }
-
-    return res;
 }
 
-vector<Model> XmlParser::getModels() {
-    std::vector<Model> res;
-    xml_node<> * models = _rootNode->first_node("Models");
+PhysicsObject XmlParser::getObject(xml_node<> * model) {
+    std::string typePre = model->first_attribute("type")->value();
 
-    //Renderer model parsing
-    for (xml_node<> * model = models->first_node("Model");model;model = model->next_sibling() )
-    {
-        std::string typePre = model->first_attribute("type")->value();
+    xml_node<> * pos = model->first_node("Position");
+    xml_node<> * rot = model->first_node("Rotation");
+    xml_node<> * scale = model->first_node("Scale");
 
-        xml_node<> * pos = model->first_node("Position");
-        xml_node<> * rot = model->first_node("Rotation");
-        xml_node<> * scale = model->first_node("Scale");
+    Model modelRes;
+    if (typePre == "Cube") {
+        const char * path = (const char * )model->first_attribute("path")->value();
+        std::string directory = model->first_attribute("directory")->value();
+        Cube cube;
+        Mesh cubeMesh = procesMesh(cube.vertices, cube.indices,path,directory,192,36);
+        modelRes.meshes.push_back(cubeMesh);
 
-        Model modelRes;
-        if (typePre == "Cube") {
-            const char * path = (const char * )model->first_attribute("path")->value();
-            std::string directory = model->first_attribute("directory")->value();
-            Cube cube;
-            Mesh cubeMesh = procesMesh(cube.vertices, cube.indices,path,directory,192,36);
-            modelRes.meshes.push_back(cubeMesh);
-
-        }
-        else if (typePre == "AModel")
-        {
-            const char * path = (const char * )model->first_attribute("path")->value();
-            modelRes = Model(path);
-        }
-        modelRes.setPosition(getValues3(pos));
+        PhysicsObject obj(entIndex,1,modelRes);
+        obj.setPosition(getValues3(pos));
         glm::vec4 rotation = getValues4(rot);
-        modelRes.setRotation(rotation.w, glm::vec3(rotation));
-        modelRes.setScale(getValues3(scale));
-
-        res.push_back(modelRes);
+        obj.setRotation(rotation);
+        obj.setScale(getValues3(scale));
+        return obj;
     }
-
-    return res;
+    else if (typePre == "AModel")
+    {
+        const char * path = (const char * )model->first_attribute("path")->value();
+        PhysicsObject obj(entIndex,1,path);
+        obj.setPosition(getValues3(pos));
+        glm::vec4 rotation = getValues4(rot);
+        obj.setRotation(rotation);
+        obj.setScale(getValues3(scale));
+        return obj;
+    }
 }
 
 vector<Mesh> XmlParser::getSprites() {
