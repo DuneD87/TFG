@@ -9,6 +9,8 @@ World::World(const char *scenePath, const char *skyBoxPath, unsigned int scrWidt
     renderer = Renderer(scrWidth,scrHeight,camera,skyBoxPath);
     XmlParser parser(scenePath);
     worldEntities = parser._ents;
+    nPointLights = parser.nPointLights;
+    renderer.nPointLights = nPointLights;
     renderer.camera = camera;
 }
 

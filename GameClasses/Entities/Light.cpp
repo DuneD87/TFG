@@ -5,7 +5,7 @@
 #include "Light.h"
 
 Light::Light(std::string lightType, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular, float constant,
-             float linear, float quadratic, int entId) {
+             float linear, float quadratic, int entId,int lightIndex) {
     this->ambient = ambient;
     this->diffuse = diffuse;
     this->specular = specular;
@@ -15,6 +15,7 @@ Light::Light(std::string lightType, glm::vec3 ambient, glm::vec3 diffuse, glm::v
     this->subType = lightType;
     this->id = entId;
     this->type = 2;
+    this->lightIndex = lightIndex;
 }
 
 Light::Light(std::string lightType, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular, glm::vec3 direction,
@@ -26,11 +27,6 @@ Light::Light(std::string lightType, glm::vec3 ambient, glm::vec3 diffuse, glm::v
     this->direction = direction;
     this->id = entId;
     this->type = 2;
-}
-
-
-void Light::setPosition(glm::vec3 position) {
-    this->position = position;
 }
 
 void Light::setAmbient(glm::vec3 ambient) {
@@ -89,34 +85,6 @@ glm::vec3 Light::getDirection() {
     return this->direction;
 }
 
-glm::vec3 Light::getPosition() {
-    return this->position;
-}
-
-std::string Light::toString() {
-    if (subType == "pointLight")
-    {
-        printf("Light found with type %s and:\n\tConstant: %f\n\tLinear: %f\n\tQuadratic: %f\n" ,
-               subType.c_str(),
-               constant,
-               linear,
-               quadratic
-        );
-        printf("\tPosition:\n\t\tX:%f\n\t\tY:%f\n\t\tZ:%f\n",position.x,position.y,position.z);
-        printf("\tAmbient:\n\t\tX:%f\n\t\tY:%f\n\t\tZ:%f\n",ambient.x,ambient.y,ambient.z);
-        printf("\tDiffuse:\n\t\tX:%f\n\t\tY:%f\n\t\tZ:%f\n",diffuse.x,diffuse.y,diffuse.z);
-        printf("\tSpecular:\n\t\tX:%f\n\t\tY:%f\n\t\tZ:%f\n",specular.x,specular.y,specular.z);
-    }
-    else if (subType == "dirLight")
-    {
-        printf("\tDirection:\n\t\tX:%f\n\t\tY:%f\n\t\tZ:%f\n",direction.x,direction.y,direction.z);
-        printf("\tAmbient:\n\t\tX:%f\n\t\tY:%f\n\t\tZ:%f\n",ambient.x,ambient.y,ambient.z);
-        printf("\tDiffuse:\n\t\tX:%f\n\t\tY:%f\n\t\tZ:%f\n",diffuse.x,diffuse.y,diffuse.z);
-        printf("\tSpecular:\n\t\tX:%f\n\t\tY:%f\n\t\tZ:%f\n",specular.x,specular.y,specular.z);
-    }
-
-}
-
 void Light::draw(Shader &shader,bool outlined, int depthMap) {
     if (this->getSubType() == "pointLight") {
         shader.setVec3("pointLights["+std::to_string(this->lightIndex)+"].position", this->getPosition());
@@ -126,10 +94,8 @@ void Light::draw(Shader &shader,bool outlined, int depthMap) {
         shader.setFloat("pointLights["+std::to_string(this->lightIndex)+"].constant", this->getConstant());
         shader.setFloat("pointLights["+std::to_string(this->lightIndex)+"].linear", this->getLinear());
         shader.setFloat("pointLights["+std::to_string(this->lightIndex)+"].quadratic", this->getQuadratic());
-        //lights[i].toString();
     }
     else if (this->getSubType() == "dirLight") {
-
         shader.setVec3("dirLight.direction", this->getDirection());
         shader.setVec3("dirLight.ambient",this->getAmbient());
         shader.setVec3("dirLight.diffuse", this->getDiffuse());

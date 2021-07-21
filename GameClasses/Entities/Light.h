@@ -12,10 +12,9 @@
 class Light : public Entity {
 public:
     Light(std::string lightType, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular, float constant,
-          float linear, float quadratic, int entId);
+          float linear, float quadratic, int entId, int lightIndex);
     Light(std::string lightType, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular,glm::vec3 direction, int entId);
     std::string getSubType();
-    glm::vec3 getPosition() override;
     glm::vec3 getDirection();
     glm::vec3 getAmbient();
     glm::vec3 getDiffuse();
@@ -23,7 +22,6 @@ public:
     float getConstant();
     float getLinear();
     float getQuadratic();
-    void setPosition(glm::vec3 position);
     void setAmbient(glm::vec3 ambient);
     void setDiffuse(glm::vec3 diffuse);
     void setSpecular(glm::vec3 specular);
@@ -31,7 +29,6 @@ public:
     void setCutOff(float cutOff);
     void setOuterCutOff(float outerCutOff);
     void draw(Shader &shader,bool outlined, int depthMap);
-    std::string toString();
 private:
     glm::vec3 position,ambient,diffuse,specular,direction;
     std::string subType;

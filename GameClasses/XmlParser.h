@@ -20,12 +20,10 @@ using namespace rapidxml;
 using namespace std;
 class XmlParser {
 public:
-    vector<Light> _lights;
-    vector<Model> _models;
-    vector<Mesh> _effects;
 
     vector<Entity*> _ents;
 
+    int nPointLights;
     int entIndex;
     XmlParser(std::string path);
 

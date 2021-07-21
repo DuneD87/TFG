@@ -16,6 +16,7 @@ XmlParser::XmlParser(std::string path) {
     // Find our root node
     _rootNode = doc.first_node("Scene");
     entIndex = 0;
+    nPointLights = 0;
     xml_node<> * entities = _rootNode->first_node("Entities");
     for (xml_node<> * ent = entities->first_node("Entity");ent;ent = ent->next_sibling())
     {
@@ -51,8 +52,8 @@ Light* XmlParser::getLight(xml_node<> *light) {
 
             xml_node<> * pos = light->first_node("Position");
             glm::vec3 position = getValues3(pos);
-
-            auto lightAux = new Light(typePre,ambient,diffuse,specular,constant,linear,quadratic,entIndex);
+            auto lightAux = new Light(typePre,ambient,diffuse,specular,constant,linear,quadratic,entIndex,nPointLights);
+            nPointLights++;
             lightAux->setPosition(position);
             return lightAux;
         } else if (typePre == "dirLight")

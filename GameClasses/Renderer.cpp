@@ -13,7 +13,7 @@ Renderer::Renderer(unsigned int scrWidth, unsigned int scrHeight, Camera &camera
     this->scrHeight = scrHeight;
     this->camera = camera;
     spotLight =  Light("spotLight",glm::vec3(0.0f, 0.0f, 0.0f),glm::vec3(1.0f, 1.0f, 1.0f),
-                                 glm::vec3(1.0f, 1.0f, 1.0f),1.0,0.09,0.032,-1);
+                                 glm::vec3(1.0f, 1.0f, 1.0f),1.0,0.09,0.032,-1,-1);
     // build and compile our shader zprogram
     // ------------------------------------
     Shader lightShader("../Shaders/lightingShaderVertex.shader", "../Shaders/lightingShaderFragment.shader");
@@ -54,18 +54,16 @@ void Renderer::renderScene(vector<Entity*> worldEnts) {
     shaders[0].setVec3("viewPos",camera.Position);
     shaders[0].setVec3("sunPos", sunPos);
     shaders[0].setMat4("lightSpaceMatrix", lightSpaceMatrix);
-
-
+    shaders[0].setInt("nPointLights",nPointLights);
     //Draw
     std::vector<int> selectedeItems;
     for (int i = 0; i < worldEnts.size();i++)
     {
         worldEnts[i]->draw(shaders[0],false,depthMap);
-
     }
 
     for (int i = 0; i < selectedeItems.size();i++)
-        models[selectedeItems[i]].outlineObject(shaders[2],glm::vec3(1.1));
+        worldEnts[selectedeItems[i]]->getModel().outlineObject(shaders[2],glm::vec3(1.1));
 
     glDepthFunc(GL_LEQUAL);
     shaders[4].use();

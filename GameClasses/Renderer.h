@@ -18,6 +18,7 @@
 class Renderer {
 public:
     unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
+    int nPointLights;
     Camera camera;
     bool enableSpotLight = false;
     Renderer();
@@ -34,14 +35,12 @@ private:
     void setupSkyBox(const char * path);
     unsigned int loadCubemap(vector<std::string> faces);
     GLFWwindow *window;
-    std::vector<Model> models;
-    std::vector<Light> lights;
     std::vector<Mesh> effects;
     std::vector<Shader> shaders;
     glm::vec3 sunPos = glm::vec3(2.0f, -1.0f, 2.0f);
     glm::mat4 lightSpaceMatrix;
 
-    Light spotLight = Light("", glm::vec3(), glm::vec3(), glm::vec3(), 0, 0, 0,-1);
+    Light spotLight = Light("", glm::vec3(), glm::vec3(), glm::vec3(), 0, 0, 0,-1,-1);
     unsigned int scrWidth,scrHeight,frameBuffer,textColorBuffer,rbo,quadVAO,quadVBO,skyboxVAO,skyboxVBO,cubemapTexture,
             depthMapFBO,depthMap;
     std::string postProcessPath[6] = {
