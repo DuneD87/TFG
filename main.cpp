@@ -12,10 +12,10 @@
 const unsigned int SCR_WIDTH = 1920;
 const unsigned int SCR_HEIGHT = 1080;
 bool spotLightEnabled = false, enableCursor = true;
-
+auto *cam = new Camera(glm::vec3(0.0f, -2.0f, 3.0f));
 float lastX = SCR_WIDTH/2, lastY = SCR_HEIGHT/2,pitch = 0, yaw = -90, fov = 45;
 
-Camera camera(glm::vec3(0.0f, -2.0f, 3.0f));
+
 
 float deltaTime = 0.0f;	// Time between current frame and last frame
 float lastFrame = 0.0f; // Time of last frame
@@ -38,17 +38,17 @@ void processInput(GLFWwindow *window,World &world)
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        camera.ProcessKeyboard(FORWARD, deltaTime);
+        cam->ProcessKeyboard(FORWARD, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        camera.ProcessKeyboard(BACKWARD, deltaTime);
+        cam->ProcessKeyboard(BACKWARD, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        camera.ProcessKeyboard(LEFT, deltaTime);
+        cam->ProcessKeyboard(LEFT, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        camera.ProcessKeyboard(RIGHT, deltaTime);
+        cam->ProcessKeyboard(RIGHT, deltaTime);
     if (glfwGetKey(window,GLFW_KEY_SPACE) == GLFW_PRESS)
-        camera.ProcessKeyboard(UP,deltaTime);
+        cam->ProcessKeyboard(UP,deltaTime);
     if (glfwGetKey(window,GLFW_KEY_C) == GLFW_PRESS)
-        camera.ProcessKeyboard(DOWN,deltaTime);
+        cam->ProcessKeyboard(DOWN,deltaTime);
 
     if (glfwGetKey(window,GLFW_KEY_0) == GLFW_PRESS)
         world.getRenderer()->setPostProcess(5);
@@ -73,13 +73,13 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
     lastX = xpos;
     lastY = ypos;
 
-    camera.ProcessMouseMovement(xoffset, yoffset);
+    cam->ProcessMouseMovement(xoffset, yoffset);
 
 }
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
-    camera.ProcessMouseScroll(yoffset);
+    cam->ProcessMouseScroll(yoffset);
 }
 
 GLFWwindow * createWindow()
@@ -140,17 +140,16 @@ int main()
 {
 
     GLFWwindow *window = createWindow();
-    World world("../Scenes/Scene1.xml","../Textures/SkyBox/space1/",SCR_WIDTH,SCR_HEIGHT,camera);
+    World world("../Scenes/Scene1.xml","../Textures/SkyBox/space1/",SCR_WIDTH,SCR_HEIGHT,cam);
     //scene1.setPostProcess(0);
     //Render loop
     while (!glfwWindowShouldClose(window))
     {
         // input
         // -----
-        processInput(window,world);
-
+        processInput(window, world);
         world.renderWorld();
-        world.camera = camera;
+
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------

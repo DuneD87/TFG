@@ -8,7 +8,7 @@ Renderer::Renderer() {
 
 }
 
-Renderer::Renderer(unsigned int scrWidth, unsigned int scrHeight, Camera &camera, const char* skyboxPath) {
+Renderer::Renderer(unsigned int scrWidth, unsigned int scrHeight, Camera *camera, const char* skyboxPath) {
     this->scrWidth = scrWidth;
     this->scrHeight = scrHeight;
     this->camera = camera;
@@ -51,7 +51,7 @@ void Renderer::renderScene(vector<Entity*> worldEnts) {
     glViewport(0, 0, scrWidth, scrHeight);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     shaders[0].setFloat("material.shininess", 64.0f);
-    shaders[0].setVec3("viewPos",camera.Position);
+    shaders[0].setVec3("viewPos",camera->Position);
     shaders[0].setVec3("sunPos", sunPos);
     shaders[0].setMat4("lightSpaceMatrix", lightSpaceMatrix);
     shaders[0].setInt("nPointLights",nPointLights);
@@ -97,14 +97,14 @@ void Renderer::renderLoopCamera(Shader shader,bool skybox) {
     //view
     glm::mat4 view;
     if (skybox)
-        view = glm::mat4(glm::mat3(camera.GetViewMatrix())); // remove translation from the view matrix
+        view = glm::mat4(glm::mat3(camera->GetViewMatrix())); // remove translation from the view matrix
     else
-        view = this->camera.GetViewMatrix();
+        view = this->camera->GetViewMatrix();
     shader.setMat4("view",view);
 
     //projection
     glm::mat4 projection;
-    projection = glm::perspective(glm::radians(this->camera.Zoom), (float)scrWidth/scrHeight, 0.1f, 100.0f);
+    projection = glm::perspective(glm::radians(this->camera->Zoom), (float)scrWidth/scrHeight, 0.1f, 100.0f);
     shader.setMat4("projection",projection);
 
     glm::mat4 cameraModel(1.0f);

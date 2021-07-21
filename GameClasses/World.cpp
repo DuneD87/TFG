@@ -5,7 +5,7 @@
 #include "World.h"
 
 World::World(const char *scenePath, const char *skyBoxPath, unsigned int scrWidth, unsigned int scrHeight,
-             Camera &camera) {
+             Camera *camera) {
     renderer = Renderer(scrWidth,scrHeight,camera,skyBoxPath);
     XmlParser parser(scenePath);
     worldEntities = parser._ents;
@@ -31,7 +31,6 @@ void World::addLightToWorld(Light &light) {
 }
 
 void World::renderWorld() {
-    renderer.camera = this->camera;
     renderer.renderScene(worldEntities);
 }
 

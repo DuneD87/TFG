@@ -12,7 +12,7 @@ class World {
 public:
     Camera camera;
     int nPointLights;
-    World(const char * scenePath, const char * skyBoxPath, unsigned int scrWidth, unsigned int scrHeight, Camera &camera);
+    World(const char * scenePath, const char * skyBoxPath, unsigned int scrWidth, unsigned int scrHeight, Camera *camera);
 
     void addEntity(Entity *entity);
     Renderer* getRenderer();

@@ -19,10 +19,10 @@ class Renderer {
 public:
     unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
     int nPointLights;
-    Camera camera;
+    Camera *camera;
     bool enableSpotLight = false;
     Renderer();
-    Renderer(unsigned int scrWidth, unsigned int scrHeight, Camera &camera, const char* skyboxPath);
+    Renderer(unsigned int scrWidth, unsigned int scrHeight, Camera *camera, const char* skyboxPath);
     void renderScene(vector<Entity*> worldEnts);
     void setPostProcess(unsigned int index);
     void addShader(Shader &shader);
