@@ -150,7 +150,6 @@ int main()
         processInput(window, world);
         world.renderWorld();
 
-
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
         float currentFrame = glfwGetTime();

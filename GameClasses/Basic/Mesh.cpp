@@ -20,9 +20,9 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, cons
     this->axis = glm::vec3(1);
     this->angle = 0;
     Texture baseText;
-    baseText.path = directory + "/" + path;
+    baseText.path = "../Textures/" + std::string(path);
     baseText.type = "texture_specular";
-    baseText.id = TextureFromFile( path,directory,false);
+    baseText.id = TextureFromFile( path,"../Textures/",false);
     std::vector<Texture> textAux;
     textAux.push_back(baseText);
     this->textures = textAux;
