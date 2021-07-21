@@ -33,7 +33,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     if(key == GLFW_KEY_L) spotLightEnabled = !spotLightEnabled;
 }
 
-void processInput(GLFWwindow *window/*,Renderer &scene1*/)
+void processInput(GLFWwindow *window,World &world)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
@@ -49,20 +49,20 @@ void processInput(GLFWwindow *window/*,Renderer &scene1*/)
         camera.ProcessKeyboard(UP,deltaTime);
     if (glfwGetKey(window,GLFW_KEY_C) == GLFW_PRESS)
         camera.ProcessKeyboard(DOWN,deltaTime);
-    /*
+
     if (glfwGetKey(window,GLFW_KEY_0) == GLFW_PRESS)
-        scene1.setPostProcess(5);
+        world.getRenderer()->setPostProcess(5);
     if (glfwGetKey(window,GLFW_KEY_1) == GLFW_PRESS)
-        scene1.setPostProcess(0);
+        world.getRenderer()->setPostProcess(0);
     if (glfwGetKey(window,GLFW_KEY_2) == GLFW_PRESS)
-        scene1.setPostProcess(1);
+        world.getRenderer()->setPostProcess(1);
     if (glfwGetKey(window,GLFW_KEY_3) == GLFW_PRESS)
-        scene1.setPostProcess(2);
+        world.getRenderer()->setPostProcess(2);
     if (glfwGetKey(window,GLFW_KEY_4) == GLFW_PRESS)
-        scene1.setPostProcess(3);
+        world.getRenderer()->setPostProcess(3);
     if (glfwGetKey(window,GLFW_KEY_5) == GLFW_PRESS)
-        scene1.setPostProcess(4);
-    */
+        world.getRenderer()->setPostProcess(4);
+
 }
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos)
@@ -147,7 +147,7 @@ int main()
     {
         // input
         // -----
-        processInput(window);
+        processInput(window,world);
 
         world.renderWorld();
         world.camera = camera;

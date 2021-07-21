@@ -15,6 +15,7 @@ public:
     World(const char * scenePath, const char * skyBoxPath, unsigned int scrWidth, unsigned int scrHeight, Camera &camera);
 
     void addEntity(Entity *entity);
+    Renderer* getRenderer();
     void removeEntity(int id);
     void renderWorld();
     void setSunPosition(glm::vec3 position);

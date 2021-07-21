@@ -34,3 +34,7 @@ void World::renderWorld() {
     renderer.camera = this->camera;
     renderer.renderScene(worldEntities);
 }
+
+Renderer* World::getRenderer() {
+    return &renderer;
+}
