@@ -16,13 +16,7 @@
                 <Scale x="1.0" y="1.0" z="1.0"/>
             </Model>
         </Entity>
-        <Entity type = "PhysicsObject">
-            <Model type="Cube" path="wall.jpg" directory="../Models/">
-                <Position x="0.0" y="-4.0" z="0.0"/>
-                <Rotation x="0" y="1.0" z="1" angle="0.0"/>
-                <Scale x="10.0" y="1.0" z="10.0"/>
-            </Model>
-        </Entity>
+
         <Entity type = "PhysicsObject">
             <Model type="AModel" path="../Models/backpack.obj">
                 <Position x="-2.0" y="-2.0" z="0.0"/>

@@ -6,7 +6,7 @@
 #define OPENGLTEST_WORLD_H
 
 #include "Renderer.h"
-#include "Entities/Entity.h"
+#include "Entities/BasicTerrain.h"
 
 class World {
 public:
@@ -21,7 +21,7 @@ public:
     void setSunPosition(glm::vec3 position);
 private:
     void addLightToWorld(Light &light);
-
+    BasicTerrain *terrain;
     vector<Entity*> worldEntities;
     Renderer renderer;
 };

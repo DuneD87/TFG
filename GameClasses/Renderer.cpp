@@ -104,7 +104,7 @@ void Renderer::renderLoopCamera(Shader shader,bool skybox) {
 
     //projection
     glm::mat4 projection;
-    projection = glm::perspective(glm::radians(this->camera->Zoom), (float)scrWidth/scrHeight, 0.1f, 100.0f);
+    projection = glm::perspective(glm::radians(this->camera->Zoom), (float)scrWidth/scrHeight, 0.1f, 10000.0f);
     shader.setMat4("projection",projection);
 
     glm::mat4 cameraModel(1.0f);
