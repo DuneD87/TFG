@@ -9,7 +9,8 @@
 #include "../BasicShapeBuilder.h"
 class BasicTerrain : public Entity{
 public:
-    BasicTerrain(float width, float height, int wSeg, int hSeg,const glm::vec3 &position, const std::vector<Texture> &textures);
+    BasicTerrain(float width, float height, int wSeg, int hSeg,const glm::vec3 &position,
+                 const std::vector<Texture> &textures, const char * path);
     void draw(Shader &shader, bool outlined, int depthMap);
 private:
     float width,height;
@@ -18,7 +19,7 @@ private:
     std::vector<Texture> textures;
     Mesh terrainMesh;
     int vertexCount;
-    void setupMesh();
+    void setupMesh(const char * path);
 };
 
 
