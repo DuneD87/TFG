@@ -25,21 +25,24 @@ void BasicTerrain::setupMesh(const char * path) {
 
     float segWidth = width / gridX;
     float segHeight = height / gridY;
-    int w;
-    int h;
-    int comp;
-    stbi_set_flip_vertically_on_load(false);
-    unsigned char* image = stbi_load(path, &w, &h, &comp, 1);
 
-    stbi_set_flip_vertically_on_load(true);
-    if(image == nullptr)
-        throw(std::string("Failed to load heightmap"));
-    std::cout<<w<<std::endl;
     std::vector<Vertex> vertex;
     std::vector<Texture> text;
     std::vector<unsigned int> indices;
     srand(time(NULL));
     float hMap = 100;
+    FastNoiseLite noise;
+    noise.SetNoiseType(FastNoiseLite::NoiseType_Cellular);
+    noise.SetFractalType(FastNoiseLite::FractalType_PingPong);
+    noise.SetFractalOctaves(80);
+    noise.SetFractalLacunarity(2.0f);
+    noise.SetFractalGain(0.9);
+    noise.SetFractalWeightedStrength(0.7);
+    noise.SetFractalPingPongStrength(3);
+    noise.SetCellularDistanceFunction(FastNoiseLite::CellularDistanceFunction_Euclidean);
+    noise.SetCellularReturnType(FastNoiseLite::CellularReturnType_Distance2Add);
+    noise.SetCellularJitter(1.0f);
+
     //Vertices and texcoords
     for (int iy = 0; iy < gridY1; iy++)
     {
@@ -48,7 +51,7 @@ void BasicTerrain::setupMesh(const char * path) {
         {
             Vertex auxVert;
             float x = ix * segWidth - halfWidth;
-            float y = bilinearSample(ix,iy,image,w);
+            float y = noise.GetNoise((float)ix,(float)iy)*300;
             auxVert.Position = glm::vec3(x,-15+y,z);
             auxVert.TexCoords = glm::vec2(((float)ix/(gridX)),(float)iy/(gridY))*glm::vec2(wSeg,hSeg) ;
             vertex.push_back(auxVert);
@@ -86,7 +89,6 @@ void BasicTerrain::setupMesh(const char * path) {
     }
 
     terrainMesh = new Mesh(vertex,indices,"grass2.png","../Textures/");
-    stbi_image_free(image);
 }
 
 void BasicTerrain::draw(Shader &shader, bool outLined, int depthMap) {
@@ -97,40 +99,47 @@ BasicTerrain::~BasicTerrain() {
  delete terrainMesh;
 }
 
-float BasicTerrain::bilinearSample(float x, float y, unsigned char* data,float width) {
+float BasicTerrain::bilinearSample(float x, float y, unsigned char* data,float wdt) {
+    auto offset = -250.0f;
+    auto dimensions = 500.0f;
+
+    auto xf = sat((x - offset)/dimensions);
+    auto yf = sat((y-offset) / dimensions);
 
     float w = width - 1.0f;
     float h = height - 1.0f;
 
-    float x1 = std::floor(x*w);
-    float y1 = std::floor(y*h);
-    float x2 = std::clamp(float(x1) + 1.0f,0.0f,w);
-    float y2 = std::clamp(float(y1) + 1.0f,0.0f,h);
+    float x1 = std::floor(xf*w);
+    float y1 = std::floor(yf*h);
+    float x2 = std::clamp(x1 + 1.0f,0.0f,w);
+    float y2 = std::clamp(y1 + 1.0f,0.0f,h);
 
-    float xp = x * w - x1;
-    float yp = y * h - y1;
+    float xp = xf * w - x1;
+    float yp = yf * h - y1;
 
-    float p11 = getPixelHeight(data,x1,y1,width,1);
-    float p21 = getPixelHeight(data,x2,y1,width,1);
-    float p12 = getPixelHeight(data,x1,y2,width,1);
-    float p22 = getPixelHeight(data,x2,y2,width,1);
 
-    float px1 = lerp(float(yp),p11,p21);
-    float px2 = lerp(float(xp),p12,p22);
-    float sample = lerp(yp,px1,px2)*10;
-    std::cout<<sample<<std::endl;
-    return sample;
+    float p11 = getPixelHeight(data,x1,y1,wdt,1);
+    float p21 = getPixelHeight(data,x2,y1,wdt,1);
+    float p12 = getPixelHeight(data,x1,y2,wdt,1);
+    float p22 = getPixelHeight(data,x2,y2,wdt,1);
 
+    float px1 = lerp(yp,p11,p21);
+    float px2 = lerp(xp,p12,p22);
+    float sample = lerp(yp,px1,px2);
+    return sample * 10;
 }
 
 float BasicTerrain::getPixelHeight(unsigned char *data, float x, float y,float w,float hScale) {
     float pixelHeight = 0;
     if (x < 0 || x >= w || y < 0 || y >= w)
+    {
+        //std::cout << "x: " << x << " y: " << y << " w: " << w << std::endl;
         pixelHeight = 0.0f;
-    else
+    }else
     {
         float value = static_cast<float>(*(data + int(x*w + y)));
         pixelHeight = hScale * (value / 255.0f);
+        //std::cout<<pixelHeight<<std::endl;
     }
     return pixelHeight;
 }

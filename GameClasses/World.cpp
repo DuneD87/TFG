@@ -14,7 +14,7 @@ World::World(const char *scenePath, const char *skyBoxPath, unsigned int scrWidt
     renderer->nPointLights = nPointLights;
     renderer->camera = camera;
     std::vector<Texture> text;
-    terrain = new BasicTerrain(2000,2000,256,256,glm::vec3(0),text, "../Textures/hMap1.jpeg");
+    terrain = new BasicTerrain(4000,4000,512,512,glm::vec3(0),text, "../Textures/hMap1.png");
     worldEntities.push_back(terrain);
 }
 
