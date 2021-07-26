@@ -74,14 +74,14 @@ PhysicsObject* XmlParser::getObject(xml_node<> * model) {
     xml_node<> * rot = model->first_node("Rotation");
     xml_node<> * scale = model->first_node("Scale");
 
-    Model modelRes;
+
     if (typePre == "Cube") {
         const char * path = (const char * )model->first_attribute("path")->value();
         std::string directory = model->first_attribute("directory")->value();
         Cube cube;
-        Mesh cubeMesh = procesMesh(cube.vertices, cube.indices,path,directory,192,36);
-        modelRes.meshes.push_back(cubeMesh);
-
+        Mesh *cubeMesh = procesMesh(cube.vertices, cube.indices,path,directory,192,36);
+        Model *modelRes = new Model();
+        modelRes->meshes.push_back(cubeMesh);
         auto *obj = new PhysicsObject(entIndex,1,modelRes);
         obj->setPosition(getValues3(pos));
         glm::vec4 rotation = getValues4(rot);
@@ -101,8 +101,8 @@ PhysicsObject* XmlParser::getObject(xml_node<> * model) {
     }
 }
 
-vector<Mesh> XmlParser::getSprites() {
-    std::vector<Mesh> res;
+vector<Mesh*> XmlParser::getSprites() {
+    std::vector<Mesh*> res;
     xml_node<> * models = _rootNode->first_node("Effects");
 
     //Renderer model parsing
@@ -115,7 +115,7 @@ vector<Mesh> XmlParser::getSprites() {
         xml_node<> * rot = effect->first_node("Rotation");
         xml_node<> * scale = effect->first_node("Scale");
 
-        Mesh cubeMesh;
+        Mesh *cubeMesh;
         if (typePre == "Sprite" || typePre == "Window") {
             const char * path = (const char * )effect->first_attribute("path")->value();
             std::string directory = effect->first_attribute("directory")->value();
@@ -123,11 +123,11 @@ vector<Mesh> XmlParser::getSprites() {
             cubeMesh = procesMesh(quad.vertices, quad.indices,path,directory,32,6);
         }
 
-        cubeMesh.position = getValues3(pos);
+        cubeMesh->position = getValues3(pos);
         glm::vec4 rotation = getValues4(rot);
-        cubeMesh.axis= glm::vec3(rotation);
-        cubeMesh.angle = rotation.w;
-        cubeMesh.scale = getValues3(scale);
+        cubeMesh->axis= glm::vec3(rotation);
+        cubeMesh->angle = rotation.w;
+        cubeMesh->scale = getValues3(scale);
 
         res.push_back(cubeMesh);
     }

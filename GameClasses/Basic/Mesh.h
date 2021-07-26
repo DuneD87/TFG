@@ -76,8 +76,10 @@ unsigned int static TextureFromFile(const char *path, const std::string &directo
 }
 
 
+
 class Mesh {
 public:
+
     // mesh Data
     std::vector<Vertex>       vertices;
     std::vector<unsigned int> indices;
@@ -89,6 +91,9 @@ public:
     glm::vec3 scale;
 
     unsigned int VAO;
+
+    ~Mesh();
+
     Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures);
     Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, const char *path, std::string directory);
     Mesh();
@@ -96,6 +101,8 @@ public:
     void Draw(Shader &shader, bool outlined, unsigned int depthMap);
 
     void outlineMesh(Shader &outline, glm::vec3 scale);
+
+
 private:
     glm::mat4 model;
     unsigned int VBO, EBO;

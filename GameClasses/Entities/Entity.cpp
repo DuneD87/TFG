@@ -5,11 +5,11 @@
 #include "Entity.h"
 
 void Entity::setModel(const char *path) {
-    this->entityModel = Model(path);
+    this->entityModel = new Model(path);
 }
 
-Model Entity::getModel() {
-    return this->entityModel;
+Model* Entity::getModel() {
+    return entityModel;
 }
 
 glm::vec3 Entity::getPosition() {
@@ -39,5 +39,11 @@ void Entity::setScale(glm::vec3 scale) {
 int Entity::getType() {
     return type;
 }
+
+Entity::~Entity() {
+
+}
+
+
 
 

@@ -12,6 +12,9 @@ class World {
 public:
     Camera camera;
     int nPointLights;
+
+    ~World();
+
     World(const char * scenePath, const char * skyBoxPath, unsigned int scrWidth, unsigned int scrHeight, Camera *camera);
 
     void addEntity(Entity *entity);
@@ -23,7 +26,7 @@ private:
     void addLightToWorld(Light &light);
     BasicTerrain *terrain;
     vector<Entity*> worldEntities;
-    Renderer renderer;
+    Renderer *renderer;
 };
 
 

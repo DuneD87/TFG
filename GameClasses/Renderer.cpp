@@ -63,7 +63,7 @@ void Renderer::renderScene(vector<Entity*> worldEnts) {
     }
 
     for (int i = 0; i < selectedeItems.size();i++)
-        worldEnts[selectedeItems[i]]->getModel().outlineObject(shaders[2],glm::vec3(1.1));
+        worldEnts[selectedeItems[i]]->getModel()->outlineObject(shaders[2],glm::vec3(1.1));
 
     glDepthFunc(GL_LEQUAL);
     shaders[4].use();
@@ -324,4 +324,8 @@ void Renderer::removeShader(int shaderId) {
     for (it = shaders.begin(); it < shaders.end(); it++)
         if (it->ID == shaderId)
             shaders.erase(it);
+}
+
+Renderer::~Renderer() {
+    std::cout<<"Destroying renderer"<<std::endl;
 }

@@ -33,7 +33,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     if(key == GLFW_KEY_L) spotLightEnabled = !spotLightEnabled;
 }
 
-void processInput(GLFWwindow *window,World &world)
+void processInput(GLFWwindow *window,World *world)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
@@ -51,17 +51,17 @@ void processInput(GLFWwindow *window,World &world)
         cam->ProcessKeyboard(DOWN,deltaTime);
 
     if (glfwGetKey(window,GLFW_KEY_0) == GLFW_PRESS)
-        world.getRenderer()->setPostProcess(5);
+        world->getRenderer()->setPostProcess(5);
     if (glfwGetKey(window,GLFW_KEY_1) == GLFW_PRESS)
-        world.getRenderer()->setPostProcess(0);
+        world->getRenderer()->setPostProcess(0);
     if (glfwGetKey(window,GLFW_KEY_2) == GLFW_PRESS)
-        world.getRenderer()->setPostProcess(1);
+        world->getRenderer()->setPostProcess(1);
     if (glfwGetKey(window,GLFW_KEY_3) == GLFW_PRESS)
-        world.getRenderer()->setPostProcess(2);
+        world->getRenderer()->setPostProcess(2);
     if (glfwGetKey(window,GLFW_KEY_4) == GLFW_PRESS)
-        world.getRenderer()->setPostProcess(3);
+        world->getRenderer()->setPostProcess(3);
     if (glfwGetKey(window,GLFW_KEY_5) == GLFW_PRESS)
-        world.getRenderer()->setPostProcess(4);
+        world->getRenderer()->setPostProcess(4);
 
 }
 
@@ -140,7 +140,8 @@ int main()
 {
 
     GLFWwindow *window = createWindow();
-    World world("../Scenes/Scene1.xml","../Textures/SkyBox/space1/",SCR_WIDTH,SCR_HEIGHT,cam);
+    World *world = new World("../Scenes/Scene1.xml","../Textures/SkyBox/space1/",SCR_WIDTH,SCR_HEIGHT,cam);
+
     //scene1.setPostProcess(0);
     //Render loop
     while (!glfwWindowShouldClose(window))
@@ -148,7 +149,7 @@ int main()
         // input
         // -----
         processInput(window, world);
-        world.renderWorld();
+        world->renderWorld();
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
@@ -158,7 +159,7 @@ int main()
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
-
+    delete world;
     // optional: de-allocate all resources once they've outlived their purpose:
     // ------------------------------------------------------------------------
 

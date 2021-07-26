@@ -11,7 +11,7 @@ Model::Model(std::string const &path, bool gamma) : gammaCorrection(gamma)
 
 void Model::Draw(Shader &shader, bool outlined, unsigned int depthMap) {
     for (int i = 0; i < meshes.size();i++)
-        meshes[i].Draw(shader, outlined,depthMap);
+        meshes[i]->Draw(shader, outlined,depthMap);
 }
 
 void Model::loadModel(const std::string &path) {
@@ -37,7 +37,7 @@ void Model::processNode(aiNode *node, const aiScene *scene) {
         processNode(node->mChildren[i],scene);
 }
 
-Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
+Mesh* Model::processMesh(aiMesh *mesh, const aiScene *scene) {
     std::vector<Vertex> vertices;
     std::vector<unsigned int> indices;
     std::vector<Texture> textures;
@@ -115,7 +115,7 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
     textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
 
     // return a mesh object created from the extracted mesh data
-    return Mesh(vertices, indices, textures);
+    return new Mesh(vertices, indices, textures);
 }
 
 std::vector<Texture> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType type, std::string typeName) {
@@ -151,7 +151,7 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType 
 void Model::setPosition(glm::vec3 position) {
     for (int i = 0; i < meshes.size();i++)
     {
-        meshes[i].position = position;
+        meshes[i]->position = position;
     }
 
 }
@@ -159,15 +159,15 @@ void Model::setPosition(glm::vec3 position) {
 void Model::setRotation(float angle, glm::vec3 axis) {
     for (int i = 0; i < meshes.size();i++)
     {
-        meshes[i].angle = angle;
-        meshes[i].axis = axis;
+        meshes[i]->angle = angle;
+        meshes[i]->axis = axis;
     }
 }
 
 void Model::setScale(glm::vec3 scale) {
     for (int i = 0; i < meshes.size();i++)
     {
-        meshes[i].scale = scale;
+        meshes[i]->scale = scale;
     }
 }
 
@@ -178,13 +178,18 @@ Model::Model() {
 void Model::outlineObject(Shader &outline, glm::vec3 scale) {
     for (int i = 0; i < meshes.size();i++)
     {
-        meshes[i].outlineMesh(outline,scale);
+        meshes[i]->outlineMesh(outline,scale);
     }
 }
 
 void Model::setModel(glm::mat4 model) {
     for (int i = 0; i < meshes.size();i++)
     {
-        meshes[i].setModel(model);
+        meshes[i]->setModel(model);
     }
+}
+
+Model::~Model() {
+    for (auto mesh : meshes)
+        delete mesh;
 }

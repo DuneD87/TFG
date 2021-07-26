@@ -7,18 +7,22 @@
 PhysicsObject::PhysicsObject(int entId,int type, const char *path){
     this->id = id;
     this->type = 1;
-    this->entityModel = Model(path);
+    this->entityModel = new Model(path);
 }
 
-PhysicsObject::PhysicsObject(int entId,int type, Model &model){
+PhysicsObject::PhysicsObject(int entId,int type, Model *model){
     this->id = id;
     this->type = 1;
     this->entityModel = model;
 }
 
 void PhysicsObject::draw(Shader &shader, bool outlined, int depthMap) {
-    this->entityModel.setPosition(_position);
-    this->entityModel.setRotation(_rotation.w,glm::vec3(_rotation));
-    this->entityModel.setScale(_scale);
-    this->entityModel.Draw(shader,outlined,depthMap);
+    this->entityModel->setPosition(_position);
+    this->entityModel->setRotation(_rotation.w,glm::vec3(_rotation));
+    this->entityModel->setScale(_scale);
+    this->entityModel->Draw(shader,outlined,depthMap);
+}
+
+PhysicsObject::~PhysicsObject() {
+    delete entityModel;
 }

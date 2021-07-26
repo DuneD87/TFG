@@ -14,7 +14,8 @@ public:
     int id;
 
 
-    Model getModel();
+    Model* getModel();
+    virtual ~Entity();
     void setModel(const char * path);
     virtual glm::vec3 getPosition();
     virtual glm::vec4 getRotation();
@@ -30,7 +31,7 @@ protected:
     glm::vec3 _position;
     glm::vec4 _rotation;
     glm::vec3 _scale;
-    Model entityModel;
+    Model *entityModel;
     /*
    * Types:
     * 0-> LIGHT

@@ -6,15 +6,15 @@
 
 World::World(const char *scenePath, const char *skyBoxPath, unsigned int scrWidth, unsigned int scrHeight,
              Camera *camera) {
-    renderer = Renderer(scrWidth,scrHeight,camera,skyBoxPath);
+    renderer = new Renderer(scrWidth,scrHeight,camera,skyBoxPath);
     XmlParser parser(scenePath);
     worldEntities = parser._ents;
 
     nPointLights = parser.nPointLights;
-    renderer.nPointLights = nPointLights;
-    renderer.camera = camera;
+    renderer->nPointLights = nPointLights;
+    renderer->camera = camera;
     std::vector<Texture> text;
-    terrain = new BasicTerrain(2000,2000,256,256,glm::vec3(0),text, "../Textures/hMap2.png");
+    terrain = new BasicTerrain(2000,2000,256,256,glm::vec3(0),text, "../Textures/hMap1.jpeg");
     worldEntities.push_back(terrain);
 }
 
@@ -35,9 +35,15 @@ void World::addLightToWorld(Light &light) {
 }
 
 void World::renderWorld() {
-    renderer.renderScene(worldEntities);
+    renderer->renderScene(worldEntities);
 }
 
 Renderer* World::getRenderer() {
-    return &renderer;
+    return renderer;
+}
+
+World::~World() {
+    for (auto ent : worldEntities)
+        delete ent;
+    delete renderer;
 }

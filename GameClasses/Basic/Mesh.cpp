@@ -21,7 +21,7 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, cons
     this->angle = 0;
     Texture baseText;
     baseText.path = "../Textures/" + std::string(path);
-    baseText.type = "texture_specular";
+    baseText.type = "texture_diffuse";
     baseText.id = TextureFromFile( path,"../Textures/",false);
     std::vector<Texture> textAux;
     textAux.push_back(baseText);
@@ -152,6 +152,14 @@ Mesh::Mesh() {
 
 void Mesh::setModel(glm::mat4 model) {
     this->model = model;
+}
+
+Mesh::~Mesh() {
+ for (int i = 0; i < textures.size();i++)
+     glDeleteTextures(1,&textures[i].id);
+    glDeleteVertexArrays(1, &VAO);
+    glDeleteBuffers(1, &VBO);
+    glDeleteBuffers(1, &EBO);
 }
 
 

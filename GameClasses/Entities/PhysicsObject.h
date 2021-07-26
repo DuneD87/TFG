@@ -9,7 +9,9 @@
 class PhysicsObject : public Entity {
 public:
     PhysicsObject(int entId,int type,const char * path);
-    PhysicsObject(int entId,int type,Model &model);
+    PhysicsObject(int entId,int type,Model *model);
+
+    ~PhysicsObject();
 
     void draw(Shader &shader, bool outlined, int depthMap);
 };

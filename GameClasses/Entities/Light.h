@@ -11,6 +11,9 @@
 
 class Light : public Entity {
 public:
+    virtual ~Light();
+
+public:
     Light(std::string lightType, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular, float constant,
           float linear, float quadratic, int entId, int lightIndex);
     Light(std::string lightType, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular,glm::vec3 direction, int entId);

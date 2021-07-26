@@ -162,7 +162,7 @@ static float getPixelHeight(unsigned char* data, int width, int x, int y,int hSc
 
 
 
-static Mesh procesMesh(float vertices[], unsigned int indices[],const char * path, std::string dir, int nVertices, int nIndices)
+static Mesh* procesMesh(float vertices[], unsigned int indices[],const char * path, std::string dir, int nVertices, int nIndices)
 {
     std::vector<Vertex> vertexes;
     std::vector<Texture> text;
@@ -175,8 +175,7 @@ static Mesh procesMesh(float vertices[], unsigned int indices[],const char * pat
         actualVertex.TexCoords = glm::vec2(vertices[i+6],vertices[i+7]);
         vertexes.push_back(actualVertex);
     }
-    Mesh res(vertexes, indexes, path, dir);
-    return res;
+    return new Mesh(vertexes,indexes,path,dir);
 }
 
 #endif //OPENGLTEST_BASICSHAPEBUILDER_H

@@ -103,5 +103,9 @@ void Light::draw(Shader &shader,bool outlined, int depthMap) {
     }
 }
 
+Light::~Light() {
+    //check light type and set values to 0 in the shaders uniforms so the light doesnt stick
+}
+
 
 

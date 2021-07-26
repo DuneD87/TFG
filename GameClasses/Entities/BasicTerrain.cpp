@@ -30,6 +30,7 @@ void BasicTerrain::setupMesh(const char * path) {
     int comp;
     stbi_set_flip_vertically_on_load(false);
     unsigned char* image = stbi_load(path, &w, &h, &comp, 1);
+    //stbi_image_free(image);
     stbi_set_flip_vertically_on_load(true);
     if(image == nullptr)
         throw(std::string("Failed to load heightmap"));
@@ -38,7 +39,7 @@ void BasicTerrain::setupMesh(const char * path) {
     std::vector<Texture> text;
     std::vector<unsigned int> indices;
     srand(time(NULL));
-    float hMap = 10;
+    float hMap = 100;
     //Vertices and texcoords
     for (int iy = 0; iy < gridY1; iy++)
     {
@@ -47,7 +48,6 @@ void BasicTerrain::setupMesh(const char * path) {
         {
             Vertex auxVert;
             float x = ix * segWidth - halfWidth;
-            int index = (int)w * iy + ix;
             float y = getPixelHeight(image,w,iy,ix,hMap);
             auxVert.Position = glm::vec3(x,-15+y,z);
             auxVert.TexCoords = glm::vec2(((float)ix/(gridX)),(float)iy/(gridY))*glm::vec2(wSeg,hSeg) ;
@@ -88,11 +88,15 @@ void BasicTerrain::setupMesh(const char * path) {
     {
         vertex[i].Normal = glm::normalize(vertex[i].Normal);
     }
-    terrainMesh = Mesh(vertex,indices,"grassy2.png","../Textures/");
-    stbi_image_free(image);
+    terrainMesh = new Mesh(vertex,indices,"grassy.png","../Textures/");
+
 }
 
 void BasicTerrain::draw(Shader &shader, bool outLined, int depthMap) {
-    terrainMesh.Draw(shader,outLined,depthMap);
+    terrainMesh->Draw(shader,outLined,depthMap);
+}
+
+BasicTerrain::~BasicTerrain() {
+ delete terrainMesh;
 }
 

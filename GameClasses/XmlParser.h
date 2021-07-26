@@ -33,7 +33,7 @@ private:
 
     Light* getLight(xml_node<> *light);
     PhysicsObject* getObject(xml_node<> *model);
-    vector<Mesh> getSprites();
+    vector<Mesh*> getSprites();
 
     glm::vec3 getValues3(xml_node<> *pos);
     glm::vec4 getValues4(xml_node<> *rot);

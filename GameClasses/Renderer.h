@@ -22,6 +22,7 @@ public:
     Camera *camera;
     bool enableSpotLight = false;
     Renderer();
+    ~Renderer();
     Renderer(unsigned int scrWidth, unsigned int scrHeight, Camera *camera, const char* skyboxPath);
     void renderScene(vector<Entity*> worldEnts);
     void setPostProcess(unsigned int index);
@@ -37,7 +38,7 @@ private:
     GLFWwindow *window;
     std::vector<Mesh> effects;
     std::vector<Shader> shaders;
-    glm::vec3 sunPos = glm::vec3(2.0f, -2.0f, 2.0f);
+    glm::vec3 sunPos = glm::vec3(2.0f, 1000.0f, 2.0f);
     glm::mat4 lightSpaceMatrix;
 
     Light spotLight = Light("", glm::vec3(), glm::vec3(), glm::vec3(), 0, 0, 0,-1,-1);

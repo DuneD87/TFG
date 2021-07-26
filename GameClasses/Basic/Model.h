@@ -25,15 +25,16 @@ class Model {
 public:
     // model data
     std::vector<Texture> textures_loaded;	// stores all the textures loaded so far, optimization to make sure textures aren't loaded more than once.
-    std::vector<Mesh>    meshes;
+    std::vector<Mesh*>    meshes;
     std::string directory;
     bool gammaCorrection;
 
     // constructor, expects a filepath to a 3D model.
     Model(std::string const &path, bool gamma = false);
     Model();
+    ~Model();
     void Draw(Shader &shader, bool outlined = false, unsigned int depthMap = -1);
-    Mesh processMesh(aiMesh *mesh, const aiScene *scene);
+    Mesh* processMesh(aiMesh *mesh, const aiScene *scene);
     std::vector<Texture> loadMaterialTextures(aiMaterial *mat, aiTextureType type, std::string typeName);
     void setPosition(glm::vec3 position);
     void setRotation(float angle, glm::vec3 axis);
