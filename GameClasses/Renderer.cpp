@@ -328,4 +328,11 @@ void Renderer::removeShader(int shaderId) {
 
 Renderer::~Renderer() {
     std::cout<<"Destroying renderer"<<std::endl;
+    glDeleteVertexArrays(1,&quadVAO);
+    glDeleteVertexArrays(1,&skyboxVAO);
+    glDeleteBuffers(1,&quadVBO);
+    glDeleteBuffers(1,&skyboxVBO);
+    glDeleteTextures(1,&cubemapTexture);
+    glDeleteFramebuffers(1,&depthMap);
+    glDeleteFramebuffers(1,&depthMapFBO);
 }

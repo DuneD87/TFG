@@ -30,7 +30,7 @@ void BasicTerrain::setupMesh(const char * path) {
     int comp;
     stbi_set_flip_vertically_on_load(false);
     unsigned char* image = stbi_load(path, &w, &h, &comp, 1);
-    //stbi_image_free(image);
+
     stbi_set_flip_vertically_on_load(true);
     if(image == nullptr)
         throw(std::string("Failed to load heightmap"));
@@ -80,16 +80,13 @@ void BasicTerrain::setupMesh(const char * path) {
         auto edgeAB = vertex[iB].Position - vertex[iA].Position;
         auto edgeAC = vertex[iC].Position - vertex[iA].Position;
         auto norm = glm::normalize(glm::cross(edgeAB,edgeAC));
-        vertex[iA].Normal += norm;
-        vertex[iB].Normal += norm;
-        vertex[iC].Normal += norm;
+        vertex[iA].Normal = norm;
+        vertex[iB].Normal = norm;
+        vertex[iC].Normal = norm;
     }
-    for (int i = 0; i < vertex.size();i++)
-    {
-        vertex[i].Normal = glm::normalize(vertex[i].Normal);
-    }
-    terrainMesh = new Mesh(vertex,indices,"grassy.png","../Textures/");
 
+    terrainMesh = new Mesh(vertex,indices,"grassy.png","../Textures/");
+    stbi_image_free(image);
 }
 
 void BasicTerrain::draw(Shader &shader, bool outLined, int depthMap) {
