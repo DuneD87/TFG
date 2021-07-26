@@ -48,7 +48,7 @@ void BasicTerrain::setupMesh(const char * path) {
         {
             Vertex auxVert;
             float x = ix * segWidth - halfWidth;
-            float y = getPixelHeight(image,w,iy,ix,hMap);
+            float y = bilinearSample(ix,iy,image,w);
             auxVert.Position = glm::vec3(x,-15+y,z);
             auxVert.TexCoords = glm::vec2(((float)ix/(gridX)),(float)iy/(gridY))*glm::vec2(wSeg,hSeg) ;
             vertex.push_back(auxVert);
@@ -85,7 +85,7 @@ void BasicTerrain::setupMesh(const char * path) {
         vertex[iC].Normal = norm;
     }
 
-    terrainMesh = new Mesh(vertex,indices,"grassy.png","../Textures/");
+    terrainMesh = new Mesh(vertex,indices,"grass2.png","../Textures/");
     stbi_image_free(image);
 }
 
@@ -95,5 +95,43 @@ void BasicTerrain::draw(Shader &shader, bool outLined, int depthMap) {
 
 BasicTerrain::~BasicTerrain() {
  delete terrainMesh;
+}
+
+float BasicTerrain::bilinearSample(float x, float y, unsigned char* data,float width) {
+
+    float w = width - 1.0f;
+    float h = height - 1.0f;
+
+    float x1 = std::floor(x*w);
+    float y1 = std::floor(y*h);
+    float x2 = std::clamp(float(x1) + 1.0f,0.0f,w);
+    float y2 = std::clamp(float(y1) + 1.0f,0.0f,h);
+
+    float xp = x * w - x1;
+    float yp = y * h - y1;
+
+    float p11 = getPixelHeight(data,x1,y1,width,1);
+    float p21 = getPixelHeight(data,x2,y1,width,1);
+    float p12 = getPixelHeight(data,x1,y2,width,1);
+    float p22 = getPixelHeight(data,x2,y2,width,1);
+
+    float px1 = lerp(float(yp),p11,p21);
+    float px2 = lerp(float(xp),p12,p22);
+    float sample = lerp(yp,px1,px2)*10;
+    std::cout<<sample<<std::endl;
+    return sample;
+
+}
+
+float BasicTerrain::getPixelHeight(unsigned char *data, float x, float y,float w,float hScale) {
+    float pixelHeight = 0;
+    if (x < 0 || x >= w || y < 0 || y >= w)
+        pixelHeight = 0.0f;
+    else
+    {
+        float value = static_cast<float>(*(data + int(x*w + y)));
+        pixelHeight = hScale * (value / 255.0f);
+    }
+    return pixelHeight;
 }
 

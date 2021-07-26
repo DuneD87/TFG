@@ -335,4 +335,6 @@ Renderer::~Renderer() {
     glDeleteTextures(1,&cubemapTexture);
     glDeleteFramebuffers(1,&depthMap);
     glDeleteFramebuffers(1,&depthMapFBO);
+    for (auto shader: shaders)
+        glDeleteShader(shader.ID);
 }

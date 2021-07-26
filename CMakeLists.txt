@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.3)
 project(opengltest)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
 set(SOURCE_FILES main.cpp)
 find_package(ReactPhysics3D REQUIRED)
 if (assimp_FOUND)

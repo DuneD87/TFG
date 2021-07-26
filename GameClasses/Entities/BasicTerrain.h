@@ -22,6 +22,9 @@ private:
     Mesh *terrainMesh;
     int vertexCount;
     void setupMesh(const char * path);
+    float lerp(float x, float y, float t) {return x + (y - x) * t;}
+    float getPixelHeight(unsigned char* data, float x, float y,float w,float hScale);
+    float bilinearSample(float x,float,unsigned char* data, float width);
 };
 
 

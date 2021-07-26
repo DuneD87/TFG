@@ -149,15 +149,7 @@ struct Cylinder {
 
 static float getPixelHeight(unsigned char* data, int width, int x, int y,int hScale)
 {
-    float height = 0;
-    if (x < 0 || x >= width || y < 0 || y >= width)
-        height = 0.0f;
-    else
-    {
-        float value = static_cast<float>(*(data + (x*width + y)));
-        height = hScale * (value / 255.0f);
-    }
-    return height;
+
 }
 
 
