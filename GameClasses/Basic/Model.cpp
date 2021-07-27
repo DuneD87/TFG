@@ -93,7 +93,12 @@ Mesh* Model::processMesh(aiMesh *mesh, const aiScene *scene) {
     }
     // process materials
     aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
-
+    aiColor3D colorAmbient (0.0f,0.0f,0.0f);
+    aiColor3D colorSpec (0.0f,0.0f,0.0f);
+    aiColor3D colorDiffuse (0.0f,0.0f,0.0f);
+    material->Get(AI_MATKEY_COLOR_SPECULAR,colorSpec);
+    material->Get(AI_MATKEY_COLOR_DIFFUSE,colorDiffuse);
+    material->Get(AI_MATKEY_COLOR_AMBIENT,colorAmbient);
     // we assume a convention for sampler names in the shaders. Each diffuse texture should be named
     // as 'texture_diffuseN' where N is a sequential number ranging from 1 to MAX_SAMPLER_NUMBER.
     // Same applies to other texture as the following list summarizes:
@@ -104,6 +109,7 @@ Mesh* Model::processMesh(aiMesh *mesh, const aiScene *scene) {
     // 1. diffuse maps
     std::vector<Texture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
     textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
+
     // 2. specular maps
     std::vector<Texture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
     textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
@@ -113,7 +119,16 @@ Mesh* Model::processMesh(aiMesh *mesh, const aiScene *scene) {
     // 4. height maps
     std::vector<Texture> heightMaps = loadMaterialTextures(material, aiTextureType_AMBIENT, "texture_height");
     textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
-
+    if (textures.size() == 0)
+    {
+        Texture text;
+        text.type = "material";
+        float val = 4;
+        text.ka = glm::vec3(colorAmbient.r*val,colorAmbient.g*val,colorAmbient.b*val);
+        text.kd = glm::vec3(colorDiffuse.r*val,colorDiffuse.g*val,colorDiffuse.b*val);
+        text.ks = glm::vec3(colorSpec.r*val,colorSpec.g*val,colorSpec.b*val);
+        textures.push_back(text);
+    }
     // return a mesh object created from the extracted mesh data
     return new Mesh(vertices, indices, textures);
 }

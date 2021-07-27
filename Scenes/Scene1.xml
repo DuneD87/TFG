@@ -9,8 +9,6 @@
                 <Scale x="1.0" y="1.0" z="1.0"/>
             </Model>
         </Entity>
-
-
         <Entity type = "Light">
             <Light type="pointLight" constant="1.0" linear="0.09" quadratic="0.032">
                 <Position x="1.6" y="-1" z="2.0"/>
@@ -21,7 +19,7 @@
         </Entity>
         <Entity type = "Light">
             <Light type="dirLight">
-                <Direction x="-0.2" y="-1" z="-0.3"/>
+                <Direction x="0" y="-0.5" z="0"/>
                 <Ambient x="0.05" y="0.05f" z="0.05f"/>
                 <Diffuse x="0.7" y="0.7f" z="0.7"/>
                 <Specular x="1.0" y="1.0" z="1.0"/>

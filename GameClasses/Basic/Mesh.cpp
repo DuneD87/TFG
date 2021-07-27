@@ -21,7 +21,7 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, cons
     this->angle = 0;
     Texture baseText;
     baseText.path = "../Textures/" + std::string(path);
-    baseText.type = "texture_diffuse";
+    baseText.type = "texture_specular";
     baseText.id = TextureFromFile( path,"../Textures/",false);
     textures.push_back(baseText);
 
@@ -63,11 +63,12 @@ void Mesh::Draw(Shader &shader, bool outlined,unsigned int depthMap) {
         glStencilMask(0x00);
     }
     unsigned int i = 0;
+
     for(i; i < textures.size(); i++)
     {
         glActiveTexture(GL_TEXTURE0 + i); // active proper texture unit before binding
         // retrieve texture number (the N in diffuse_textureN)
-        std::string number;
+        std::string number = "1";
         std::string name = textures[i].type;
         if(name == "texture_diffuse")
             number = std::to_string(diffuseNr++);
@@ -79,10 +80,24 @@ void Mesh::Draw(Shader &shader, bool outlined,unsigned int depthMap) {
             number = std::to_string(heightNr++); // transfer unsigned int to stream
 
         // now set the sampler to the correct texture unit
+        if (name != "material")
+        {
+            shader.setInt("material.hasTexture",1);
+            glUniform1i(glGetUniformLocation(shader.ID, (name + number).c_str()), i);
+            // and finally bind the texture
+            glBindTexture(GL_TEXTURE_2D, textures[i].id);
+        } else
+        {
+            shader.setInt("material.hasTexture",0);
+            shader.setVec3("material.mAmbient",textures[i].ka);
+            shader.setVec3("material.mDiffuse",textures[i].kd);
+            shader.setVec3("material.mSpecular",textures[i].ks);
+        }
 
-        glUniform1i(glGetUniformLocation(shader.ID, (name + number).c_str()), i);
-        // and finally bind the texture
-        glBindTexture(GL_TEXTURE_2D, textures[i].id);
+    }
+    if (textures.size() == 0)
+    {
+
     }
     // draw mesh
     if (depthMap != -1)

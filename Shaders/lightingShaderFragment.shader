@@ -5,6 +5,10 @@ struct Material {
     sampler2D diffuse;
     sampler2D specular;
     float shininess;
+    int hasTexture;
+    vec3 mAmbient;
+    vec3 mDiffuse;
+    vec3 mSpecular;
 };
 
 struct DirLight {
@@ -152,9 +156,20 @@ vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir, vec4 FragPosLightSp
     vec3 reflectDir = reflect(-lightDir, normal);
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
     // combine results
-    vec3 ambient  = light.ambient  * vec3(texture(material.diffuse, TexCoords));
-    vec3 diffuse  = light.diffuse  * diff * vec3(texture(material.diffuse, TexCoords));
-    vec3 specular = light.specular * spec * vec3(texture(material.specular, TexCoords));
+    vec3 mDiffuse;
+    vec3 mSpecular;
+    if (material.hasTexture == 1)
+    {
+        mDiffuse = vec3(texture(material.diffuse,TexCoords));
+        mSpecular = vec3(texture(material.specular,TexCoords));
+    } else
+    {
+        mDiffuse = material.mDiffuse;
+        mSpecular = material.mSpecular;
+    }
+    vec3 ambient  = light.ambient  * mDiffuse;
+    vec3 diffuse  = light.diffuse  * diff * mDiffuse;
+    vec3 specular = light.specular * spec * mSpecular;
     float shadow = ShadowCalculation(FragPosLightSpace);
     return (ambient + (1-shadow)*(diffuse + specular));
 }
@@ -199,11 +214,11 @@ void main()
         float per = (normY/total);
         vec4 text = mix(
                     mix(
-                        mix(texture(texture_diffuse3,TexCoords),texture(texture_diffuse1,TexCoords),per*8),
-                        mix(texture(texture_diffuse1,TexCoords),texture(texture_diffuse2,TexCoords),per*16),
+                        mix(texture(texture_diffuse3,TexCoords),texture(texture_diffuse1,TexCoords),per),
+                        mix(texture(texture_diffuse1,TexCoords),texture(texture_diffuse2,TexCoords),per),
                     per),
-                    mix(texture(texture_diffuse2,TexCoords),texture(texture_diffuse4,TexCoords),per*8),
-                    per);
+                    mix(texture(texture_diffuse2,TexCoords),texture(texture_diffuse4,TexCoords),per*3),
+                    per/2);
         vec3 result2 = CalcTerrainLight(dirLight, norm, viewDir, FragPosLightSpace,lightPos,text);
         FragColor = vec4(result2,1.0);
     }

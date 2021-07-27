@@ -15,7 +15,25 @@ World::World(const char *scenePath, const char *skyBoxPath, unsigned int scrWidt
     renderer->camera = camera;
     std::vector<Texture> text;
     const char *textures[] = {"grassy2.png","grassFlowers.png","mud.png","seamless_rock2.png"};
-    terrain = new BasicTerrain(4000, 4000, 512, 512, glm::vec3(0), text, textures,4);
+    int wSeg= 1024;
+    terrain = new BasicTerrain(8000, 8000, wSeg, wSeg, glm::vec3(0), text, textures,4);
+    float hPoint = terrain->getHighestPoint();
+    float lPoint = terrain->getLowestPoint();
+    float mPoint = lPoint-((lPoint-hPoint)/2);
+    for (int i = 0; i < wSeg; i+=8)
+    {
+        for (int j = 0; j < wSeg; j+=8)
+        {
+            int index = i*j+j;
+            glm::vec3 groundPos = terrain->terrainMesh->vertices[index].Position;
+            if (groundPos.y < mPoint - 40 && groundPos.y > mPoint - 100)
+            {
+                PhysicsObject *tree = new PhysicsObject(-1,0,"../Models/treeLP1.obj");
+                tree->setPosition(groundPos);
+                worldEntities.push_back(tree);
+            }
+        }
+    }
     worldEntities.push_back(terrain);
 }
 

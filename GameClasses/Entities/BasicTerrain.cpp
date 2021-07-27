@@ -38,10 +38,10 @@ void BasicTerrain::setupMesh(const char ** path) {
     noise.SetNoiseType(FastNoiseLite::NoiseType_Cellular);
     noise.SetFractalType(FastNoiseLite::FractalType_PingPong);
     noise.SetFractalOctaves(80);
-    noise.SetFractalLacunarity(2.0f);
+    noise.SetFractalLacunarity(1.5f);
     noise.SetFractalGain(0.9);
-    noise.SetFractalWeightedStrength(0.7);
-    noise.SetFractalPingPongStrength(3);
+    noise.SetFractalWeightedStrength(0.9);
+    noise.SetFractalPingPongStrength(0.85);
     noise.SetCellularDistanceFunction(FastNoiseLite::CellularDistanceFunction_Euclidean);
     noise.SetCellularReturnType(FastNoiseLite::CellularReturnType_Distance2Add);
     noise.SetCellularJitter(1.0f);
@@ -54,7 +54,7 @@ void BasicTerrain::setupMesh(const char ** path) {
         {
             Vertex auxVert;
             float x = ix * segWidth - halfWidth;
-            float y = noise.GetNoise((float)ix,(float)iy)*300;
+            float y = noise.GetNoise((float)ix,(float)iy)*3000;
             if (y < lowestPoint)
                 lowestPoint = y;
             else if (y > highestPoint)
@@ -154,5 +154,13 @@ float BasicTerrain::getPixelHeight(unsigned char *data, float x, float y,float w
         //std::cout<<pixelHeight<<std::endl;
     }
     return pixelHeight;
+}
+
+float BasicTerrain::getLowestPoint() const {
+    return lowestPoint;
+}
+
+float BasicTerrain::getHighestPoint() const {
+    return highestPoint;
 }
 

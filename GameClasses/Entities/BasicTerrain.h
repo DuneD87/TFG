@@ -12,17 +12,24 @@
 class BasicTerrain : public Entity{
 public:
     virtual ~BasicTerrain();
-
+    Mesh *terrainMesh;
     BasicTerrain(float width, float height, int wSeg, int hSeg,const glm::vec3 &position,
                  const std::vector<Texture> &textures, const char ** path, uint nTextures);
     void draw(Shader &shader, bool outlined, int depthMap);
+private:
+public:
+    float getLowestPoint() const;
+
+    float getHighestPoint() const;
+
 private:
     float width,height,lowestPoint,highestPoint;
     int wSeg,hSeg;
     uint nText;
     glm::vec3 position;
     std::vector<Texture> textures;
-    Mesh *terrainMesh;
+
+    Mesh *tree;
     int vertexCount;
     void setupMesh(const char ** path);
     float getPixelHeight(unsigned char* data, float x, float y,float w,float hScale);

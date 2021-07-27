@@ -33,6 +33,7 @@ struct Texture {
     unsigned int id;
     std::string type;
     std::string path;
+    glm::vec3 ka,kd,ks;
 };
 
 unsigned int static TextureFromFile(const char *path, const std::string &directory, bool gamma)
