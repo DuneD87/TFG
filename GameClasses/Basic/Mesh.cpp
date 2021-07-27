@@ -23,14 +23,30 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, cons
     baseText.path = "../Textures/" + std::string(path);
     baseText.type = "texture_diffuse";
     baseText.id = TextureFromFile( path,"../Textures/",false);
-    std::vector<Texture> textAux;
-    textAux.push_back(baseText);
-    this->textures = textAux;
+    textures.push_back(baseText);
 
     // now that we have all the required data, set the vertex buffers and its attribute pointers.
     setupMesh();
 }
-
+Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, const char **path, uint nTextures) {
+    this->vertices = vertices;
+    this->indices = indices;
+    this->position = glm::vec3(0);
+    this->scale = glm::vec3(1);
+    this->axis = glm::vec3(1);
+    this->angle = 0;
+    for (auto i = 0; i < nTextures; i++)
+    {
+        Texture text;
+        text.path = "../Textures/" + std::string(path[i]);
+        std::cout<<path[i]<<std::endl;
+        text.type = "texture_diffuse";
+        text.id = TextureFromFile( path[i],"../Textures/",false);
+        textures.push_back(text);
+    }
+    // now that we have all the required data, set the vertex buffers and its attribute pointers.
+    setupMesh();
+}
 void Mesh::Draw(Shader &shader, bool outlined,unsigned int depthMap) {
     // bind appropriate textures
     unsigned int diffuseNr  = 1;
@@ -63,6 +79,7 @@ void Mesh::Draw(Shader &shader, bool outlined,unsigned int depthMap) {
             number = std::to_string(heightNr++); // transfer unsigned int to stream
 
         // now set the sampler to the correct texture unit
+
         glUniform1i(glGetUniformLocation(shader.ID, (name + number).c_str()), i);
         // and finally bind the texture
         glBindTexture(GL_TEXTURE_2D, textures[i].id);
@@ -161,5 +178,7 @@ Mesh::~Mesh() {
     glDeleteBuffers(1, &VBO);
     glDeleteBuffers(1, &EBO);
 }
+
+
 
 

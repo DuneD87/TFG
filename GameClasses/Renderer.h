@@ -38,7 +38,7 @@ private:
     GLFWwindow *window;
     std::vector<Mesh> effects;
     std::vector<Shader> shaders;
-    glm::vec3 sunPos = glm::vec3(2.0f, 1000.0f, 2.0f);
+    glm::vec3 sunPos = glm::vec3(2.0f, 5000.0f, 2.0f);
     glm::mat4 lightSpaceMatrix;
 
     Light spotLight = Light("", glm::vec3(), glm::vec3(), glm::vec3(), 0, 0, 0,-1,-1);

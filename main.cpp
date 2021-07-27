@@ -11,7 +11,7 @@
 // settings
 const unsigned int SCR_WIDTH = 1920;
 const unsigned int SCR_HEIGHT = 1080;
-bool spotLightEnabled = false, enableCursor = false;
+bool spotLightEnabled = false, enableCursor = true;
 auto *cam = new Camera(glm::vec3(0.0f, -2.0f, 3.0f));
 float lastX = SCR_WIDTH/2, lastY = SCR_HEIGHT/2,pitch = 0, yaw = -90, fov = 45;
 
@@ -140,7 +140,7 @@ int main()
 {
 
     GLFWwindow *window = createWindow();
-    World *world = new World("../Scenes/Scene1.xml","../Textures/SkyBox/space1/",SCR_WIDTH,SCR_HEIGHT,cam);
+    World *world = new World("../Scenes/Scene1.xml","../Textures/SkyBox/yellowCloud/",SCR_WIDTH,SCR_HEIGHT,cam);
 
     //scene1.setPostProcess(0);
     //Render loop

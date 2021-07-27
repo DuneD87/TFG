@@ -5,15 +5,18 @@
 #include "BasicTerrain.h"
 
 BasicTerrain::BasicTerrain(float width, float height, int wSeg, int hSeg, const glm::vec3 &position,
-                           const std::vector<Texture> &textures, const char *path):width(width),height(height),wSeg(wSeg),hSeg(hSeg),
-                           position(position),textures(textures){
+                           const std::vector<Texture> &textures, const char **path, uint nTextures):width(width),
+                           height(height),wSeg(wSeg),hSeg(hSeg),
+                           position(position),textures(textures), nText(nTextures){
     this->type = 3;
+    lowestPoint = 0;
+    highestPoint = 0;
     setupMesh(path);
 }
 
 
 
-void BasicTerrain::setupMesh(const char * path) {
+void BasicTerrain::setupMesh(const char ** path) {
     float halfWidth = width/2;
     float halfHeight = height/2;
 
@@ -52,11 +55,16 @@ void BasicTerrain::setupMesh(const char * path) {
             Vertex auxVert;
             float x = ix * segWidth - halfWidth;
             float y = noise.GetNoise((float)ix,(float)iy)*300;
-            auxVert.Position = glm::vec3(x,-15+y,z);
+            if (y < lowestPoint)
+                lowestPoint = y;
+            else if (y > highestPoint)
+                highestPoint = y;
+            auxVert.Position = glm::vec3(x,y,z);
             auxVert.TexCoords = glm::vec2(((float)ix/(gridX)),(float)iy/(gridY))*glm::vec2(wSeg,hSeg) ;
             vertex.push_back(auxVert);
         }
     }
+    std::cout<<"Highest point: "<<highestPoint<<" Lowest point: "<<lowestPoint<<std::endl;
     //Indices
     for (int iy = 0; iy < gridY; iy++)
     {
@@ -88,11 +96,15 @@ void BasicTerrain::setupMesh(const char * path) {
         vertex[iC].Normal = norm;
     }
 
-    terrainMesh = new Mesh(vertex,indices,"grass2.png","../Textures/");
+    terrainMesh = new Mesh(vertex,indices,path,nText);
 }
 
 void BasicTerrain::draw(Shader &shader, bool outLined, int depthMap) {
+    glUniform1i(glGetUniformLocation(shader.ID,"isTerrain"),1);
+    glUniform1f(glGetUniformLocation(shader.ID,"hPoint"),highestPoint);
+    glUniform1f(glGetUniformLocation(shader.ID,"lPoint"),lowestPoint);
     terrainMesh->Draw(shader,outLined,depthMap);
+    glUniform1i(glGetUniformLocation(shader.ID,"isTerrain"),0);
 }
 
 BasicTerrain::~BasicTerrain() {
