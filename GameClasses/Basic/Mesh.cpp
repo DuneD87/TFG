@@ -41,27 +41,20 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, cons
         text.path = "../Textures/" + std::string(path[i]);
         std::cout<<path[i]<<std::endl;
         text.type = "texture_diffuse";
-        text.id = TextureFromFile( path[i],"../Textures/",false);
+        text.id = TextureFromFile( path[i],"../Textures/",false,true);
         textures.push_back(text);
     }
     // now that we have all the required data, set the vertex buffers and its attribute pointers.
     setupMesh();
 }
-void Mesh::Draw(Shader &shader, bool outlined,unsigned int depthMap) {
+
+void Mesh::bindTextures(Shader &shader,unsigned int depthMap) {
     // bind appropriate textures
     unsigned int diffuseNr  = 1;
     unsigned int specularNr = 1;
     unsigned int normalNr   = 1;
     unsigned int heightNr   = 1;
-    if (outlined)
-    {
-        glStencilFunc(GL_ALWAYS, 1, 0xFF);
-        glStencilMask(0xFF);
-    }
-    else
-    {
-        glStencilMask(0x00);
-    }
+
     unsigned int i = 0;
 
     for(i; i < textures.size(); i++)
@@ -105,6 +98,20 @@ void Mesh::Draw(Shader &shader, bool outlined,unsigned int depthMap) {
         glActiveTexture(GL_TEXTURE0+i);
         glBindTexture(GL_TEXTURE_2D, depthMap);
     }
+}
+
+
+void Mesh::Draw(Shader &shader, bool outlined,unsigned int depthMap) {
+    if (outlined)
+    {
+        glStencilFunc(GL_ALWAYS, 1, 0xFF);
+        glStencilMask(0xFF);
+    }
+    else
+    {
+        glStencilMask(0x00);
+    }
+    bindTextures(shader,depthMap);
     glBindVertexArray(VAO);
     //std::cout<<position.z<<std::endl;
 
@@ -193,6 +200,7 @@ Mesh::~Mesh() {
     glDeleteBuffers(1, &VBO);
     glDeleteBuffers(1, &EBO);
 }
+
 
 
 

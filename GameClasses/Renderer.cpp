@@ -37,10 +37,10 @@ Renderer::Renderer(unsigned int scrWidth, unsigned int scrHeight, Camera *camera
     setupSkyBox(skyboxPath);
 }
 
-void Renderer::renderScene(vector<Entity*> worldEnts,vector<glm::mat4> &entModel, PhysicsObject *ent,int amount) {
+void Renderer::renderScene(vector<Entity*> worldEnts,std::vector<std::pair<std::vector<glm::mat4>,PhysicsObject*>> ents) {
     glEnable(GL_DEPTH_TEST); // enable depth testing (is disabled for rendering screen-space quad)
-    renderShadowMap(worldEnts);
-    depthMap = -1;
+    renderShadowMap(worldEnts,ents);
+
     glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
 
     shaders[2].use();
@@ -55,7 +55,7 @@ void Renderer::renderScene(vector<Entity*> worldEnts,vector<glm::mat4> &entModel
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     shaders[0].setFloat("material.shininess", 64.0f);
     shaders[0].setVec3("viewPos",camera->Position);
-    shaders[0].setVec3("sunPos", sunPos);
+    shaders[0].setVec3("lightPos", camera->Position + glm::vec3(0,1000,0));
     shaders[0].setMat4("lightSpaceMatrix", lightSpaceMatrix);
     shaders[0].setInt("nPointLights",nPointLights);
     //Draw
@@ -68,7 +68,7 @@ void Renderer::renderScene(vector<Entity*> worldEnts,vector<glm::mat4> &entModel
     renderLoopCamera(shaders[6]);
     shaders[6].setFloat("material.shininess", 64.0f);
     shaders[6].setVec3("viewPos",camera->Position);
-    shaders[6].setVec3("sunPos", sunPos);
+    shaders[6].setVec3("lightPos", camera->Position + glm::vec3(0,1000,0));
     shaders[6].setMat4("lightSpaceMatrix", lightSpaceMatrix);
     shaders[6].setInt("nPointLights",nPointLights);
     for (int i = 0; i < worldEnts.size();i++)
@@ -78,7 +78,8 @@ void Renderer::renderScene(vector<Entity*> worldEnts,vector<glm::mat4> &entModel
             worldEnts[i]->draw(shaders[6]);
         }
     }
-    renderInstanced(entModel,ent,amount);
+    for (int i = 0; i < ents.size();i++)
+        renderInstanced(ents[i],shaders[6]);
 
     for (int i = 0; i < selectedeItems.size();i++)
         worldEnts[selectedeItems[i]]->getModel()->outlineObject(shaders[2],glm::vec3(1.1));
@@ -111,15 +112,15 @@ void Renderer::renderScene(vector<Entity*> worldEnts,vector<glm::mat4> &entModel
     glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
-void Renderer::renderInstanced(vector<glm::mat4> &entModel, PhysicsObject *ent, int amount) {
+void Renderer::renderInstanced(std::pair<std::vector<glm::mat4>,PhysicsObject*> ent,Shader &shader) {
     unsigned int diffuseNr  = 1;
     unsigned int specularNr = 1;
     unsigned int normalNr   = 1;
     unsigned int heightNr   = 1;
-    for (int i = 0; i < ent->getModel()->meshes.size();i++)
+    for (int i = 0; i < ent.second->getModel()->meshes.size();i++)
     {
         int j = 0;
-        vector<Texture> textures = ent->getModel()->meshes[i]->textures;
+        vector<Texture> textures = ent.second->getModel()->meshes[i]->textures;
         for(j; j < textures.size(); j++)
         {
             glActiveTexture(GL_TEXTURE0 + j); // active proper texture unit before binding
@@ -138,21 +139,21 @@ void Renderer::renderInstanced(vector<glm::mat4> &entModel, PhysicsObject *ent, 
             // now set the sampler to the correct texture unit
             if (name != "material")
             {
-                shaders[6].setInt("material.hasTexture",1);
-                glUniform1i(glGetUniformLocation(shaders[6].ID, (name + number).c_str()), i);
+                shader.setInt("material.hasTexture",1);
+                glUniform1i(glGetUniformLocation(shader.ID, (name + number).c_str()), i);
                 // and finally bind the texture
                 glBindTexture(GL_TEXTURE_2D, textures[j].id);
             } else
             {
-                shaders[6].setInt("material.hasTexture",0);
-                shaders[6].setVec3("material.mAmbient",textures[j].ka);
-                shaders[6].setVec3("material.mDiffuse",textures[j].kd);
-                shaders[6].setVec3("material.mSpecular",textures[j].ks);
+                shader.setInt("material.hasTexture",0);
+                shader.setVec3("material.mAmbient",textures[j].ka);
+                shader.setVec3("material.mDiffuse",textures[j].kd);
+                shader.setVec3("material.mSpecular",textures[j].ks);
             }
 
         }
-        glBindVertexArray(ent->getModel()->meshes[i]->VAO);
-        glDrawElementsInstanced(GL_TRIANGLES, ent->getModel()->meshes[i]->indices.size(), GL_UNSIGNED_INT, 0, amount);
+        glBindVertexArray(ent.second->getModel()->meshes[i]->VAO);
+        glDrawElementsInstanced(GL_TRIANGLES, ent.second->getModel()->meshes[i]->indices.size(), GL_UNSIGNED_INT, 0, ent.first.size());
         glBindVertexArray(0);
     }
 }
@@ -348,7 +349,7 @@ void Renderer::setupSkyBox(const char * path) {
     shaders[4].setInt("skybox",0);
 }
 
-void Renderer::renderShadowMap(vector<Entity*> worldEnts) {
+void Renderer::renderShadowMap(vector<Entity*> worldEnts,std::vector<std::pair<std::vector<glm::mat4>,PhysicsObject*>>ents) {
     // render
     // ------
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
@@ -357,9 +358,9 @@ void Renderer::renderShadowMap(vector<Entity*> worldEnts) {
     // 1. render depth of scene to texture (from light's perspective)
     // --------------------------------------------------------------
     glm::mat4 lightProjection, lightView;
-    float near_plane = 1.0f, far_plane = 7.5f;
+    float near_plane = 0.1f, far_plane = 1000.0f;
     lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
-    lightView = glm::lookAt(sunPos, glm::vec3(0.0f,-10.0,0.0), glm::vec3(0.0, 1.0, 0.0));
+    lightView = glm::lookAt(camera->Position + glm::vec3(0,10000,0), glm::vec3(-2,-4,-2), glm::vec3(0,-1,0));
     lightSpaceMatrix = lightProjection * lightView;
     // render scene from light's point of view
     shaders[5].use();
@@ -373,6 +374,8 @@ void Renderer::renderShadowMap(vector<Entity*> worldEnts) {
         if (worldEnts[i]->getType() == 1)
             worldEnts[i]->draw(shaders[5],false);
     }
+    for (int i = 0; i < ents.size();i++)
+        renderInstanced(ents[i],shaders[5]);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glViewport(0, 0, scrWidth, scrHeight);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);

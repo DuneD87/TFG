@@ -6,6 +6,7 @@
 #define OPENGLTEST_WORLD_H
 
 #include "Renderer.h"
+#include "Math.h"
 #include "Entities/BasicTerrain.h"
 
 class World {
@@ -17,18 +18,14 @@ public:
 
     World(const char * scenePath, const char * skyBoxPath, unsigned int scrWidth, unsigned int scrHeight, Camera *camera);
 
-    void addEntity(Entity *entity);
+
     Renderer* getRenderer();
-    void removeEntity(int id);
     void renderWorld();
-    void setSunPosition(glm::vec3 position);
 private:
-    void addLightToWorld(Light &light);
-    unsigned int vegVAO,treeAmount;
+    void setupInstanceObjects(int wSeg, int divider);
     BasicTerrain *terrain;
     vector<Entity*> worldEntities;
-    vector<glm::mat4> treePos;
-    PhysicsObject *treeModel;
+    vector<std::pair<std::vector<glm::mat4>,PhysicsObject*>> worldDeco;
     Renderer *renderer;
 };
 

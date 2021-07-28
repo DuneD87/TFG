@@ -36,7 +36,7 @@ struct Texture {
     glm::vec3 ka,kd,ks;
 };
 
-unsigned int static TextureFromFile(const char *path, const std::string &directory, bool gamma)
+unsigned int static TextureFromFile(const char *path, const std::string &directory, bool gamma, bool repeat = false)
 {
     std::string filename = std::string(path);
     filename = directory + '/' + filename;
@@ -59,9 +59,17 @@ unsigned int static TextureFromFile(const char *path, const std::string &directo
         glBindTexture(GL_TEXTURE_2D, textureID);
         glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
+        if (!repeat)
+        {
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        }
+        else
+        {
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        }
 
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
@@ -100,6 +108,7 @@ public:
     Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, const char **path, uint nTextures);
     Mesh();
     void setModel(glm::mat4 model);
+    void bindTextures(Shader &shader,unsigned int depthMap);
     void Draw(Shader &shader, bool outlined, unsigned int depthMap);
 
     void outlineMesh(Shader &outline, glm::vec3 scale);

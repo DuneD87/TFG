@@ -11,8 +11,8 @@
 // settings
 const unsigned int SCR_WIDTH = 1920;
 const unsigned int SCR_HEIGHT = 1080;
-bool spotLightEnabled = false, enableCursor = true;
-auto *cam = new Camera(glm::vec3(0.0f, -2.0f, 3.0f));
+bool spotLightEnabled = false, enableCursor = false;
+auto *cam = new Camera(glm::vec3(0.0f, -35.0f, 3.0f));
 float lastX = SCR_WIDTH/2, lastY = SCR_HEIGHT/2,pitch = 0, yaw = -90, fov = 45;
 
 
@@ -49,6 +49,8 @@ void processInput(GLFWwindow *window,World *world)
         cam->ProcessKeyboard(UP,deltaTime);
     if (glfwGetKey(window,GLFW_KEY_C) == GLFW_PRESS)
         cam->ProcessKeyboard(DOWN,deltaTime);
+    if (glfwGetKey(window,GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+        cam->MovementSpeed += 10;
 
     if (glfwGetKey(window,GLFW_KEY_0) == GLFW_PRESS)
         world->getRenderer()->setPostProcess(5);

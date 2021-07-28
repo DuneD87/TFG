@@ -24,15 +24,15 @@ public:
     Renderer();
     ~Renderer();
     Renderer(unsigned int scrWidth, unsigned int scrHeight, Camera *camera, const char* skyboxPath);
-    void renderScene(vector<Entity*> worldEnts,vector<glm::mat4> &entModel, PhysicsObject *ent,int amount);
+    void renderScene(vector<Entity*> worldEnts,std::vector<std::pair<std::vector<glm::mat4>,PhysicsObject*>>ents);
 
     void setPostProcess(unsigned int index);
     void addShader(Shader &shader);
     void removeShader(int shaderId);
 
 private:
-    void renderInstanced(vector<glm::mat4> &entModel, PhysicsObject *ent,int amount);
-    void renderShadowMap(vector<Entity*> worldEnts);
+    void renderInstanced(std::pair<std::vector<glm::mat4>,PhysicsObject*>ent, Shader &shader);
+    void renderShadowMap(vector<Entity*> worldEnts,std::vector<std::pair<std::vector<glm::mat4>,PhysicsObject*>>ents);
     void renderLoopCamera(Shader shader,bool skybox = false);
     void setupFrameBuffer();
     void setupSkyBox(const char * path);
@@ -40,7 +40,7 @@ private:
     GLFWwindow *window;
     std::vector<Mesh> effects;
     std::vector<Shader> shaders;
-    glm::vec3 sunPos = glm::vec3(2.0f, 5000.0f, 2.0f);
+    glm::vec3 sunPos = glm::vec3(-2.0f, -30.0f, -2.0f);
     glm::mat4 lightSpaceMatrix;
 
     Light spotLight = Light("", glm::vec3(), glm::vec3(), glm::vec3(), 0, 0, 0,-1,-1);

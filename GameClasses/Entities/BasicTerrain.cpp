@@ -37,8 +37,8 @@ void BasicTerrain::setupMesh(const char ** path) {
     FastNoiseLite noise;
     noise.SetNoiseType(FastNoiseLite::NoiseType_Cellular);
     noise.SetFractalType(FastNoiseLite::FractalType_PingPong);
-    noise.SetFractalOctaves(80);
-    noise.SetFractalLacunarity(1.5f);
+    noise.SetFractalOctaves(8);
+    noise.SetFractalLacunarity(1.0f);
     noise.SetFractalGain(0.9);
     noise.SetFractalWeightedStrength(0.9);
     noise.SetFractalPingPongStrength(0.85);
@@ -54,7 +54,7 @@ void BasicTerrain::setupMesh(const char ** path) {
         {
             Vertex auxVert;
             float x = ix * segWidth - halfWidth;
-            float y = noise.GetNoise((float)ix,(float)iy)*3000;
+            float y = noise.GetNoise((float)ix,(float)iy)*1500;
             if (y < lowestPoint)
                 lowestPoint = y;
             else if (y > highestPoint)

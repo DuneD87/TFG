@@ -4,7 +4,7 @@
 
         <Entity type = "PhysicsObject">
             <Model type="Cube" path="wall.jpg" directory="../Models/">
-                <Position x="2.0" y="-10.0" z="0.0"/>
+                <Position x="2.0" y="-37.0" z="0.0"/>
                 <Rotation x="1.0" y="1.0" z="1.0" angle="0.0"/>
                 <Scale x="1.0" y="1.0" z="1.0"/>
             </Model>
@@ -19,9 +19,9 @@
         </Entity>
         <Entity type = "Light">
             <Light type="dirLight">
-                <Direction x="0" y="-0.5" z="0"/>
+                <Direction x="-2" y="-4" z="-2"/>
                 <Ambient x="0.05" y="0.05f" z="0.05f"/>
-                <Diffuse x="0.7" y="0.7f" z="0.7"/>
+                <Diffuse x="0.9" y="0.9f" z="0.9"/>
                 <Specular x="1.0" y="1.0" z="1.0"/>
             </Light>
         </Entity>
