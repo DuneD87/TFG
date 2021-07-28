@@ -22,12 +22,14 @@ Renderer::Renderer(unsigned int scrWidth, unsigned int scrHeight, Camera *camera
     Shader screenShader = Shader("../Shaders/PostProcess/screenShader.vs","../Shaders/PostProcess/screenShader.fs");
     Shader skyboxShader = Shader("../Shaders/skyboxShader.vs","../Shaders/skyboxShader.fs");
     Shader depthSMapShader = Shader("../Shaders/depthShadowMappingVertex.shader","../Shaders/depthShadowMappingFragment.shader");
+    Shader lightInstancedShader("../Shaders/lightingShaderInstancedVertex.shader", "../Shaders/lightingShaderFragment.shader");
     shaders.push_back(lightShader);//0
     shaders.push_back(spriteShader);//1
     shaders.push_back(outlineShader);//2
     shaders.push_back(screenShader);//3
     shaders.push_back(skyboxShader);//4
     shaders.push_back(depthSMapShader);//5
+    shaders.push_back(lightInstancedShader);//6
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
 
@@ -35,9 +37,10 @@ Renderer::Renderer(unsigned int scrWidth, unsigned int scrHeight, Camera *camera
     setupSkyBox(skyboxPath);
 }
 
-void Renderer::renderScene(vector<Entity*> worldEnts) {
+void Renderer::renderScene(vector<Entity*> worldEnts,vector<glm::mat4> &entModel, PhysicsObject *ent,int amount) {
     glEnable(GL_DEPTH_TEST); // enable depth testing (is disabled for rendering screen-space quad)
     renderShadowMap(worldEnts);
+    depthMap = -1;
     glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
 
     shaders[2].use();
@@ -61,6 +64,21 @@ void Renderer::renderScene(vector<Entity*> worldEnts) {
     {
         worldEnts[i]->draw(shaders[0],false,depthMap);
     }
+    shaders[6].use();
+    renderLoopCamera(shaders[6]);
+    shaders[6].setFloat("material.shininess", 64.0f);
+    shaders[6].setVec3("viewPos",camera->Position);
+    shaders[6].setVec3("sunPos", sunPos);
+    shaders[6].setMat4("lightSpaceMatrix", lightSpaceMatrix);
+    shaders[6].setInt("nPointLights",nPointLights);
+    for (int i = 0; i < worldEnts.size();i++)
+    {
+        if (worldEnts[i]->getType() == 2)
+        {
+            worldEnts[i]->draw(shaders[6]);
+        }
+    }
+    renderInstanced(entModel,ent,amount);
 
     for (int i = 0; i < selectedeItems.size();i++)
         worldEnts[selectedeItems[i]]->getModel()->outlineObject(shaders[2],glm::vec3(1.1));
@@ -91,6 +109,52 @@ void Renderer::renderScene(vector<Entity*> worldEnts) {
     glBindVertexArray(quadVAO);
     glBindTexture(GL_TEXTURE_2D, textColorBuffer);	// use the color attachment texture as the texture of the quad plane
     glDrawArrays(GL_TRIANGLES, 0, 6);
+}
+
+void Renderer::renderInstanced(vector<glm::mat4> &entModel, PhysicsObject *ent, int amount) {
+    unsigned int diffuseNr  = 1;
+    unsigned int specularNr = 1;
+    unsigned int normalNr   = 1;
+    unsigned int heightNr   = 1;
+    for (int i = 0; i < ent->getModel()->meshes.size();i++)
+    {
+        int j = 0;
+        vector<Texture> textures = ent->getModel()->meshes[i]->textures;
+        for(j; j < textures.size(); j++)
+        {
+            glActiveTexture(GL_TEXTURE0 + j); // active proper texture unit before binding
+            // retrieve texture number (the N in diffuse_textureN)
+            std::string number = "1";
+            std::string name = textures[j].type;
+            if(name == "texture_diffuse")
+                number = std::to_string(diffuseNr++);
+            else if(name == "texture_specular")
+                number = std::to_string(specularNr++); // transfer unsigned int to stream
+            else if(name == "texture_normal")
+                number = std::to_string(normalNr++); // transfer unsigned int to stream
+            else if(name == "texture_height")
+                number = std::to_string(heightNr++); // transfer unsigned int to stream
+
+            // now set the sampler to the correct texture unit
+            if (name != "material")
+            {
+                shaders[6].setInt("material.hasTexture",1);
+                glUniform1i(glGetUniformLocation(shaders[6].ID, (name + number).c_str()), i);
+                // and finally bind the texture
+                glBindTexture(GL_TEXTURE_2D, textures[j].id);
+            } else
+            {
+                shaders[6].setInt("material.hasTexture",0);
+                shaders[6].setVec3("material.mAmbient",textures[j].ka);
+                shaders[6].setVec3("material.mDiffuse",textures[j].kd);
+                shaders[6].setVec3("material.mSpecular",textures[j].ks);
+            }
+
+        }
+        glBindVertexArray(ent->getModel()->meshes[i]->VAO);
+        glDrawElementsInstanced(GL_TRIANGLES, ent->getModel()->meshes[i]->indices.size(), GL_UNSIGNED_INT, 0, amount);
+        glBindVertexArray(0);
+    }
 }
 
 void Renderer::renderLoopCamera(Shader shader,bool skybox) {
@@ -338,3 +402,6 @@ Renderer::~Renderer() {
     for (auto shader: shaders)
         glDeleteShader(shader.ID);
 }
+
+
+

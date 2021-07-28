@@ -24,8 +24,11 @@ public:
     void setSunPosition(glm::vec3 position);
 private:
     void addLightToWorld(Light &light);
+    unsigned int vegVAO,treeAmount;
     BasicTerrain *terrain;
     vector<Entity*> worldEntities;
+    vector<glm::mat4> treePos;
+    PhysicsObject *treeModel;
     Renderer *renderer;
 };
 
