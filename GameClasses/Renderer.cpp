@@ -40,7 +40,7 @@ Renderer::Renderer(unsigned int scrWidth, unsigned int scrHeight, Camera *camera
 void Renderer::renderScene(vector<Entity*> worldEnts,std::vector<std::pair<std::vector<glm::mat4>,PhysicsObject*>> ents) {
     glEnable(GL_DEPTH_TEST); // enable depth testing (is disabled for rendering screen-space quad)
     renderShadowMap(worldEnts,ents);
-
+    sunPos = camera->Position + glm::vec3(0,100000,0);
     glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
 
     shaders[2].use();
@@ -55,7 +55,7 @@ void Renderer::renderScene(vector<Entity*> worldEnts,std::vector<std::pair<std::
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     shaders[0].setFloat("material.shininess", 64.0f);
     shaders[0].setVec3("viewPos",camera->Position);
-    shaders[0].setVec3("lightPos", camera->Position + glm::vec3(0,1000,0));
+    shaders[0].setVec3("lightPos", sunPos);
     shaders[0].setMat4("lightSpaceMatrix", lightSpaceMatrix);
     shaders[0].setInt("nPointLights",nPointLights);
     //Draw
@@ -63,14 +63,17 @@ void Renderer::renderScene(vector<Entity*> worldEnts,std::vector<std::pair<std::
     for (int i = 0; i < worldEnts.size();i++)
     {
         worldEnts[i]->draw(shaders[0],false,depthMap);
+        if (worldEnts[i]->getType() == 2 && dynamic_cast<Light*>(worldEnts[i])->getSubType() == "dirLight")
+            sunDir = dynamic_cast<Light*>(worldEnts[i])->getDirection();
     }
     shaders[6].use();
     renderLoopCamera(shaders[6]);
     shaders[6].setFloat("material.shininess", 64.0f);
     shaders[6].setVec3("viewPos",camera->Position);
-    shaders[6].setVec3("lightPos", camera->Position + glm::vec3(0,1000,0));
+    shaders[6].setVec3("lightPos", sunPos);
     shaders[6].setMat4("lightSpaceMatrix", lightSpaceMatrix);
     shaders[6].setInt("nPointLights",nPointLights);
+
     for (int i = 0; i < worldEnts.size();i++)
     {
         if (worldEnts[i]->getType() == 2)
@@ -113,45 +116,9 @@ void Renderer::renderScene(vector<Entity*> worldEnts,std::vector<std::pair<std::
 }
 
 void Renderer::renderInstanced(std::pair<std::vector<glm::mat4>,PhysicsObject*> ent,Shader &shader) {
-    unsigned int diffuseNr  = 1;
-    unsigned int specularNr = 1;
-    unsigned int normalNr   = 1;
-    unsigned int heightNr   = 1;
     for (int i = 0; i < ent.second->getModel()->meshes.size();i++)
     {
-        int j = 0;
-        vector<Texture> textures = ent.second->getModel()->meshes[i]->textures;
-        for(j; j < textures.size(); j++)
-        {
-            glActiveTexture(GL_TEXTURE0 + j); // active proper texture unit before binding
-            // retrieve texture number (the N in diffuse_textureN)
-            std::string number = "1";
-            std::string name = textures[j].type;
-            if(name == "texture_diffuse")
-                number = std::to_string(diffuseNr++);
-            else if(name == "texture_specular")
-                number = std::to_string(specularNr++); // transfer unsigned int to stream
-            else if(name == "texture_normal")
-                number = std::to_string(normalNr++); // transfer unsigned int to stream
-            else if(name == "texture_height")
-                number = std::to_string(heightNr++); // transfer unsigned int to stream
-
-            // now set the sampler to the correct texture unit
-            if (name != "material")
-            {
-                shader.setInt("material.hasTexture",1);
-                glUniform1i(glGetUniformLocation(shader.ID, (name + number).c_str()), i);
-                // and finally bind the texture
-                glBindTexture(GL_TEXTURE_2D, textures[j].id);
-            } else
-            {
-                shader.setInt("material.hasTexture",0);
-                shader.setVec3("material.mAmbient",textures[j].ka);
-                shader.setVec3("material.mDiffuse",textures[j].kd);
-                shader.setVec3("material.mSpecular",textures[j].ks);
-            }
-
-        }
+        ent.second->getModel()->meshes[i]->bindTextures(shader,depthMap);
         glBindVertexArray(ent.second->getModel()->meshes[i]->VAO);
         glDrawElementsInstanced(GL_TRIANGLES, ent.second->getModel()->meshes[i]->indices.size(), GL_UNSIGNED_INT, 0, ent.first.size());
         glBindVertexArray(0);
@@ -231,8 +198,8 @@ void Renderer::setupFrameBuffer() {
     glGenTextures(1, &depthMap);
     glBindTexture(GL_TEXTURE_2D, depthMap);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     // attach depth texture as FBO's depth buffer
@@ -244,6 +211,9 @@ void Renderer::setupFrameBuffer() {
     shaders[0].use();
     shaders[0].setInt("diffuseTexture", 0);
     shaders[0].setInt("shadowMap", 1);
+    shaders[6].use();
+    shaders[6].setInt("diffuseTexture", 0);
+    shaders[6].setInt("shadowMap", 1);
 
 }
 
@@ -358,9 +328,9 @@ void Renderer::renderShadowMap(vector<Entity*> worldEnts,std::vector<std::pair<s
     // 1. render depth of scene to texture (from light's perspective)
     // --------------------------------------------------------------
     glm::mat4 lightProjection, lightView;
-    float near_plane = 0.1f, far_plane = 1000.0f;
-    lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
-    lightView = glm::lookAt(camera->Position + glm::vec3(0,10000,0), glm::vec3(-2,-4,-2), glm::vec3(0,-1,0));
+    float near_plane = 0.1f, zFar = 100.0f;
+    lightProjection = glm::ortho(-zFar, zFar, -zFar, zFar, near_plane, zFar);
+    lightView = glm::lookAt(sunPos , sunPos + sunDir * zFar/2.0f, glm::vec3(0,1,0));
     lightSpaceMatrix = lightProjection * lightView;
     // render scene from light's point of view
     shaders[5].use();

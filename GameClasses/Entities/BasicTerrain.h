@@ -29,11 +29,9 @@ private:
     glm::vec3 position;
     std::vector<Texture> textures;
 
-    Mesh *tree;
-    int vertexCount;
     void setupMesh(const char ** path);
     float getPixelHeight(unsigned char* data, float x, float y,float w,float hScale);
-    float bilinearSample(float x,float,unsigned char* data, float width);
+
 };
 
 

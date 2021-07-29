@@ -13,7 +13,7 @@ class World {
 public:
     Camera camera;
     int nPointLights;
-
+    int waterLevel = 10;
     ~World();
 
     World(const char * scenePath, const char * skyBoxPath, unsigned int scrWidth, unsigned int scrHeight, Camera *camera);
@@ -24,6 +24,7 @@ public:
 private:
     void setupInstanceObjects(int wSeg, int divider);
     BasicTerrain *terrain;
+    Mesh waterPlane;
     vector<Entity*> worldEntities;
     vector<std::pair<std::vector<glm::mat4>,PhysicsObject*>> worldDeco;
     Renderer *renderer;

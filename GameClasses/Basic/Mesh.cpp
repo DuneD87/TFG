@@ -88,10 +88,6 @@ void Mesh::bindTextures(Shader &shader,unsigned int depthMap) {
         }
 
     }
-    if (textures.size() == 0)
-    {
-
-    }
     // draw mesh
     if (depthMap != -1)
     {

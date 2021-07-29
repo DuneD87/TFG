@@ -17,7 +17,7 @@
 
 class Renderer {
 public:
-    unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
+    unsigned int SHADOW_WIDTH = 4096, SHADOW_HEIGHT = 4096;
     int nPointLights;
     Camera *camera;
     bool enableSpotLight = false;
@@ -40,7 +40,8 @@ private:
     GLFWwindow *window;
     std::vector<Mesh> effects;
     std::vector<Shader> shaders;
-    glm::vec3 sunPos = glm::vec3(-2.0f, -30.0f, -2.0f);
+    glm::vec3 sunPos = glm::vec3(0);
+    glm::vec3 sunDir = glm::vec3(0);
     glm::mat4 lightSpaceMatrix;
 
     Light spotLight = Light("", glm::vec3(), glm::vec3(), glm::vec3(), 0, 0, 0,-1,-1);

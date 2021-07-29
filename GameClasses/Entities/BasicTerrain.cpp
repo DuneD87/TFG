@@ -111,36 +111,6 @@ BasicTerrain::~BasicTerrain() {
  delete terrainMesh;
 }
 
-float BasicTerrain::bilinearSample(float x, float y, unsigned char* data,float wdt) {
-    auto offset = -250.0f;
-    auto dimensions = 500.0f;
-
-    auto xf = sat((x - offset)/dimensions);
-    auto yf = sat((y-offset) / dimensions);
-
-    float w = width - 1.0f;
-    float h = height - 1.0f;
-
-    float x1 = std::floor(xf*w);
-    float y1 = std::floor(yf*h);
-    float x2 = std::clamp(x1 + 1.0f,0.0f,w);
-    float y2 = std::clamp(y1 + 1.0f,0.0f,h);
-
-    float xp = xf * w - x1;
-    float yp = yf * h - y1;
-
-
-    float p11 = getPixelHeight(data,x1,y1,wdt,1);
-    float p21 = getPixelHeight(data,x2,y1,wdt,1);
-    float p12 = getPixelHeight(data,x1,y2,wdt,1);
-    float p22 = getPixelHeight(data,x2,y2,wdt,1);
-
-    float px1 = lerp(yp,p11,p21);
-    float px2 = lerp(xp,p12,p22);
-    float sample = lerp(yp,px1,px2);
-    return sample * 10;
-}
-
 float BasicTerrain::getPixelHeight(unsigned char *data, float x, float y,float w,float hScale) {
     float pixelHeight = 0;
     if (x < 0 || x >= w || y < 0 || y >= w)

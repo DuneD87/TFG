@@ -62,7 +62,7 @@ uniform vec3 viewPos;
 uniform Material material;
 uniform sampler2D shadowMap;
 
-float ShadowCalculation(vec4 fragPosLightSpace)
+float ShadowCalculation(vec4 fragPosLightSpace, vec3 lightDir)
 {
     // perform perspective divide
     vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
@@ -74,7 +74,7 @@ float ShadowCalculation(vec4 fragPosLightSpace)
     float currentDepth = projCoords.z;
     // calculate bias (based on depth map resolution and slope)
     vec3 normal = normalize(Normal);
-    vec3 lightDir = normalize(lightPos - FragPos);
+
     float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
     // check whether current frag pos is in shadow
     // float shadow = currentDepth - bias > closestDepth  ? 1.0 : 0.0;
@@ -170,7 +170,8 @@ vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir, vec4 FragPosLightSp
     vec3 ambient  = light.ambient  * mDiffuse;
     vec3 diffuse  = light.diffuse  * diff * mDiffuse;
     vec3 specular = light.specular * spec * mSpecular;
-    float shadow = ShadowCalculation(FragPosLightSpace);
+
+    float shadow = ShadowCalculation(FragPosLightSpace,lightDir);
     return (ambient + (1-shadow)*(diffuse + specular));
 }
 
@@ -186,8 +187,8 @@ vec3 CalcTerrainLight(DirLight light, vec3 normal, vec3 viewDir, vec4 FragPosLig
     vec3 ambient  = light.ambient  * vec3(text);
     vec3 diffuse  = light.diffuse  * diff * vec3(text);
 
-    float shadow = ShadowCalculation(FragPosLightSpace);
-    return (ambient + (1-shadow)*(diffuse));
+    float shadow = ShadowCalculation(FragPosLightSpace,-lightDir);
+    return (ambient + (1-shadow)*(diffuse ));
 }
 
 void main()
