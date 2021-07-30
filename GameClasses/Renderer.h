@@ -9,6 +9,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include "Entities/Light.h"
+#include "Entities/BasicTerrain.h"
 #include "Basic/Model.h"
 #include "Basic/Camera.h"
 #include "Basic/Shader.h"
@@ -17,7 +18,7 @@
 
 class Renderer {
 public:
-    unsigned int SHADOW_WIDTH = 4096, SHADOW_HEIGHT = 4096;
+    int SHADOW_WIDTH = 4096, SHADOW_HEIGHT = 4096;
     int nPointLights;
     Camera *camera;
     bool enableSpotLight = false;

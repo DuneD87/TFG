@@ -15,7 +15,7 @@ PhysicsObject::PhysicsObject(int entId,int type, const char *path){
 
 PhysicsObject::PhysicsObject(int entId,int type, Model *model){
     this->id = id;
-    this->type = 1;
+    this->type = type;
     _position = glm::vec3(0);
     _rotation = glm::vec4(glm::vec3(1),0);
     _scale = glm::vec3(1);

@@ -93,6 +93,7 @@ void Mesh::bindTextures(Shader &shader,unsigned int depthMap) {
     {
         glActiveTexture(GL_TEXTURE0+i);
         glBindTexture(GL_TEXTURE_2D, depthMap);
+        shader.setInt("shadowMap",i);
     }
 }
 

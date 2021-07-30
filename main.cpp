@@ -9,9 +9,9 @@
 
 
 // settings
-const unsigned int SCR_WIDTH = 1920;
-const unsigned int SCR_HEIGHT = 1080;
-bool spotLightEnabled = false, enableCursor = false;
+const unsigned int SCR_WIDTH = 2560;
+const unsigned int SCR_HEIGHT = 1440;
+bool spotLightEnabled = false, enableCursor = true;
 auto *cam = new Camera(glm::vec3(0.0f, -35.0f, 3.0f));
 float lastX = SCR_WIDTH/2, lastY = SCR_HEIGHT/2,pitch = 0, yaw = -90, fov = 45;
 
@@ -129,11 +129,11 @@ GLFWwindow * createWindow()
     glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    /* -- USE IT ON OBJECTS THAT YOU KNOW CAN BE CULLED+
+
     glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
+    glCullFace(GL_FRONT);
     glFrontFace(GL_CW);
-    */
+
     return window;
 }
 

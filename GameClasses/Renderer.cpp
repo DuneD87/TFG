@@ -23,6 +23,7 @@ Renderer::Renderer(unsigned int scrWidth, unsigned int scrHeight, Camera *camera
     Shader skyboxShader = Shader("../Shaders/skyboxShader.vs","../Shaders/skyboxShader.fs");
     Shader depthSMapShader = Shader("../Shaders/depthShadowMappingVertex.shader","../Shaders/depthShadowMappingFragment.shader");
     Shader lightInstancedShader("../Shaders/lightingShaderInstancedVertex.shader", "../Shaders/lightingShaderFragment.shader");
+    Shader depthSMapInstancedShader("../Shaders/depthShadowMappingInstancedVertex.shader", "../Shaders/depthShadowMappingFragment.shader");
     shaders.push_back(lightShader);//0
     shaders.push_back(spriteShader);//1
     shaders.push_back(outlineShader);//2
@@ -30,6 +31,7 @@ Renderer::Renderer(unsigned int scrWidth, unsigned int scrHeight, Camera *camera
     shaders.push_back(skyboxShader);//4
     shaders.push_back(depthSMapShader);//5
     shaders.push_back(lightInstancedShader);//6
+    shaders.push_back(depthSMapInstancedShader);//7
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
 
@@ -40,8 +42,8 @@ Renderer::Renderer(unsigned int scrWidth, unsigned int scrHeight, Camera *camera
 void Renderer::renderScene(vector<Entity*> worldEnts,std::vector<std::pair<std::vector<glm::mat4>,PhysicsObject*>> ents) {
     glEnable(GL_DEPTH_TEST); // enable depth testing (is disabled for rendering screen-space quad)
     renderShadowMap(worldEnts,ents);
-    sunPos = camera->Position + glm::vec3(0,100000,0);
-    glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
+
+    //glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
 
     shaders[2].use();
     renderLoopCamera(shaders[2]);
@@ -53,6 +55,8 @@ void Renderer::renderScene(vector<Entity*> worldEnts,std::vector<std::pair<std::
 
     glViewport(0, 0, scrWidth, scrHeight);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+
     shaders[0].setFloat("material.shininess", 64.0f);
     shaders[0].setVec3("viewPos",camera->Position);
     shaders[0].setVec3("lightPos", sunPos);
@@ -62,12 +66,25 @@ void Renderer::renderScene(vector<Entity*> worldEnts,std::vector<std::pair<std::
     std::vector<int> selectedeItems;
     for (int i = 0; i < worldEnts.size();i++)
     {
+
         worldEnts[i]->draw(shaders[0],false,depthMap);
         if (worldEnts[i]->getType() == 2 && dynamic_cast<Light*>(worldEnts[i])->getSubType() == "dirLight")
+        {
+
             sunDir = dynamic_cast<Light*>(worldEnts[i])->getDirection();
+        }
+        else if (worldEnts[i]->getType() == 3)
+        {
+            sunPos = camera->Position
+                    + glm::vec3(0.0f,dynamic_cast<BasicTerrain*>(worldEnts[i])->getHighestPoint(),0.0f)
+                    + camera->Front * 100.0f;
+        }
+
     }
     shaders[6].use();
     renderLoopCamera(shaders[6]);
+
+
     shaders[6].setFloat("material.shininess", 64.0f);
     shaders[6].setVec3("viewPos",camera->Position);
     shaders[6].setVec3("lightPos", sunPos);
@@ -96,23 +113,23 @@ void Renderer::renderScene(vector<Entity*> worldEnts,std::vector<std::pair<std::
     glDrawArrays(GL_TRIANGLES, 0, 36);
     glBindVertexArray(0);
     glDepthFunc(GL_LESS); // set depth function back to default
-    shaders[1].use();
-    for (int i = 0; i < effects.size();i++)
+   // shaders[1].use();
+    /*for (int i = 0; i < effects.size();i++)
     {
         //Render should be a function, handle semi-transparent objects sorting them to draw in order ( pre-render function? )
         effects[i].Draw(shaders[1],false,-1);
     }
     // now bind back to default framebuffer and draw a quad plane with the attached framebuffer color texture
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glDisable(GL_DEPTH_TEST); // disable depth test so screen-space quad isn't discarded due to depth test.
+    //glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    //glDisable(GL_DEPTH_TEST); // disable depth test so screen-space quad isn't discarded due to depth test.
     // clear all relevant buffers
-    glClearColor(1.0f, 1.0f, 1.0f, 1.0f); // set clear color to white (not really necessary actually, since we won't be able to see behind the quad anyways)
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    //glClearColor(1.0f, 1.0f, 1.0f, 1.0f); // set clear color to white (not really necessary actually, since we won't be able to see behind the quad anyways)
+    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
     shaders[3].use();
     glBindVertexArray(quadVAO);
-    glBindTexture(GL_TEXTURE_2D, textColorBuffer);	// use the color attachment texture as the texture of the quad plane
-    glDrawArrays(GL_TRIANGLES, 0, 6);
+    glBindTexture(GL_TEXTURE_2D, depthMap);	// use the color attachment texture as the texture of the quad plane
+    glDrawArrays(GL_TRIANGLES, 0, 6);*/
 }
 
 void Renderer::renderInstanced(std::pair<std::vector<glm::mat4>,PhysicsObject*> ent,Shader &shader) {
@@ -197,23 +214,18 @@ void Renderer::setupFrameBuffer() {
     // create depth texture
     glGenTextures(1, &depthMap);
     glBindTexture(GL_TEXTURE_2D, depthMap);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
     // attach depth texture as FBO's depth buffer
     glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
     glDrawBuffer(GL_NONE);
     glReadBuffer(GL_NONE);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    shaders[0].use();
-    shaders[0].setInt("diffuseTexture", 0);
-    shaders[0].setInt("shadowMap", 1);
-    shaders[6].use();
-    shaders[6].setInt("diffuseTexture", 0);
-    shaders[6].setInt("shadowMap", 1);
 
 }
 
@@ -324,13 +336,14 @@ void Renderer::renderShadowMap(vector<Entity*> worldEnts,std::vector<std::pair<s
     // ------
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+    glDisable(GL_CULL_FACE);
     // 1. render depth of scene to texture (from light's perspective)
     // --------------------------------------------------------------
     glm::mat4 lightProjection, lightView;
-    float near_plane = 0.1f, zFar = 100.0f;
-    lightProjection = glm::ortho(-zFar, zFar, -zFar, zFar, near_plane, zFar);
-    lightView = glm::lookAt(sunPos , sunPos + sunDir * zFar/2.0f, glm::vec3(0,1,0));
+    float near_plane = -100.0f, zFar = 500.0f,boxSize = 256.0f;
+    lightProjection = glm::ortho(-boxSize, boxSize, -boxSize, boxSize, near_plane, zFar);
+    //std::cout<<camera->Front.x<<" "<<camera->Front.y<<" " << camera->Front.z<<std::endl;
+    lightView = glm::lookAt(sunPos , sunPos + (sunDir * zFar/2.0f), glm::vec3(0,1,0));
     lightSpaceMatrix = lightProjection * lightView;
     // render scene from light's point of view
     shaders[5].use();
@@ -339,17 +352,20 @@ void Renderer::renderShadowMap(vector<Entity*> worldEnts,std::vector<std::pair<s
     glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
     glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
     glClear(GL_DEPTH_BUFFER_BIT);
+
     for (int i = 0; i < worldEnts.size();i++)
     {
         if (worldEnts[i]->getType() == 1)
             worldEnts[i]->draw(shaders[5],false);
     }
+    shaders[7].use();
+    shaders[7].setMat4("lightSpaceMatrix", lightSpaceMatrix);
     for (int i = 0; i < ents.size();i++)
-        renderInstanced(ents[i],shaders[5]);
+        renderInstanced(ents[i],shaders[7]);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glViewport(0, 0, scrWidth, scrHeight);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
+    glEnable(GL_CULL_FACE);
 }
 
 void Renderer::addShader(Shader &shader) {

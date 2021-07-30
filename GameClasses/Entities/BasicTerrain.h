@@ -26,6 +26,16 @@ private:
     float width,height,lowestPoint,highestPoint;
     int wSeg,hSeg;
     uint nText;
+public:
+    float getWidth() const;
+
+    float getHeight() const;
+
+    int getWSeg() const;
+
+    int getHSeg() const;
+
+private:
     glm::vec3 position;
     std::vector<Texture> textures;
 

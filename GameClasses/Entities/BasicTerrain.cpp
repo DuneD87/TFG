@@ -134,3 +134,19 @@ float BasicTerrain::getHighestPoint() const {
     return highestPoint;
 }
 
+float BasicTerrain::getWidth() const {
+    return width;
+}
+
+float BasicTerrain::getHeight() const {
+    return height;
+}
+
+int BasicTerrain::getWSeg() const {
+    return wSeg;
+}
+
+int BasicTerrain::getHSeg() const {
+    return hSeg;
+}
+
