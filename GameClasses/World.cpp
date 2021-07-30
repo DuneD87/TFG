@@ -14,9 +14,9 @@ World::World(const char *scenePath, const char *skyBoxPath, unsigned int scrWidt
     renderer->camera = camera;
     std::vector<Texture> text;
     const char *textures[] = {"grassy2.png","grassFlowers.png","mud.png","seamless_rock2.png"};
-    int wSeg= 512;
+    int wSeg= 1024;
     int divider = 4;
-    terrain = new BasicTerrain(4000, 4000, wSeg, wSeg, glm::vec3(0), text, textures,4);
+    terrain = new BasicTerrain(8192, 8192, wSeg, wSeg, glm::vec3(0), text, textures,4);
     setupInstanceObjects(wSeg,divider);
     worldEntities.push_back(terrain);
     makeWaterLevel();

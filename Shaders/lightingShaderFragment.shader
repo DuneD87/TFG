@@ -167,7 +167,7 @@ vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir, vec4 FragPosLightSp
         } else
         {
             mDiffuse = vec3(text);
-            mSpecular = vec3(text);
+            //mSpecular = vec3(text);
         }
 
     } else
@@ -212,6 +212,67 @@ vec3 CalcTerrainLight(DirLight light, vec3 normal, vec3 viewDir, vec4 FragPosLig
     return (ambient + (1-shadow)*(diffuse));
 }
 
+vec4 createTerrainTexture()
+{
+
+    /*float total = (abs(lPoint - hPoint));
+    float normY = FragPos.y + abs(lPoint);
+
+
+    float per = (normY/total);
+    float mix1Val = 0.2;
+    float mix2Val = 0.1;
+    float mix3Val = 0.5;
+    float mix4Val = 0.1;
+    vec4 text = mix(
+    mix(
+        mix(texture(texture_diffuse3,TexCoords),texture(texture_diffuse1,TexCoords),mix1Val),
+        mix(texture(texture_diffuse1,TexCoords),texture(texture_diffuse2,TexCoords),mix2Val),
+        mix3Val),
+        mix(texture(texture_diffuse2,TexCoords),texture(texture_diffuse4,TexCoords),mix4Val),
+    per);*/
+    vec4 terrainColor = vec4(0.0, 0.0, 0.0, 1.0);
+    float height = FragPos.y;
+    float regionMin = 0.0;
+    float regionMax = 0.0;
+    float regionRange = 0.0;
+    float regionWeight = 0.0;
+
+    // Terrain region 1.
+    regionMin = lPoint;
+    regionMax = lPoint + abs(0.5*hPoint);
+    regionRange = regionMax - regionMin;
+    regionWeight = (regionRange - abs(height - regionMax)) / regionRange;
+    regionWeight = max(0.0, regionWeight);
+    terrainColor += regionWeight * texture(texture_diffuse3, TexCoords);
+
+    // Terrain region 2.
+    regionMin = lPoint + abs(0.4*hPoint);;
+    regionMax = lPoint + abs(0.7*hPoint);
+    regionRange = regionMax - regionMin;
+    regionWeight = (regionRange - abs(height - regionMax)) / regionRange;
+    regionWeight = max(0.0, regionWeight);
+    terrainColor += regionWeight * texture(texture_diffuse1, TexCoords);
+
+    // Terrain region 2.
+    regionMin = lPoint + abs(0.6*hPoint);
+    regionMax = lPoint + abs(0.8*hPoint);
+    regionRange = regionMax - regionMin;
+    regionWeight = (regionRange - abs(height - regionMax)) / regionRange;
+    regionWeight = max(0.0, regionWeight);
+    terrainColor += regionWeight * texture(texture_diffuse2, TexCoords);
+
+    // Terrain region 3.
+    regionMin = lPoint + abs(0.6*hPoint);
+    regionMax = hPoint;
+    regionRange = regionMax - regionMin;
+    regionWeight = (regionRange - abs(height - regionMax)) / regionRange;
+    regionWeight = max(0.0, regionWeight);
+    terrainColor += regionWeight * texture(texture_diffuse4, TexCoords) ;
+
+    return terrainColor;
+}
+
 void main()
 {
     // properties
@@ -221,16 +282,7 @@ void main()
     vec4 text;
     if (isTerrain == 1)
     {
-        float total = (abs(lPoint - hPoint));
-        float normY = FragPos.y + abs(lPoint);
-        float per = (normY/total);
-        text = mix(
-        mix(
-        mix(texture(texture_diffuse3,TexCoords),texture(texture_diffuse1,TexCoords),per),
-        mix(texture(texture_diffuse1,TexCoords),texture(texture_diffuse2,TexCoords),per),
-        per),
-        mix(texture(texture_diffuse2,TexCoords),texture(texture_diffuse4,TexCoords),per*3),
-        per/2);
+        text = createTerrainTexture();
 
     }
     vec3 result;

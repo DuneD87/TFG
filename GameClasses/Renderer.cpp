@@ -43,7 +43,7 @@ void Renderer::renderScene(vector<Entity*> worldEnts,std::vector<std::pair<std::
     glEnable(GL_DEPTH_TEST); // enable depth testing (is disabled for rendering screen-space quad)
     renderShadowMap(worldEnts,ents);
 
-    //glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
+    glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
 
     shaders[2].use();
     renderLoopCamera(shaders[2]);
@@ -119,17 +119,19 @@ void Renderer::renderScene(vector<Entity*> worldEnts,std::vector<std::pair<std::
         //Render should be a function, handle semi-transparent objects sorting them to draw in order ( pre-render function? )
         effects[i].Draw(shaders[1],false,-1);
     }
+     */
     // now bind back to default framebuffer and draw a quad plane with the attached framebuffer color texture
-    //glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    //glDisable(GL_DEPTH_TEST); // disable depth test so screen-space quad isn't discarded due to depth test.
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    glDisable(GL_DEPTH_TEST); // disable depth test so screen-space quad isn't discarded due to depth test.
     // clear all relevant buffers
-    //glClearColor(1.0f, 1.0f, 1.0f, 1.0f); // set clear color to white (not really necessary actually, since we won't be able to see behind the quad anyways)
-    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    glClearColor(1.0f, 1.0f, 1.0f, 1.0f); // set clear color to white (not really necessary actually, since we won't be able to see behind the quad anyways)
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
     shaders[3].use();
     glBindVertexArray(quadVAO);
-    glBindTexture(GL_TEXTURE_2D, depthMap);	// use the color attachment texture as the texture of the quad plane
-    glDrawArrays(GL_TRIANGLES, 0, 6);*/
+    glBindTexture(GL_TEXTURE_2D, textColorBuffer);	// use the color attachment texture as the texture of the quad plane
+    glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
 void Renderer::renderInstanced(std::pair<std::vector<glm::mat4>,PhysicsObject*> ent,Shader &shader) {

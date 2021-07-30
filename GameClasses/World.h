@@ -13,7 +13,7 @@ class World {
 public:
     Camera camera;
     int nPointLights;
-    int waterLevel = -50;
+    int waterLevel = -80;
     ~World();
 
     World(const char * scenePath, const char * skyBoxPath, unsigned int scrWidth, unsigned int scrHeight, Camera *camera);
