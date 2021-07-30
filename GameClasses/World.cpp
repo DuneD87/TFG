@@ -277,8 +277,9 @@ void World::makeWaterLevel() {
     t.kd = glm::vec3(0.5f);
     t.ks = glm::vec3(0.5f);
     text.push_back(t);
-    Mesh *mesh = new Mesh(vertex,indices,text);
+    Mesh *mesh = new Mesh(vertex,indices,"reflection.jpg","");
     Model *model = new Model();
     model->meshes.push_back(mesh);
-    worldEntities.push_back(new PhysicsObject(34,4,model));
+    water = new PhysicsObject(34,4,model);
+    worldEntities.push_back(water);
 }

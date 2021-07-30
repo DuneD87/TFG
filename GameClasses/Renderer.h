@@ -35,6 +35,7 @@ private:
     void renderInstanced(std::pair<std::vector<glm::mat4>,PhysicsObject*>ent, Shader &shader);
     void renderShadowMap(vector<Entity*> worldEnts,std::vector<std::pair<std::vector<glm::mat4>,PhysicsObject*>>ents);
     void renderLoopCamera(Shader shader,bool skybox = false);
+    void renderReflexionTexture();
     void setupFrameBuffer();
     void setupSkyBox(const char * path);
     unsigned int loadCubemap(vector<std::string> faces);
@@ -44,10 +45,10 @@ private:
     glm::vec3 sunPos = glm::vec3(0);
     glm::vec3 sunDir = glm::vec3(0);
     glm::mat4 lightSpaceMatrix;
-
+    PhysicsObject *water;
     Light spotLight = Light("", glm::vec3(), glm::vec3(), glm::vec3(), 0, 0, 0,-1,-1);
     unsigned int scrWidth,scrHeight,frameBuffer,textColorBuffer,rbo,quadVAO,quadVBO,skyboxVAO,skyboxVBO,cubemapTexture,
-            depthMapFBO,depthMap;
+            depthMapFBO,depthMap,reflexionFBO,reflexion,refractionFBO,refraction;
     std::string postProcessPath[6] = {
             "../Shaders/PostProcess/blurShader.fs",
             "../Shaders/PostProcess/edgeShader.fs",

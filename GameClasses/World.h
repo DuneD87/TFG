@@ -26,6 +26,7 @@ private:
     void makeWaterLevel();
     BasicTerrain *terrain;
     Mesh waterPlane;
+    PhysicsObject * water;
     vector<Entity*> worldEntities;
     vector<std::pair<std::vector<glm::mat4>,PhysicsObject*>> worldDeco;
     Renderer *renderer;

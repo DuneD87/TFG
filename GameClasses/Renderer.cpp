@@ -24,6 +24,7 @@ Renderer::Renderer(unsigned int scrWidth, unsigned int scrHeight, Camera *camera
     Shader depthSMapShader = Shader("../Shaders/depthShadowMappingVertex.shader","../Shaders/depthShadowMappingFragment.shader");
     Shader lightInstancedShader("../Shaders/lightingShaderInstancedVertex.shader", "../Shaders/lightingShaderFragment.shader");
     Shader depthSMapInstancedShader("../Shaders/depthShadowMappingInstancedVertex.shader", "../Shaders/depthShadowMappingFragment.shader");
+    Shader waterShader("../Shaders/waterShaderVertex.shader", "../Shaders/waterShaderFragment.shader");
     shaders.push_back(lightShader);//0
     shaders.push_back(spriteShader);//1
     shaders.push_back(outlineShader);//2
@@ -32,6 +33,7 @@ Renderer::Renderer(unsigned int scrWidth, unsigned int scrHeight, Camera *camera
     shaders.push_back(depthSMapShader);//5
     shaders.push_back(lightInstancedShader);//6
     shaders.push_back(depthSMapInstancedShader);//7
+    shaders.push_back(waterShader);//8
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
 
@@ -49,6 +51,8 @@ void Renderer::renderScene(vector<Entity*> worldEnts,std::vector<std::pair<std::
     renderLoopCamera(shaders[2]);
     shaders[1].use();
     renderLoopCamera(shaders[1]);
+    shaders[8].use();
+    renderLoopCamera(shaders[8]);
     shaders[0].use();
 
     renderLoopCamera(shaders[0]);
@@ -66,8 +70,17 @@ void Renderer::renderScene(vector<Entity*> worldEnts,std::vector<std::pair<std::
     std::vector<int> selectedeItems;
     for (int i = 0; i < worldEnts.size();i++)
     {
+        if (worldEnts[i]->getType() != 4)
+            worldEnts[i]->draw(shaders[0],false,depthMap);
+        else
+        {
+            shaders[8].use();
+            renderLoopCamera(shaders[8]);
+            worldEnts[i]->draw(shaders[8],false,-1);
+            shaders[0].use();
+            renderLoopCamera(shaders[0]);
+        }
 
-        worldEnts[i]->draw(shaders[0],false,depthMap);
         if (worldEnts[i]->getType() == 2 && dynamic_cast<Light*>(worldEnts[i])->getSubType() == "dirLight")
         {
 
@@ -229,6 +242,15 @@ void Renderer::setupFrameBuffer() {
     glReadBuffer(GL_NONE);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+    glGenFramebuffers(1, &reflexionFBO);
+    // create depth texture
+    glGenTextures(1, &reflexion);
+    glBindTexture(GL_TEXTURE_2D, reflexion);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, scrWidth, scrHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
 }
 
 void Renderer::setPostProcess(unsigned int index) {
@@ -370,6 +392,11 @@ void Renderer::renderShadowMap(vector<Entity*> worldEnts,std::vector<std::pair<s
     glEnable(GL_CULL_FACE);
 }
 
+void Renderer::renderReflexionTexture() {
+
+}
+
+
 void Renderer::addShader(Shader &shader) {
     shaders.push_back(shader);
 }
@@ -393,6 +420,7 @@ Renderer::~Renderer() {
     for (auto shader: shaders)
         glDeleteShader(shader.ID);
 }
+
 
 
 
