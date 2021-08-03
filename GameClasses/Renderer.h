@@ -13,8 +13,8 @@
 #include "Basic/Model.h"
 #include "Basic/Camera.h"
 #include "Basic/Shader.h"
-#include "XmlParser.h"
-#include "BasicShapeBuilder.h"
+#include "Util/XmlParser.h"
+#include "Util/BasicShapeBuilder.h"
 
 class Renderer {
 public:
@@ -35,7 +35,7 @@ private:
     void renderInstanced(std::pair<std::vector<glm::mat4>,PhysicsObject*>ent, Shader &shader);
     void renderShadowMap(vector<Entity*> worldEnts,std::vector<std::pair<std::vector<glm::mat4>,PhysicsObject*>>ents);
     void renderLoopCamera(Shader shader,bool skybox = false);
-    void renderReflexionTexture();
+    void renderReflexionTexture(vector<Entity*> worldEnts,std::vector<std::pair<std::vector<glm::mat4>,PhysicsObject*>>ents);
     void setupFrameBuffer();
     void setupSkyBox(const char * path);
     unsigned int loadCubemap(vector<std::string> faces);

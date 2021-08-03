@@ -15,6 +15,8 @@ enum Camera_Movement {
     BACKWARD,
     LEFT,
     RIGHT,
+    RLEFT,
+    RRIGHT,
     UP,
     DOWN
 };
@@ -30,6 +32,7 @@ public:
     // euler Angles
     float Yaw;
     float Pitch;
+    float Roll;
     // camera options
     float MovementSpeed;
     float MouseSensitivity;

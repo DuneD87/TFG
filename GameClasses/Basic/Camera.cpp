@@ -10,6 +10,7 @@ Camera::Camera(glm::vec3 position, glm::vec3 up, float yaw, float pitch) : Front
     WorldUp = up;
     Yaw = yaw;
     Pitch = pitch;
+    Roll = 0;
     updateCameraVectors();
 }
 
@@ -42,6 +43,11 @@ void Camera::ProcessKeyboard(Camera_Movement direction, float deltaTime)
         Position += Up * velocity;
     if (direction == DOWN)
         Position -= Up * velocity;
+    if (direction == RLEFT)
+        Roll += velocity;
+    if (direction == RRIGHT)
+        Roll -= velocity;
+    updateCameraVectors();
 }
 
 void Camera::ProcessMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch)
@@ -55,10 +61,10 @@ void Camera::ProcessMouseMovement(float xoffset, float yoffset, GLboolean constr
     // make sure that when pitch is out of bounds, screen doesn't get flipped
     if (constrainPitch)
     {
-        if (Pitch > 89.0f)
-            Pitch = 89.0f;
-        if (Pitch < -89.0f)
-            Pitch = -89.0f;
+        if (Pitch > 180.0f)
+            Pitch = -180.0f;
+        if (Pitch < -180.0f)
+            Pitch = 180.0f;
     }
 
     // update Front, Right and Up Vectors using the updated Euler angles
@@ -78,8 +84,10 @@ void Camera::updateCameraVectors() {
     front.x = cos(glm::radians(Yaw)) * cos(glm::radians(Pitch));
     front.y = sin(glm::radians(Pitch));
     front.z = sin(glm::radians(Yaw)) * cos(glm::radians(Pitch));
+    glm::mat4 roll_mat = glm::rotate(glm::mat4(1.0f), glm::radians(Roll), Front);
     Front = glm::normalize(front);
+
     // also re-calculate the Right and Up vector
     Right = glm::normalize(glm::cross(Front, WorldUp));  // normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
-    Up    = glm::normalize(glm::cross(Right, Front));
+    Up    = glm::mat3(roll_mat) * glm::normalize(glm::cross(Right, Front));
 }

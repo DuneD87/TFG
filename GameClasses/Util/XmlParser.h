@@ -11,9 +11,9 @@
 #include <fstream>
 #include <vector>
 #include <map>
-#include "Entities/Light.h"
-#include "Entities/PhysicsObject.h"
-#include "Basic/Model.h"
+#include "../Entities/Light.h"
+#include "../Entities/PhysicsObject.h"
+#include "../Basic/Model.h"
 #include "rapidxml/rapidxml.hpp"
 #include "BasicShapeBuilder.h"
 using namespace rapidxml;

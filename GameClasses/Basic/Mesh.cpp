@@ -39,7 +39,6 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, cons
     {
         Texture text;
         text.path = "../Textures/" + std::string(path[i]);
-        std::cout<<path[i]<<std::endl;
         text.type = "texture_diffuse";
         text.id = TextureFromFile( path[i],"../Textures/",false,true);
         textures.push_back(text);
@@ -110,7 +109,6 @@ void Mesh::Draw(Shader &shader, bool outlined,unsigned int depthMap) {
     }
     bindTextures(shader,depthMap);
     glBindVertexArray(VAO);
-    //std::cout<<position.z<<std::endl;
 
     glm::mat4 meshModel = glm::mat4(1.0f);
     meshModel = glm::translate(meshModel,position);

@@ -3,6 +3,8 @@
 //
 
 #include "World.h"
+#include "Entities/BasicWater.h"
+#include "Entities/Planet/Planet.h"
 
 World::World(const char *scenePath, const char *skyBoxPath, unsigned int scrWidth, unsigned int scrHeight,
              Camera *camera) {
@@ -12,14 +14,20 @@ World::World(const char *scenePath, const char *skyBoxPath, unsigned int scrWidt
     nPointLights = parser.nPointLights;
     renderer->nPointLights = nPointLights;
     renderer->camera = camera;
-    std::vector<Texture> text;
     const char *textures[] = {"grassy2.png","grassFlowers.png","mud.png","seamless_rock2.png"};
     int wSeg= 1024;
     int divider = 4;
-    terrain = new BasicTerrain(8192, 8192, wSeg, wSeg, glm::vec3(0), text, textures,4);
+    /*terrain = new BasicTerrain(8192, 8192, wSeg, wSeg, glm::vec3(0,0,0), textures,4);
+    terrain->translateTerrain(glm::vec3(500));
+    terrain->rotateTerrain(glm::vec4(1,0,0,glm::radians(90.0f)));
     setupInstanceObjects(wSeg,divider);
+
     worldEntities.push_back(terrain);
-    makeWaterLevel();
+
+    auto *water = new BasicWater(terrain->getWidth(),terrain->getHeight(),256,256,waterLevel);
+    worldEntities.push_back(water);*/
+    Planet *planet = new Planet(4096,9,true);
+    worldEntities.push_back(planet);
 }
 
 void World::renderWorld() {
@@ -217,69 +225,4 @@ void World::setupInstanceObjects(int wSeg, int divider) {
             glBindVertexArray(0);
         }
     }
-}
-
-void World::makeWaterLevel() {
-    int wSeg = terrain->getWSeg();
-    int hSeg = terrain->getHSeg();
-    float width = terrain->getWidth();
-    float height = terrain->getHeight();
-    vector<Vertex> vertex;
-    vector<unsigned int> indices;
-    float halfWidth = width/2;
-    float halfHeight = height/2;
-
-    int gridX = std::floor(wSeg);
-    int gridY = std::floor(hSeg);
-
-    int gridX1 = gridX + 1;
-    int gridY1 = gridY + 1;
-
-    float segWidth = width / gridX;
-    float segHeight = height / gridY;
-    //Vertices and texcoords
-    for (int iy = 0; iy < gridY1; iy++)
-    {
-        float z = iy * segHeight - halfHeight;
-        for (int ix = 0; ix < gridX1; ix++)
-        {
-            Vertex auxVert;
-            float x = ix * segWidth - halfWidth;
-
-            auxVert.Position = glm::vec3(x,waterLevel,z);
-            auxVert.TexCoords = glm::vec2(((float)ix/(gridX)),(float)iy/(gridY))*glm::vec2(wSeg,hSeg);
-            auxVert.Normal = glm::vec3(0,1,0);
-            vertex.push_back(auxVert);
-        }
-    }
-
-    //Indices
-    for (int iy = 0; iy < gridY; iy++)
-    {
-        for (int ix=0; ix < gridX; ix++)
-        {
-            uint a = ix+gridX1*iy;
-            uint b = ix + gridX1 * (iy + 1);
-            uint c = (ix + 1) + gridX1 * (iy + 1);
-            uint d = (ix + 1) + gridX1 * iy;
-            indices.push_back(a);
-            indices.push_back(b);
-            indices.push_back(d);
-            indices.push_back(b);
-            indices.push_back(c);
-            indices.push_back(d);
-        }
-    }
-    vector<Texture> text;
-    Texture t;
-    t.type = "material";
-    t.ka = glm::vec3(1.0f);
-    t.kd = glm::vec3(0.5f);
-    t.ks = glm::vec3(0.5f);
-    text.push_back(t);
-    Mesh *mesh = new Mesh(vertex,indices,"reflection.jpg","");
-    Model *model = new Model();
-    model->meshes.push_back(mesh);
-    water = new PhysicsObject(34,4,model);
-    worldEntities.push_back(water);
 }

@@ -89,7 +89,7 @@ void Renderer::renderScene(vector<Entity*> worldEnts,std::vector<std::pair<std::
         else if (worldEnts[i]->getType() == 3)
         {
             sunPos = camera->Position
-                    + glm::vec3(0.0f,dynamic_cast<BasicTerrain*>(worldEnts[i])->getHighestPoint(),0.0f)
+                    //+ glm::vec3(0.0f,dynamic_cast<BasicTerrain*>(worldEnts[i])->getHighestPoint(),0.0f)
                     + camera->Front * 100.0f;
         }
 
@@ -168,7 +168,7 @@ void Renderer::renderLoopCamera(Shader shader,bool skybox) {
 
     //projection
     glm::mat4 projection;
-    projection = glm::perspective(glm::radians(this->camera->Zoom), (float)scrWidth/scrHeight, 0.1f, 10000.0f);
+    projection = glm::perspective(glm::radians(this->camera->Zoom), (float)scrWidth/scrHeight, 0.1f, 10000000.0f);
     shader.setMat4("projection",projection);
 
     glm::mat4 cameraModel(1.0f);
@@ -392,7 +392,32 @@ void Renderer::renderShadowMap(vector<Entity*> worldEnts,std::vector<std::pair<s
     glEnable(GL_CULL_FACE);
 }
 
-void Renderer::renderReflexionTexture() {
+void Renderer::renderReflexionTexture(vector<Entity*> worldEnts,std::vector<std::pair<std::vector<glm::mat4>,PhysicsObject*>>ents) {
+    // render
+    // ------
+    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    // 1. render depth of scene to texture (from light's perspective)
+    // --------------------------------------------------------------
+    shaders[0].use();
+    shaders[0].setMat4("lightSpaceMatrix", lightSpaceMatrix);
+
+    glViewport(0, 0, scrWidth, scrHeight);
+    glBindFramebuffer(GL_FRAMEBUFFER, reflexionFBO);
+    glClear(GL_DEPTH_BUFFER_BIT);
+
+    for (int i = 0; i < worldEnts.size();i++)
+    {
+        if (worldEnts[i]->getType() == 1)
+            worldEnts[i]->draw(shaders[5],false);
+    }
+    shaders[7].use();
+    shaders[7].setMat4("lightSpaceMatrix", lightSpaceMatrix);
+    for (int i = 0; i < ents.size();i++)
+        renderInstanced(ents[i],shaders[7]);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glViewport(0, 0, scrWidth, scrHeight);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 }
 

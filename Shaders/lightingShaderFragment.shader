@@ -50,6 +50,7 @@ in vec3 FragPos;
 in vec3 Normal;
 in vec2 TexCoords;
 in vec4 FragPosLightSpace;
+in vec3 LocalPos;
 uniform sampler2D texture_diffuse1;
 uniform sampler2D texture_diffuse2;
 uniform sampler2D texture_diffuse3;
@@ -59,6 +60,8 @@ uniform float hPoint;
 uniform float lPoint;
 uniform vec3 lightPos;
 uniform vec3 viewPos;
+uniform vec3 upVector;
+uniform float pRadius;
 uniform Material material;
 uniform sampler2D shadowMap;
 
@@ -232,7 +235,8 @@ vec4 createTerrainTexture()
         mix(texture(texture_diffuse2,TexCoords),texture(texture_diffuse4,TexCoords),mix4Val),
     per);*/
     vec4 terrainColor = vec4(0.0, 0.0, 0.0, 1.0);
-    float height = FragPos.y;
+    vec3 dir = upVector-FragPos;
+    float height = length(dir) - pRadius;
     float regionMin = 0.0;
     float regionMax = 0.0;
     float regionRange = 0.0;

@@ -6,15 +6,17 @@
 #define OPENGLTEST_BASICTERRAIN_H
 
 #include "Entity.h"
-#include "../Math.h"
-#include "../FastNoiseLite.h"
-#include "../BasicShapeBuilder.h"
+#include "../Util/Math.h"
+#include "../Util/FastNoiseLite.h"
+#include "../Util/BasicShapeBuilder.h"
 class BasicTerrain : public Entity{
 public:
     virtual ~BasicTerrain();
     Mesh *terrainMesh;
     BasicTerrain(float width, float height, int wSeg, int hSeg,const glm::vec3 &position,
-                 const std::vector<Texture> &textures, const char ** path, uint nTextures);
+                 const char ** path, uint nTextures, glm::vec3 up = glm::vec3(0,1,0));
+    void translateTerrain(glm::vec3 position) {terrainMesh->position = position;}
+    void rotateTerrain(glm::vec4 rotate) {terrainMesh->angle = rotate.w, terrainMesh->axis = glm::vec3(rotate.x,rotate.y,rotate.z);}
     void draw(Shader &shader, bool outlined, int depthMap);
 private:
 public:
@@ -37,6 +39,15 @@ public:
 
 private:
     glm::vec3 position;
+    glm::vec3 upVector;
+    glm::vec3 xAxis;
+    glm::vec3 yAxis;
+public:
+    const glm::vec3 &getXAxis() const;
+
+    const glm::vec3 &getYAxis() const;
+
+private:
     std::vector<Texture> textures;
 
     void setupMesh(const char ** path);
