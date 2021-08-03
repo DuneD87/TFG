@@ -115,14 +115,14 @@ void Cubesphere::buildVerticesSmooth()
     noise.SetFrequency(0.010f);
     noise.SetFractalType(FastNoiseLite::FractalType_PingPong);
     noise.SetFractalOctaves(16);
-    noise.SetFractalLacunarity(0.2);
-    noise.SetFractalGain(0.9);
+    noise.SetFractalLacunarity(1.7);
+    noise.SetFractalGain(1.2);
     noise.SetFractalWeightedStrength(0.7);
     noise.SetFractalPingPongStrength(3);
     noise.SetCellularDistanceFunction(FastNoiseLite::CellularDistanceFunction_Euclidean);
     noise.SetCellularReturnType(FastNoiseLite::CellularReturnType_Distance2Add);
     noise.SetCellularJitter(1.0f);
-    float height = 300;
+    float height = 1500;
     float x, y, z, s, t;
     int k = 0, k1, k2;
 

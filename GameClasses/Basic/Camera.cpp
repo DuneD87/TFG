@@ -3,6 +3,8 @@
 //
 
 #include "Camera.h"
+#include "../../glm/detail/type_quat.hpp"
+#include "../../glm/gtc/quaternion.hpp"
 
 Camera::Camera(glm::vec3 position, glm::vec3 up, float yaw, float pitch) : Front(glm::vec3(0.0f, 0.0f, -1.0f)), MovementSpeed(SPEED), MouseSensitivity(SENSITIVITY), Zoom(ZOOM)
 {
@@ -25,7 +27,20 @@ Camera::Camera(float posX, float posY, float posZ, float upX, float upY, float u
 
 glm::mat4 Camera::GetViewMatrix()
 {
-    return glm::lookAt(Position, Position + Front, Up);
+    //FPS camera:  RotationX(pitch) * RotationY(yaw)
+    glm::quat qPitch = glm::angleAxis(-Pitch, glm::vec3(1, 0, 0));
+    glm::quat qYaw = glm::angleAxis(Yaw, glm::vec3(0, 1, 0));
+    glm::quat qRoll = glm::angleAxis(Roll,glm::vec3(0,0,1));
+
+    //For a FPS camera we can omit roll
+    orientation =  qPitch * qYaw * qRoll;
+    orientation = glm::normalize(orientation);
+    glm::mat4 rotate = glm::mat4_cast(orientation);
+
+    glm::mat4 translate = glm::mat4(1.0f);
+    translate = glm::translate(translate, -Position);
+
+    return rotate * translate;
 }
 
 void Camera::ProcessKeyboard(Camera_Movement direction, float deltaTime)
@@ -44,9 +59,9 @@ void Camera::ProcessKeyboard(Camera_Movement direction, float deltaTime)
     if (direction == DOWN)
         Position -= Up * velocity;
     if (direction == RLEFT)
-        Roll += velocity;
+        Roll += (SENSITIVITY*100)*deltaTime;
     if (direction == RRIGHT)
-        Roll -= velocity;
+        Roll -= (SENSITIVITY*100)*deltaTime;
     updateCameraVectors();
 }
 
@@ -81,13 +96,12 @@ void Camera::ProcessMouseScroll(float yoffset) {
 
 void Camera::updateCameraVectors() {
     glm::vec3 front;
-    front.x = cos(glm::radians(Yaw)) * cos(glm::radians(Pitch));
-    front.y = sin(glm::radians(Pitch));
-    front.z = sin(glm::radians(Yaw)) * cos(glm::radians(Pitch));
-    glm::mat4 roll_mat = glm::rotate(glm::mat4(1.0f), glm::radians(Roll), Front);
-    Front = glm::normalize(front);
+    front.x = orientation.x;
+    front.y = orientation.y;
+    front.z = orientation.z;
 
+    Front = glm::conjugate(orientation) * glm::vec3(0.0f, 0.0f, -1.0f);
     // also re-calculate the Right and Up vector
-    Right = glm::normalize(glm::cross(Front, WorldUp));  // normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
-    Up    = glm::mat3(roll_mat) * glm::normalize(glm::cross(Right, Front));
+    Right = glm::conjugate(orientation) * glm::vec3(1.0, 0.0f, 0.0f);
+    Up = glm::conjugate(orientation) * glm::vec3(0.0f, 1.0f, 0.0f);
 }
