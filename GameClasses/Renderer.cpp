@@ -2,6 +2,8 @@
 // Created by drive on 8/7/21.
 //
 
+#include <libs/imgui_impl_opengl3.h>
+#include <libs/imgui_impl_glfw.h>
 #include "Renderer.h"
 
 Renderer::Renderer() {
@@ -42,6 +44,7 @@ Renderer::Renderer(unsigned int scrWidth, unsigned int scrHeight, Camera *camera
 }
 
 void Renderer::renderScene(vector<Entity*> worldEnts,std::vector<std::pair<std::vector<glm::mat4>,PhysicsObject*>> ents) {
+
     glEnable(GL_DEPTH_TEST); // enable depth testing (is disabled for rendering screen-space quad)
     renderShadowMap(worldEnts,ents);
 
@@ -59,6 +62,7 @@ void Renderer::renderScene(vector<Entity*> worldEnts,std::vector<std::pair<std::
 
     glViewport(0, 0, scrWidth, scrHeight);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
 
 
     shaders[0].setFloat("material.shininess", 64.0f);
@@ -126,6 +130,8 @@ void Renderer::renderScene(vector<Entity*> worldEnts,std::vector<std::pair<std::
     glDrawArrays(GL_TRIANGLES, 0, 36);
     glBindVertexArray(0);
     glDepthFunc(GL_LESS); // set depth function back to default
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
    // shaders[1].use();
     /*for (int i = 0; i < effects.size();i++)
     {
@@ -145,6 +151,8 @@ void Renderer::renderScene(vector<Entity*> worldEnts,std::vector<std::pair<std::
     glBindVertexArray(quadVAO);
     glBindTexture(GL_TEXTURE_2D, textColorBuffer);	// use the color attachment texture as the texture of the quad plane
     glDrawArrays(GL_TRIANGLES, 0, 6);
+
+
 }
 
 void Renderer::renderInstanced(std::pair<std::vector<glm::mat4>,PhysicsObject*> ent,Shader &shader) {

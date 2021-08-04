@@ -33,7 +33,8 @@ glm::mat4 Camera::GetViewMatrix()
     glm::quat qRoll = glm::angleAxis(Roll,glm::vec3(0,0,1));
 
     //For a FPS camera we can omit roll
-    orientation =  qPitch * qYaw * qRoll;
+    orientation =  qPitch * qYaw;
+    orientation = orientation * qRoll;
     orientation = glm::normalize(orientation);
     glm::mat4 rotate = glm::mat4_cast(orientation);
 

@@ -6,11 +6,13 @@
 #include <GLFW/glfw3.h>
 #include "GameClasses/Renderer.h"
 #include "GameClasses/World.h"
-
+#include "libs/imgui.h"
+#include "libs/imgui_impl_glfw.h"
+#include "libs/imgui_impl_opengl3.h"
 
 // settings
-const unsigned int SCR_WIDTH = 1920;
-const unsigned int SCR_HEIGHT = 1080;
+const unsigned int SCR_WIDTH = 2880;
+const unsigned int SCR_HEIGHT = 1620;
 bool spotLightEnabled = false, enableCursor = false;
 auto *cam = new Camera(glm::vec3(3000.0f, 1000.0f, 3000.0f));
 float lastX = SCR_WIDTH/2, lastY = SCR_HEIGHT/2,pitch = 0, yaw = -90, fov = 45;
@@ -55,6 +57,17 @@ void processInput(GLFWwindow *window,World *world)
         cam->ProcessKeyboard(RRIGHT,deltaTime);
     if (glfwGetKey(window,GLFW_KEY_C) == GLFW_PRESS)
         cam->ProcessKeyboard(DOWN,deltaTime);
+    if (glfwGetKey(window,GLFW_KEY_LEFT_ALT) == GLFW_PRESS)
+    {
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        enableCursor = true;
+    }
+    else
+    {
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        enableCursor = false;
+    }
+
     if (glfwGetKey(window,GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
         cam->MovementSpeed += 10;
 
@@ -80,8 +93,8 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 
     lastX = xpos;
     lastY = ypos;
-
-    cam->ProcessMouseMovement(xoffset, yoffset,true);
+    if (!enableCursor)
+        cam->ProcessMouseMovement(xoffset, yoffset,true);
 
 }
 
@@ -149,13 +162,26 @@ int main()
 
     GLFWwindow *window = createWindow();
     World *world = new World("../Scenes/Scene1.xml","../Textures/SkyBox/space1/",SCR_WIDTH,SCR_HEIGHT,cam);
+    // Setup Dear ImGui context
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 
-    //scene1.setPostProcess(0);
-    //Render loop
+    // Setup Dear ImGui style
+    ImGui::StyleColorsDark();
+    //ImGui::StyleColorsClassic();
+
+    // Setup Platform/Renderer backends
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init("#version 150");
     while (!glfwWindowShouldClose(window))
     {
         // input
         // -----
+
+
         processInput(window, world);
         world->renderWorld();
 
@@ -167,6 +193,9 @@ int main()
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
     delete world;
     // optional: de-allocate all resources once they've outlived their purpose:
     // ------------------------------------------------------------------------
