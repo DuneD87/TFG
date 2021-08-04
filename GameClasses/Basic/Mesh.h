@@ -107,6 +107,7 @@ public:
     Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, const char *path, std::string directory);
     Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, const char **path, uint nTextures);
     Mesh();
+    Mesh& operator = (const Mesh& copy) noexcept;
     void setModel(glm::mat4 model);
     void bindTextures(Shader &shader,unsigned int depthMap);
     void Draw(Shader &shader, bool outlined, unsigned int depthMap);

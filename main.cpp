@@ -11,9 +11,9 @@
 #include "libs/imgui_impl_opengl3.h"
 
 // settings
-const unsigned int SCR_WIDTH = 2880;
-const unsigned int SCR_HEIGHT = 1620;
-bool spotLightEnabled = false, enableCursor = false;
+const unsigned int SCR_WIDTH = 1920;
+const unsigned int SCR_HEIGHT = 1080;
+bool spotLightEnabled = false, enableCursor = true;
 auto *cam = new Camera(glm::vec3(3000.0f, 1000.0f, 3000.0f));
 float lastX = SCR_WIDTH/2, lastY = SCR_HEIGHT/2,pitch = 0, yaw = -90, fov = 45;
 
@@ -59,13 +59,14 @@ void processInput(GLFWwindow *window,World *world)
         cam->ProcessKeyboard(DOWN,deltaTime);
     if (glfwGetKey(window,GLFW_KEY_LEFT_ALT) == GLFW_PRESS)
     {
-        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-        enableCursor = true;
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        enableCursor = false;
     }
     else
     {
-        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-        enableCursor = false;
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        enableCursor = true;
+
     }
 
     if (glfwGetKey(window,GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)

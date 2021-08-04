@@ -13,6 +13,7 @@
 #ifndef GEOMETRY_CUBESPHERE_H
 #define GEOMETRY_CUBESPHERE_H
 #include "../../Basic/Mesh.h"
+#include "../../Util/FastNoiseLite.h"
 #include <vector>
 #include <map>
 #include <cmath>
@@ -28,7 +29,7 @@ public:
     float getRadius() const                 { return radius; }
     void setRadius(float radius);
     float getSideLength() const             { return radius * 2 / sqrt(3.0f); }
-
+    void setupNoise(float height, FastNoiseLite noise);
 
     // for vertex data
     unsigned int getVertexCount() const     { return (unsigned int)vertices.size() / 3; }
@@ -82,7 +83,8 @@ private:
     // interleaved
     std::vector<float> interleavedVertices;
     int interleavedStride;                  // # of bytes to hop to the next vertex (should be 32 bytes)
-
+    FastNoiseLite noise;
+    float height = 100;
     // for face
     unsigned int vertexCountPerRow;
     unsigned int vertexCountPerFace;

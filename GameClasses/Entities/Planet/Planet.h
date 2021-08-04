@@ -11,33 +11,61 @@
 
 class Planet : public Entity {
 public:
-    Planet(float radius, int nSeg, bool smoot);
+    Planet(float radius, int nSeg, glm::vec3 position);
     ~Planet();
     void draw(Shader &shader, bool outlined = false, int depthMap = -1);
 private:
-
+    void setupMesh();
     void renderGui();
 
-    const char * noiseTypes[7] = {"None","Value","OpenSimplex2" ,"Cellular", "OpenSimplex2S", "Perlin", "ValueCubic"};
+    const char * noiseTypes[6] = {"Value","OpenSimplex2" ,"Cellular", "OpenSimplex2S", "Perlin", "ValueCubic"};
     const char * fractalTypes[6] = {"None","DomainWarpProg","FBm" ,"DomainWarpInd", "PingPong", "Ridged"};
-    const char * cellDistFunc[5] = {"None","Hybrid","Euclidean","Euclidean Squared","Manhattan"};
-    const char * cellReturnType[8] = {"None","CellValue","Distance2Div","Distance","Distance2","Distance2Add","Distance2Sub","Distance2Mul"};
-    const char * domainWarpType[4] = {"None","BasicGrid","Open Simplex2", "Open Simplex2 Reduced"};
+    const char * cellDistFunc[4] = {"Hybrid","Euclidean","Euclidean Squared","Manhattan"};
+    const char * cellReturnType[7] = {"CellValue","Distance2Div","Distance","Distance2","Distance2Add","Distance2Sub","Distance2Mul"};
+    const char * domainWarpType[3] = {"BasicGrid","Open Simplex2", "Open Simplex2 Reduced"};
+    const FastNoiseLite::NoiseType  _noiseTypes[7] = {FastNoiseLite::NoiseType_Value,
+                                                    FastNoiseLite::NoiseType_OpenSimplex2,
+                                                    FastNoiseLite::NoiseType_Cellular,
+                                                    FastNoiseLite::NoiseType_OpenSimplex2S,
+                                                    FastNoiseLite::NoiseType_Perlin,
+                                                    FastNoiseLite::NoiseType_ValueCubic};
+    const FastNoiseLite::FractalType _fractalTypes[6] = {FastNoiseLite::FractalType_None,
+                                                         FastNoiseLite::FractalType_DomainWarpProgressive,
+                                                         FastNoiseLite::FractalType_FBm,
+                                                         FastNoiseLite::FractalType_DomainWarpIndependent,
+                                                         FastNoiseLite::FractalType_PingPong,
+                                                         FastNoiseLite::FractalType_Ridged};
+    const FastNoiseLite::CellularDistanceFunction _cellDistFunc[4] = {FastNoiseLite::CellularDistanceFunction_Hybrid,
+                                                                      FastNoiseLite::CellularDistanceFunction_Euclidean,
+                                                                      FastNoiseLite::CellularDistanceFunction_EuclideanSq,
+                                                                      FastNoiseLite::CellularDistanceFunction_Manhattan};
+    const FastNoiseLite::CellularReturnType _cellReturnType[7] = {FastNoiseLite::CellularReturnType_CellValue,
+                                                                  FastNoiseLite::CellularReturnType_Distance2Div,
+                                                                  FastNoiseLite::CellularReturnType_Distance,
+                                                                  FastNoiseLite::CellularReturnType_Distance2,
+                                                                  FastNoiseLite::CellularReturnType_Distance2Add,
+                                                                  FastNoiseLite::CellularReturnType_Distance2Sub,
+                                                                  FastNoiseLite::CellularReturnType_Distance2Mul};
+    const FastNoiseLite::DomainWarpType _domWarpType[4] = {FastNoiseLite::DomainWarpType_BasicGrid,
+                                                           FastNoiseLite::DomainWarpType_OpenSimplex2,
+                                                           FastNoiseLite::DomainWarpType_OpenSimplex2Reduced};
     std::vector<BasicTerrain*> faces;
     float highestPoint, lowestPoint,radius;
     float hPointOffset = 0;
-    float lPointOffset = 0;
-    float seed = 0;
-    float noiseFreq = 0;
-    float octaves = 0;
-    float lacunarity = 0;
-    float fGain = 0;
-    float fWeStr = 0;
-    float fPinPonStr = 0;
-    float cellJitter = 0;
-    float domWarpAmp = 0;
-
-    Mesh* planet;
+    float lPointOffset = 17.452;
+    float maxHeight = 138;
+    int seed = 1337;
+    float noiseFreq = 0.006;
+    int octaves = 26;
+    float lacunarity = 0.817;
+    float fGain = 0.623;
+    float fWeStr = 0.762;
+    float fPinPonStr = 3;
+    float cellJitter = 1.0;
+    float domWarpAmp = 50;
+    int noiseTypeSel = 3, fractalTypeSel = 2,cellDistTypeSel = 3, cellReturnTypeSel = 2, domWarpTypeSel = 2;
+    int nSeg;
+    Mesh* planet = NULL;
 };
 
 

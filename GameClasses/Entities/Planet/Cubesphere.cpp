@@ -33,7 +33,8 @@ Cubesphere::Cubesphere(float radius, int sub, bool smooth) : radius(radius), sub
     vertexCountPerFace = vertexCountPerRow * vertexCountPerRow;
     lPoint = 0;
     hPoint = 0;
-    buildVerticesSmooth();
+    //this->noise = noise;
+    //buildVerticesSmooth();
 }
 
 
@@ -110,29 +111,7 @@ void Cubesphere::buildVerticesSmooth()
     std::cout<<"Unit vertices size: "<<unitVertices.size()<<std::endl;
     // clear memory of prev arrays
     clearArrays();
-    FastNoiseLite noise;
-    noise.SetSeed(1337);
-    noise.SetNoiseType(FastNoiseLite::NoiseType_Value);
-    noise.SetFrequency(0.015f);
 
-    noise.SetFractalType(FastNoiseLite::FractalType_None);
-    noise.SetFractalOctaves(16);
-    noise.SetFractalLacunarity(1.7);
-    noise.SetFractalGain(1.2);
-    noise.SetFractalWeightedStrength(0.7);
-    noise.SetFractalPingPongStrength(3);
-
-    noise.SetCellularDistanceFunction(FastNoiseLite::CellularDistanceFunction_Hybrid);
-    noise.SetCellularReturnType(FastNoiseLite::CellularReturnType_CellValue);
-    noise.SetCellularJitter(1.0f);
-    noise.SetDomainWarpType(FastNoiseLite::DomainWarpType_BasicGrid);
-    noise.SetDomainWarpAmp(50.0f);
-    noise.SetFrequency(0.01f);
-    noise.SetFractalType(FastNoiseLite::FractalType_DomainWarpProgressive);
-    noise.SetFractalOctaves(5);
-    noise.SetFractalLacunarity(2.0f);
-    noise.SetFractalGain(0.60f);
-    float height = 10;
     float x, y, z, s, t;
     int k = 0, k1, k2;
 
@@ -475,4 +454,11 @@ float Cubesphere::getLPoint() const {
 
 float Cubesphere::getHPoint() const {
     return hPoint;
+}
+
+void Cubesphere::setupNoise(float height, FastNoiseLite noise) {
+    clearArrays();
+    this->noise = noise;
+    this->height = height;
+    buildVerticesSmooth();
 }

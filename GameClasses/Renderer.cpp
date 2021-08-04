@@ -2,8 +2,8 @@
 // Created by drive on 8/7/21.
 //
 
-#include <libs/imgui_impl_opengl3.h>
-#include <libs/imgui_impl_glfw.h>
+#include "../libs/imgui_impl_opengl3.h"
+#include "../libs/imgui_impl_glfw.h"
 #include "Renderer.h"
 
 Renderer::Renderer() {
