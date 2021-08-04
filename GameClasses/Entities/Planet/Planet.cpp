@@ -82,7 +82,7 @@ void Planet::renderGui() {
         ImGui::Combo("Domain Warp Type",&domWarpTypeSel,domainWarpType, IM_ARRAYSIZE(domainWarpType));
         ImGui::SliderFloat("Domain Warp Amplitude",&domWarpAmp,0.0f,50.0f);
         ImGui::End();
-        
+
     }
 
 }
