@@ -13,6 +13,7 @@ Planet::Planet(float radius, int nSeg, glm::vec3 position) {
     this->id = 34324;
     this->radius = radius;
     this->nSeg = nSeg;
+    this->seed = time(NULL);
     _position = position;
     setupMesh();
 }
@@ -47,6 +48,7 @@ void Planet::renderGui() {
     {
         ImGui::Begin("Planet Settings",NULL,ImGuiWindowFlags_MenuBar);                          // Create a window called "Hello, world!" and append into it.
         //ImGui::SetWindowFontScale(1.5);
+        ImGui::PushItemWidth(200);
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
         ImGui::Text("Highest Point offset");
         test = test + ImGui::SliderFloat("hPoint", &hPointOffset, 0.0f, 100.0f);
@@ -87,6 +89,12 @@ void Planet::setupMesh() {
     noise.SetNoiseType(_noiseTypes[noiseTypeSel]);
     noise.SetFrequency(noiseFreq);
 
+    noise.SetCellularDistanceFunction(_cellDistFunc[cellDistTypeSel]);
+    noise.SetCellularReturnType(_cellReturnType[cellReturnTypeSel]);
+    noise.SetCellularJitter(cellJitter);
+    noise.SetDomainWarpType(_domWarpType[domWarpTypeSel]);
+    noise.SetDomainWarpAmp(domWarpAmp);
+
     noise.SetFractalType(_fractalTypes[fractalTypeSel]);
     noise.SetFractalOctaves(octaves);
     noise.SetFractalLacunarity(lacunarity);
@@ -94,12 +102,8 @@ void Planet::setupMesh() {
     noise.SetFractalWeightedStrength(fWeStr);
     noise.SetFractalPingPongStrength(fPinPonStr);
 
-    noise.SetCellularDistanceFunction(_cellDistFunc[cellDistTypeSel]);
-    noise.SetCellularReturnType(_cellReturnType[cellReturnTypeSel]);
-    noise.SetCellularJitter(cellJitter);
-    noise.SetDomainWarpType(_domWarpType[domWarpTypeSel]);
-    noise.SetDomainWarpAmp(domWarpAmp);
-    noise.SetFrequency(noiseFreq);
+
+
     auto *cubeSphere = new Cubesphere(radius,nSeg,true);
     cubeSphere->setupNoise(maxHeight,noise);
     //std::cout<<"Vertex count: "<<cubeSphere->vertexList.size()<<std::endl;
