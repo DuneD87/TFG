@@ -11,9 +11,9 @@
 #include "libs/imgui_impl_opengl3.h"
 
 // settings
-const unsigned int SCR_WIDTH = 1920;
-const unsigned int SCR_HEIGHT = 1080;
-bool spotLightEnabled = false, enableCursor = true;
+ unsigned int SCR_WIDTH = 1920;
+ unsigned int SCR_HEIGHT = 1080;
+bool spotLightEnabled = false, enableCursor = true,fullScreen = true;
 auto *cam = new Camera(glm::vec3(3000.0f, 1000.0f, 3000.0f));
 float lastX = SCR_WIDTH/2, lastY = SCR_HEIGHT/2,pitch = 0, yaw = -90, fov = 45;
 
@@ -116,10 +116,27 @@ GLFWwindow * createWindow()
 #ifdef __APPLE__
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
+    GLFWwindow* window;
+    if (fullScreen)
+    {
+        GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+        const GLFWvidmode* mode = glfwGetVideoMode(monitor);
 
+        glfwWindowHint(GLFW_RED_BITS, mode->redBits);
+        glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
+        glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
+        glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
+
+        window = glfwCreateWindow(mode->width, mode->height, "My Title", monitor, NULL);
+        SCR_HEIGHT = mode->height;
+        SCR_WIDTH = mode->width;
+    } else
+    {
+        window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", NULL, NULL);
+    }
     // glfw window creation
     // --------------------
-    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", NULL, NULL);
+
     if (window == NULL)
     {
         std::cout << "Failed to create GLFW window" << std::endl;
