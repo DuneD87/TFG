@@ -57,17 +57,6 @@ void processInput(GLFWwindow *window,World *world)
         cam->ProcessKeyboard(RRIGHT,deltaTime);
     if (glfwGetKey(window,GLFW_KEY_C) == GLFW_PRESS)
         cam->ProcessKeyboard(DOWN,deltaTime);
-    if (glfwGetKey(window,GLFW_KEY_LEFT_ALT) == GLFW_PRESS)
-    {
-        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-        enableCursor = false;
-    }
-    else
-    {
-        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-        enableCursor = true;
-
-    }
 
     if (glfwGetKey(window,GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
         cam->MovementSpeed += 10;
@@ -91,7 +80,17 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 {
     float xoffset = xpos - lastX;
     float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
+    if (glfwGetMouseButton(window,GLFW_MOUSE_BUTTON_2))
+    {
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        enableCursor = false;
+    }
+    else
+    {
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        enableCursor = true;
 
+    }
     lastX = xpos;
     lastY = ypos;
     if (!enableCursor)
