@@ -8,10 +8,11 @@
 #include "../Entity.h"
 #include "Icosphere.h"
 #include "../BasicTerrain.h"
+#include "Atmosphere.h"
 
 class Planet : public Entity {
 public:
-    Planet(float radius, int nSeg, glm::vec3 position);
+    Planet(float radius, int nSeg, glm::vec3 position, Camera *cam);
     ~Planet();
     void draw(Shader &shader, bool outlined = false, int depthMap = -1);
     void renderGui();
@@ -85,6 +86,8 @@ private:
     int noiseTypeSel = 3, fractalTypeSel = 2,cellDistTypeSel = 3, cellReturnTypeSel = 2, domWarpTypeSel = 2;
     int nSeg;
     Mesh* planet = NULL;
+    Atmosphere * skyDome;
+    Camera * cam;
 };
 
 

@@ -47,9 +47,9 @@ Renderer::Renderer(unsigned int scrWidth, unsigned int scrHeight, Camera *camera
 void Renderer::renderScene(vector<Entity*> worldEnts,std::vector<std::pair<std::vector<glm::mat4>,PhysicsObject*>> ents) {
 
     glEnable(GL_DEPTH_TEST); // enable depth testing (is disabled for rendering screen-space quad)
-    renderShadowMap(worldEnts,ents);
+    //renderShadowMap(worldEnts,ents);
 
-    glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
+    //glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
 
     shaders[2].use();
     renderLoopCamera(shaders[2]);
@@ -57,15 +57,26 @@ void Renderer::renderScene(vector<Entity*> worldEnts,std::vector<std::pair<std::
     renderLoopCamera(shaders[1]);
     shaders[8].use();
     renderLoopCamera(shaders[8]);
-    shaders[0].use();
 
-    renderLoopCamera(shaders[0]);
 
     glViewport(0, 0, scrWidth, scrHeight);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplGlfw_NewFrame();
+    ImGui::NewFrame();
+    glDepthFunc(GL_LEQUAL);
+    shaders[4].use();
+    renderLoopCamera(shaders[4],true);
+    glBindVertexArray(skyboxVAO);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+    glBindVertexArray(0);
+    glDepthFunc(GL_LESS); // set depth function back to default*/
 
 
-
+    shaders[0].use();
+    renderLoopCamera(shaders[0]);
     shaders[0].setFloat("material.shininess", 64.0f);
     shaders[0].setVec3("viewPos",camera->Position);
     shaders[0].setVec3("lightPos", sunPos);
@@ -127,15 +138,7 @@ void Renderer::renderScene(vector<Entity*> worldEnts,std::vector<std::pair<std::
     for (int i = 0; i < selectedeItems.size();i++)
         worldEnts[selectedeItems[i]]->getModel()->outlineObject(shaders[2],glm::vec3(1.1));
 
-    glDepthFunc(GL_LEQUAL);
-    shaders[4].use();
-    renderLoopCamera(shaders[4],true);
-    glBindVertexArray(skyboxVAO);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
-    glDrawArrays(GL_TRIANGLES, 0, 36);
-    glBindVertexArray(0);
-    glDepthFunc(GL_LESS); // set depth function back to default
+
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
    // shaders[1].use();
@@ -146,7 +149,7 @@ void Renderer::renderScene(vector<Entity*> worldEnts,std::vector<std::pair<std::
     }
      */
     // now bind back to default framebuffer and draw a quad plane with the attached framebuffer color texture
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    /*glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     glDisable(GL_DEPTH_TEST); // disable depth test so screen-space quad isn't discarded due to depth test.
     // clear all relevant buffers
@@ -156,7 +159,7 @@ void Renderer::renderScene(vector<Entity*> worldEnts,std::vector<std::pair<std::
     shaders[3].use();
     glBindVertexArray(quadVAO);
     glBindTexture(GL_TEXTURE_2D, textColorBuffer);	// use the color attachment texture as the texture of the quad plane
-    glDrawArrays(GL_TRIANGLES, 0, 6);
+    glDrawArrays(GL_TRIANGLES, 0, 6);*/
 
 
 }
@@ -359,8 +362,8 @@ void Renderer::setupSkyBox(const char * path) {
     {
         std::string(path)+"right"+format,
         std::string(path)+"left"+format,
-        std::string(path)+"top"+format,
         std::string(path)+"bottom"+format,
+        std::string(path)+"top"+format,
         std::string(path)+"front"+format,
         std::string(path)+"back"+format
     };

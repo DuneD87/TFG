@@ -60,5 +60,9 @@ add_executable(opengltest main.cpp libs/glad.c
         libs/imgui_internal.h
         libs/imgui_tables.cpp
         libs/imgui_impl_opengl3.cpp
-        libs/imgui_impl_opengl3.h)
+        libs/imgui_impl_opengl3.h
+        GameClasses/Entities/Planet/Atmosphere.cpp
+        GameClasses/Entities/Planet/Atmosphere.h
+        GameClasses/Entities/Planet/Sphere.cpp
+        GameClasses/Entities/Planet/Sphere.h)
 target_link_libraries(opengltest glfw GL X11 pthread Xrandr Xi dl assimp ReactPhysics3D::ReactPhysics3D)

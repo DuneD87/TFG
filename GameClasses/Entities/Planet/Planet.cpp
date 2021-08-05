@@ -8,13 +8,14 @@
 #include "Cubesphere.h"
 #include "../../Util/FastNoiseLite.h"
 
-Planet::Planet(float radius, int nSeg, glm::vec3 position) {
+Planet::Planet(float radius, int nSeg, glm::vec3 position, Camera *cam) {
     this->type = 3;
     this->id = 34324;
     this->radius = radius;
     this->nSeg = nSeg;
     this->seed = time(NULL);
     _position = position;
+    this->cam = cam;
     setupMesh();
 }
 
@@ -23,6 +24,7 @@ Planet::Planet(float radius, int nSeg, glm::vec3 position) {
 
 void Planet::draw(Shader &shader, bool outlined, int depthMap) {
 
+
     shader.setInt("isTerrain",1);
     shader.setFloat("hPoint",highestPoint + hPointOffset);
     shader.setFloat("lPoint",lowestPoint - lPointOffset);
@@ -30,6 +32,7 @@ void Planet::draw(Shader &shader, bool outlined, int depthMap) {
     shader.setVec3("upVector",_position);
     planet->Draw(shader,outlined,depthMap);
     shader.setInt("isTerrain",0);
+    skyDome->draw(shader,outlined,-1);
 
 }
 
@@ -39,15 +42,13 @@ Planet::~Planet() {
 
 void Planet::renderGui() {
 
-    ImGui_ImplOpenGL3_NewFrame();
-    ImGui_ImplGlfw_NewFrame();
-    ImGui::NewFrame();
+
 
     bool test = false;
     // 2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
     {
         ImGui::Begin("Planet Settings",NULL,ImGuiWindowFlags_MenuBar);                          // Create a window called "Hello, world!" and append into it.
-        ImGui::SetWindowFontScale(1.5);
+        ImGui::SetWindowFontScale(2);
         ImGui::PushItemWidth(200);
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
         ImGui::Text("Highest Point offset");
@@ -77,6 +78,7 @@ void Planet::renderGui() {
         test =test +  ImGui::SliderFloat("Domain Warp Amplitude",&domWarpAmp,0.0f,50.0f);
         if (ImGui::Button("Rebuild")) setupMesh();
         ImGui::End();
+
         //if (test) setupMesh();
     }
 
@@ -115,6 +117,7 @@ void Planet::setupMesh() {
     delete planet;
     planet = new Mesh(cubeSphere->vertexList,indices,textures,4);
     delete cubeSphere;
+    skyDome = new Atmosphere(radius,radius*1.2,cam,_position);
 }
 
 float Planet::getRadius() const {

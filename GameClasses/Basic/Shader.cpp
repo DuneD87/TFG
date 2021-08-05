@@ -105,6 +105,10 @@ void Shader::checkCompileErrors(unsigned int shader, std::string type) {
     }
 }
 
+Shader::Shader() {
+
+}
+
 /*
 void Shader::addSpotLight(Light light, glm::vec3 direction, glm::vec3 position,float cutOff, float outerCutOff) {
     this->setVec3("spotLight.position", position);

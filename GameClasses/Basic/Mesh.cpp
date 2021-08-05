@@ -80,6 +80,7 @@ void Mesh::bindTextures(Shader &shader,unsigned int depthMap) {
             glBindTexture(GL_TEXTURE_2D, textures[i].id);
         } else
         {
+
             shader.setInt("material.hasTexture",0);
             shader.setVec3("material.mAmbient",textures[i].ka);
             shader.setVec3("material.mDiffuse",textures[i].kd);
@@ -90,6 +91,7 @@ void Mesh::bindTextures(Shader &shader,unsigned int depthMap) {
     // draw mesh
     if (depthMap != -1)
     {
+
         glActiveTexture(GL_TEXTURE0+i);
         glBindTexture(GL_TEXTURE_2D, depthMap);
         shader.setInt("shadowMap",i);

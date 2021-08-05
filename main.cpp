@@ -160,14 +160,14 @@ GLFWwindow * createWindow()
     stbi_set_flip_vertically_on_load(true);
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
-    glEnable(GL_STENCIL_TEST);
+    /*glEnable(GL_STENCIL_TEST);
     glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
     glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
     glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);*/
 
-    //glEnable(GL_CULL_FACE);
-    //glCullFace(GL_FRONT);
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
     //glFrontFace(GL_CW);
 
     return window;
@@ -178,7 +178,7 @@ int main()
 {
 
     GLFWwindow *window = createWindow();
-    World *world = new World("../Scenes/Scene1.xml","../Textures/SkyBox/space1/",SCR_WIDTH,SCR_HEIGHT,cam);
+    World *world = new World("../Scenes/Scene1.xml","../Textures/SkyBox/SpaceHres/",SCR_WIDTH,SCR_HEIGHT,cam);
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
