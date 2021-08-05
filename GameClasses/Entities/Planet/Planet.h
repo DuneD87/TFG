@@ -14,9 +14,10 @@ public:
     Planet(float radius, int nSeg, glm::vec3 position);
     ~Planet();
     void draw(Shader &shader, bool outlined = false, int depthMap = -1);
+    void renderGui();
 private:
     void setupMesh();
-    void renderGui();
+
 
     const char * noiseTypes[6] = {"Value","OpenSimplex2" ,"Cellular", "OpenSimplex2S", "Perlin", "ValueCubic"};
     const char * fractalTypes[6] = {"None","DomainWarpProg","FBm" ,"DomainWarpInd", "PingPong", "Ridged"};
@@ -50,10 +51,28 @@ private:
                                                            FastNoiseLite::DomainWarpType_OpenSimplex2,
                                                            FastNoiseLite::DomainWarpType_OpenSimplex2Reduced};
     std::vector<BasicTerrain*> faces;
+public:
+    float getHighestPoint() const;
+
+    float getLowestPoint() const;
+
+private:
     float highestPoint, lowestPoint,radius;
     float hPointOffset = 0;
     float lPointOffset = 17.452;
     float maxHeight = 138;
+public:
+    float getRadius() const;
+
+    float getHPointOffset() const;
+
+    float getLPointOffset() const;
+
+    float getMaxHeight() const;
+
+    int getNSeg() const;
+
+private:
     int seed = 1337;
     float noiseFreq = 0.006;
     int octaves = 26;

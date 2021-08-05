@@ -30,7 +30,7 @@ void Planet::draw(Shader &shader, bool outlined, int depthMap) {
     shader.setVec3("upVector",_position);
     planet->Draw(shader,outlined,depthMap);
     shader.setInt("isTerrain",0);
-    renderGui();
+
 }
 
 Planet::~Planet() {
@@ -47,7 +47,7 @@ void Planet::renderGui() {
     // 2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
     {
         ImGui::Begin("Planet Settings",NULL,ImGuiWindowFlags_MenuBar);                          // Create a window called "Hello, world!" and append into it.
-        //ImGui::SetWindowFontScale(1.5);
+        ImGui::SetWindowFontScale(1.5);
         ImGui::PushItemWidth(200);
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
         ImGui::Text("Highest Point offset");
@@ -107,10 +107,7 @@ void Planet::setupMesh() {
     auto *cubeSphere = new Cubesphere(radius,nSeg,true);
     cubeSphere->setupNoise(maxHeight,noise);
     //std::cout<<"Vertex count: "<<cubeSphere->vertexList.size()<<std::endl;
-    std::vector<unsigned int> indices;
-    const unsigned int * cubeIndex = cubeSphere->getIndices();
-    for (int i = 0; i < cubeSphere->getIndexCount();i++)
-        indices.push_back(cubeIndex[i]);
+    std::vector<unsigned int> indices = cubeSphere->getIndices();
     highestPoint = cubeSphere->getHPoint();
     lowestPoint = cubeSphere->getLPoint();
     //std::cout<<"hPoint: "<<highestPoint+radius<<" lPoint: "<<lowestPoint-radius<<std::endl;
@@ -118,5 +115,33 @@ void Planet::setupMesh() {
     delete planet;
     planet = new Mesh(cubeSphere->vertexList,indices,textures,4);
     delete cubeSphere;
+}
+
+float Planet::getRadius() const {
+    return radius;
+}
+
+float Planet::getHPointOffset() const {
+    return hPointOffset;
+}
+
+float Planet::getLPointOffset() const {
+    return lPointOffset;
+}
+
+float Planet::getMaxHeight() const {
+    return maxHeight;
+}
+
+int Planet::getNSeg() const {
+    return nSeg;
+}
+
+float Planet::getHighestPoint() const {
+    return highestPoint;
+}
+
+float Planet::getLowestPoint() const {
+    return lowestPoint;
 }
 

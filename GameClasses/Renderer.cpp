@@ -5,6 +5,7 @@
 #include "../libs/imgui_impl_opengl3.h"
 #include "../libs/imgui_impl_glfw.h"
 #include "Renderer.h"
+#include "Entities/Planet/Planet.h"
 
 Renderer::Renderer() {
 
@@ -75,7 +76,11 @@ void Renderer::renderScene(vector<Entity*> worldEnts,std::vector<std::pair<std::
     for (int i = 0; i < worldEnts.size();i++)
     {
         if (worldEnts[i]->getType() != 4)
+        {
             worldEnts[i]->draw(shaders[0],false,depthMap);
+            if (worldEnts[i]->getType() == 3)
+                dynamic_cast<Planet*>(worldEnts[i])->renderGui();
+        }
         else
         {
             shaders[8].use();
@@ -83,6 +88,7 @@ void Renderer::renderScene(vector<Entity*> worldEnts,std::vector<std::pair<std::
             worldEnts[i]->draw(shaders[8],false,-1);
             shaders[0].use();
             renderLoopCamera(shaders[0]);
+
         }
 
         if (worldEnts[i]->getType() == 2 && dynamic_cast<Light*>(worldEnts[i])->getSubType() == "dirLight")

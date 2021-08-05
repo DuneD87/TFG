@@ -37,7 +37,7 @@ public:
     unsigned int getTexCoordCount() const   { return (unsigned int)texCoords.size() / 2; }
     unsigned int getIndexCount() const      { return (unsigned int)indices.size(); }
     unsigned int getTriangleCount() const   { return getIndexCount() / 3; }
-    const unsigned int* getIndices() const  { return indices.data(); }
+    std::vector<unsigned int> getIndices() const  { return indices; }
   // draw only single face, valid ID is 0~5
 
     // debug

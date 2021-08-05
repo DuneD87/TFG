@@ -11,8 +11,8 @@
 #include "libs/imgui_impl_opengl3.h"
 
 // settings
- unsigned int SCR_WIDTH = 1920;
- unsigned int SCR_HEIGHT = 1080;
+ unsigned int SCR_WIDTH = 3840;
+ unsigned int SCR_HEIGHT = 2160;
 bool spotLightEnabled = false, enableCursor = true,fullScreen = true;
 auto *cam = new Camera(glm::vec3(3000.0f, 1000.0f, 3000.0f));
 float lastX = SCR_WIDTH/2, lastY = SCR_HEIGHT/2,pitch = 0, yaw = -90, fov = 45;
