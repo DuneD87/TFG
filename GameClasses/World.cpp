@@ -26,7 +26,7 @@ World::World(const char *scenePath, const char *skyBoxPath, unsigned int scrWidt
 
     auto *water = new BasicWater(terrain->getWidth(),terrain->getHeight(),256,256,waterLevel);
     worldEntities.push_back(water);*/
-    Planet *planet = new Planet(2048,8,glm::vec3(0),camera);
+    Planet *planet = new Planet(8000,9,glm::vec3(0),camera);
     worldEntities.push_back(planet);
 }
 

@@ -27,12 +27,13 @@
 // ctor
 // The radius is circumscribed sphere
 ///////////////////////////////////////////////////////////////////////////////
-Cubesphere::Cubesphere(float radius, int sub, bool smooth) : radius(radius), subdivision(sub), smooth(smooth), interleavedStride(32)
+Cubesphere::Cubesphere(float radius, int sub, bool smooth, float minValue) : radius(radius), subdivision(sub), smooth(smooth), interleavedStride(32)
 {
     vertexCountPerRow = (unsigned int)pow(2, sub) + 1;
     vertexCountPerFace = vertexCountPerRow * vertexCountPerRow;
     lPoint = 0;
     hPoint = 0;
+    this->minValue = minValue;
     //this->noise = noise;
     //buildVerticesSmooth();
 }
@@ -131,15 +132,17 @@ void Cubesphere::buildVerticesSmooth()
             s = ((float)j / (vertexCountPerRow - 1)) *vertexCountPerRow ;
             Vertex auxVertex;
             glm::vec3 vertexPos = glm::vec3(x*radius,y*radius,z*radius);
-            float noiseLevel = noise.GetNoise(x*radius,y*radius,z*radius) * height;
+            float minNoise = noise.GetNoise(x*radius,y*radius,z*radius);
+            float noiseLevel = minNoise * height;
             if (noiseLevel > hPoint)
                 hPoint = noiseLevel;
             if (noiseLevel < lPoint)
                 lPoint = noiseLevel;
             glm::vec3 dir = glm::normalize(glm::vec3(0) - vertexPos);
-            auxVertex.Position = vertexPos+dir*noiseLevel;
+            auxVertex.Position = vertexPos + dir*noiseLevel;
             auxVertex.Normal = glm::vec3(x,y,z);
             auxVertex.TexCoords = glm::vec2(s,t);
+
             vertexList.push_back(auxVertex);
             addVertex(x*radius, y*radius, z*radius);
             addNormal(x, y, z);
@@ -416,6 +419,7 @@ std::vector<float> Cubesphere::getUnitPositiveX(unsigned int pointsPerRow)
 
             // normalize direction vector
             scale = Cubesphere::computeScaleForLength(v, 1);
+
             v[0] *= scale;
             v[1] *= scale;
             v[2] *= scale;
@@ -445,6 +449,28 @@ void Cubesphere::computeNormals() {
         vertexList[iA].Normal = norm;
         vertexList[iB].Normal = norm;
         vertexList[iC].Normal = norm;
+
+        glm::vec2 deltaUV1 = vertexList[iB].TexCoords - vertexList[iA].TexCoords;
+        glm::vec2 deltaUV2 = vertexList[iC].TexCoords - vertexList[iA].TexCoords;
+
+        glm::vec3 tangent,bitangent;
+        float f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+
+        tangent.x = f * (deltaUV2.y * edgeAB.x - deltaUV1.y * edgeAC.x);
+        tangent.y = f * (deltaUV2.y * edgeAB.y - deltaUV1.y * edgeAC.y);
+        tangent.z = f * (deltaUV2.y * edgeAB.z - deltaUV1.y * edgeAC.z);
+
+        bitangent.x = f * (-deltaUV2.x * edgeAB.x + deltaUV1.x * edgeAC.x);
+        bitangent.y = f * (-deltaUV2.x * edgeAB.y + deltaUV1.x * edgeAC.y);
+        bitangent.z = f * (-deltaUV2.x * edgeAB.z + deltaUV1.x * edgeAC.z);
+
+        vertexList[iA].Tangent = tangent;
+        vertexList[iB].Tangent = tangent;
+        vertexList[iC].Tangent = tangent;
+
+        vertexList[iA].Bitangent = bitangent;
+        vertexList[iB].Bitangent = bitangent;
+        vertexList[iC].Bitangent = bitangent;
     }
 }
 
@@ -456,9 +482,10 @@ float Cubesphere::getHPoint() const {
     return hPoint;
 }
 
-void Cubesphere::setupNoise(float height, FastNoiseLite noise) {
+void Cubesphere::setupNoise(float height, FastNoiseLite noise, float minValue) {
     clearArrays();
     this->noise = noise;
     this->height = height;
+    this->minValue = minValue;
     buildVerticesSmooth();
 }

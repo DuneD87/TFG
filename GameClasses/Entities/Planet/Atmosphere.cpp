@@ -12,7 +12,7 @@ Atmosphere::Atmosphere(float planetRadius, float atmosRadius, Camera *cam,glm::v
     this->planetRadius = planetRadius;
     this->atmosRadius = atmosRadius;
     this->cam = cam;
-    Cubesphere cubesphere(atmosRadius,7,true);
+    Cubesphere cubesphere(atmosRadius,4,true);
     cubesphere.setupNoise(0,NULL);
 
     Mesh *modelMesh = new Mesh(cubesphere.vertexList,cubesphere.getIndices(),"","");
@@ -20,40 +20,27 @@ Atmosphere::Atmosphere(float planetRadius, float atmosRadius, Camera *cam,glm::v
     skyDome->meshes.push_back(modelMesh);
     _position = position;
     atmosShader = Shader("../Shaders/lightingShaderVertex.shader", "../Shaders/skydomeFragment.shader");
-
+    atmosShaderIN = Shader("../Shaders/lightingShaderVertex.shader", "../Shaders/backup/alternativeScatteringFragment.shader");
 }
 
 void Atmosphere::draw(Shader &shader, bool outlined, int depthMap) {
     renderGui();
     glEnable(GL_BLEND);
-    glBlendFunc(GL_ONE, GL_ONE);
-    glFrontFace(GL_CW);
-    atmosShader.use();
-    //view
-    glm::mat4 view = this->cam->GetViewMatrix();;
-    atmosShader.setMat4("view",view);
+    glBlendFunc(GL_SRC_ALPHA, GL_SRC_ALPHA);
 
-    /*glm::mat4 tr = glm::mat4(1);
-    tr = glm::translate(tr,cam->Position+cam->Front);
-    glm::mat4 modelmat = glm::mat4(1);
-    modelmat = glm::translate(modelmat,glm::vec3(0));
-    glm::mat4 tv = glm::transpose(modelmat*tr);
-    glm::vec4 camMult = {-tv[3][0], -tv[3][1], -tv[3][2], -tv[3][3]};
-    glm::vec4 camPosition =tv * camMult;*/
-
-    //projection
+    glm::mat4 view = this->cam->GetViewMatrix();
     glm::mat4 projection;
     projection = glm::perspective(glm::radians(this->cam->Zoom), (float)3840/2160, 0.1f, 10000000.0f);
-    atmosShader.setMat4("projection",projection);
     glm::mat4 cameraModel(1.0f);
-    atmosShader.setMat4("model", cameraModel);
 
-    //atmosShader.setFloat("cameraNear",0.1);
-    //atmosShader.setFloat("cameraFar",10000000.0f);
-    //atmosShader.setVec3("cameraForward",cam->Front);
-    atmosShader.setVec3("cameraPosition",cam->Position-cam->Front*100.0f);
-    //atmosShader.setMat4("inverseProjection",glm::inverse(projection));
-    //atmosShader.setMat4("inverseView",glm::inverse(view));
+
+
+
+    atmosShader.use();
+    atmosShader.setMat4("view",view);
+    atmosShader.setMat4("projection",projection);
+    atmosShader.setMat4("model", cameraModel);
+    atmosShader.setVec3("cameraPosition",cam->Position);
     atmosShader.setVec3("planetPosition",_position);
     atmosShader.setFloat("planetRadius",planetRadius);
     atmosShader.setFloat("atmosRadius",atmosRadius);
@@ -69,8 +56,22 @@ void Atmosphere::draw(Shader &shader, bool outlined, int depthMap) {
     atmosShader.setFloat("fNumInScatter",numInScatter);
 
     skyDome->Draw(atmosShader,outlined,depthMap);
-    glFrontFace(GL_CCW);
+
+    glFrontFace(GL_CW);
+    atmosShader.setVec3("cameraPosition",cam->Position);
+    //atmosShader.setMat4("inverseProjection",glm::inverse(projection));
+    //atmosShader.setMat4("inverseView",glm::inverse(view));
+    atmosShader.setVec3("planetPosition",_position);
+    atmosShader.setFloat("planetRadius",planetRadius);
+    //atmosShader.setFloat("cameraNear",0.1);
+    //atmosShader.setFloat("cameraFar",10000000);
+    atmosShader.setFloat("atmosRadius",atmosRadius);
+    atmosShader.setMat4("view",view);
+    atmosShader.setMat4("projection",projection);
+    atmosShader.setMat4("model", cameraModel);
     skyDome->Draw(atmosShader,outlined,depthMap);
+
+    glFrontFace(GL_CCW);
     glDisable(GL_BLEND);
 
 
@@ -85,9 +86,9 @@ void Atmosphere::renderGui() {
         ImGui::SetWindowFontScale(2);
         ImGui::PushItemWidth(200);
 
-        ImGui::SliderFloat("outterRadius", &atmosRadius, 1000.0f, 10000.0f);
+        ImGui::SliderFloat("outterRadius", &atmosRadius, 0.0f, 10000.0f);
 
-        ImGui::SliderFloat("innerRadius", &planetRadius, 1000.0f, 10000.0f);
+        ImGui::SliderFloat("innerRadius", &planetRadius, 0.0f, 10000.0f);
         ImGui::NewLine();
         ImGui::SliderFloat("K_R", &k_r, -10.0f, 10.0f);
         ImGui::SliderFloat("K_M", &k_m, -10.0f, 10.0f);

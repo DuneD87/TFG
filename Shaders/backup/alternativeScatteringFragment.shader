@@ -1,6 +1,9 @@
+#version 410
 #define PI 3.141592
 #define PRIMARY_STEP_COUNT 16
 #define LIGHT_STEP_COUNT 8
+#define saturate(a) clamp( a, 0.0, 1.0 )
+
 in vec2 TexCoords;
 in vec3 FragPos;
 in vec3 LocalPos;
@@ -17,17 +20,59 @@ uniform mat4 inverseProjection;
 uniform mat4 inverseView;
 uniform vec3 planetPosition;
 uniform float planetRadius;
-uniform float atmosphereRadius;
+uniform float atmosRadius;
 
-float saturate(float a)
-{
-    return clamp(a,0.0,1.0);
-}
-vec3 _ScreenToWorld(vec3 pos) {
-    vec4 posP = vec4(pos.xyz * 2.0 - 1.0, 1.0);
-    vec4 posVS = inverseProjection * posP;
-    vec4 posWS = inverseView * vec4((posVS.xyz / posVS.w), 1.0);
+uniform float logDepthBufFC;
+
+vec3 _ScreenToWorld(vec3 posS) {
+    float depthValue = posS.z;
+    float v_depth = pow(2.0, depthValue / (logDepthBufFC * 0.5));
+    float z_view = v_depth - 1.0;
+    vec4 posCLIP = vec4(posS.xy * 2.0 - 1.0, 0.0, 1.0);
+    vec4 posVS = inverseProjection * posCLIP;
+    posVS = vec4(posVS.xyz / posVS.w, 1.0);
+    posVS.xyz = normalize(posVS.xyz) * z_view;
+    vec4 posWS = inverseView * posVS;
     return posWS.xyz;
+}
+vec3 _ScreenToWorld_Normal(vec3 pos) {
+    vec3 posS = pos;
+    vec4 posP = vec4(posS.xyz * 2.0 - 1.0, 1.0);
+    vec4 posVS = inverseProjection * posP;
+
+    posVS = vec4((posVS.xyz / posVS.w), 1.0);
+    vec4 posWS = inverseView * posVS;
+
+    return posWS.xyz;
+}
+// source: https://github.com/selfshadow/ltc_code/blob/master/webgl/shaders/ltc/ltc_blit.fs
+vec3 RRTAndODTFit( vec3 v ) {
+    vec3 a = v * ( v + 0.0245786 ) - 0.000090537;
+    vec3 b = v * ( 0.983729 * v + 0.4329510 ) + 0.238081;
+    return a / b;
+}
+// this implementation of ACES is modified to accommodate a brighter viewing environment.
+// the scale factor of 1/0.6 is subjective. see discussion in #19621.
+vec3 ACESFilmicToneMapping( vec3 color ) {
+    // sRGB => XYZ => D65_2_D60 => AP1 => RRT_SAT
+    const mat3 ACESInputMat = mat3(
+    vec3( 0.59719, 0.07600, 0.02840 ), // transposed from source
+    vec3( 0.35458, 0.90834, 0.13383 ),
+    vec3( 0.04823, 0.01566, 0.83777 )
+    );
+    // ODT_SAT => XYZ => D60_2_D65 => sRGB
+    const mat3 ACESOutputMat = mat3(
+    vec3(  1.60475, -0.10208, -0.00327 ), // transposed from source
+    vec3( -0.53108,  1.10813, -0.07276 ),
+    vec3( -0.07367, -0.00605,  1.07602 )
+    );
+    color *= 1.0 / 0.6;
+    color = ACESInputMat * color;
+    // Apply RRT and ODT
+    color = RRTAndODTFit( color );
+    color = ACESOutputMat * color;
+    // Clamp to [0, 1]
+    return saturate( color );
 }
 float _SoftLight(float a, float b) {
     return (b < 0.5 ?
@@ -93,13 +138,13 @@ out vec3 scatteringColour, out vec3 scatteringOpacity) {
     float g = 0.76;
     float sunIntensity = 40.0;
     float planetRadius = planetRadius;
-    float atmosphereRadius = atmosphereRadius - planetRadius;
-    float totalRadius = planetRadius + atmosphereRadius;
+    float atmosphereRadius = atmosRadius - planetRadius;
+    float totalRadius = planetRadius + atmosRadius;
     float referencePlanetRadius = 6371000.0;
     float referenceAtmosphereRadius = 100000.0;
     float referenceTotalRadius = referencePlanetRadius + referenceAtmosphereRadius;
     float referenceRatio = referencePlanetRadius / referenceAtmosphereRadius;
-    float scaleRatio = planetRadius / atmosphereRadius;
+    float scaleRatio = planetRadius / atmosRadius;
     float planetScale = referencePlanetRadius / planetRadius;
     float atmosphereScale = scaleRatio / referenceRatio;
     float maxDist = distance(worldSpacePos, rayOrigin);
@@ -192,7 +237,7 @@ in vec3 rayOrigin,
 in vec3 rayDir,
 in vec3 sunDir)
 {
-    float atmosphereThickness = (atmosphereRadius - planetRadius);
+    float atmosphereThickness = (atmosRadius - planetRadius);
     float t0 = -1.0;
     float t1 = -1.0;
     // This is a hack since the world mesh has seams that we haven't fixed yet.
@@ -267,7 +312,7 @@ in vec3 rayDir,
 in vec3 sunDir)
 {
     float distToPlanet = max(0.0, length(rayOrigin) - planetRadius);
-    float atmosphereThickness = (atmosphereRadius - planetRadius);
+    float atmosphereThickness = (atmosRadius - planetRadius);
     vec3 groundCol = _ApplyGroundFog(
     rgb, distToPoint, height, worldSpacePos, rayOrigin, rayDir, sunDir);
     vec3 spaceCol = _ApplySpaceFog(
@@ -279,13 +324,22 @@ in vec3 sunDir)
 }
 void main() {
 
-    vec3 posWS = FragPos;
+    vec3 posWS =FragPos;
     float dist = length(posWS - cameraPosition);
     float height = max(0.0, length(cameraPosition) - planetRadius);
     vec3 cameraDirection = normalize(posWS - cameraPosition);
     vec3 diffuse = texture2D(tDiffuse, TexCoords).xyz;
-    vec3 lightDir = normalize(vec3(-2, -4, -2));
+    vec3 lightDir = -normalize(vec3(-2, -4, -2));
     diffuse = _ApplyFog(diffuse, dist, height, posWS, cameraPosition, cameraDirection, lightDir);
+    vec3 scatteringColour = vec3(0,0,1);
+    vec3 scatteringOpacity = vec3(1.0, 0, 1.0);
+    _ComputeScattering(
+    posWS, cameraDirection, cameraPosition,
+    lightDir, scatteringColour, scatteringOpacity
+    );
+    diffuse = diffuse * scatteringOpacity + scatteringColour;
+    diffuse = ACESFilmicToneMapping(diffuse);
+    diffuse = pow(diffuse, vec3(1.0 / 2.0));
     FragColor.rgb = diffuse;
-    FragColor.a = 1;
+    FragColor.a = 1.0;
 }

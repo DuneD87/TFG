@@ -61,7 +61,7 @@ private:
     float highestPoint, lowestPoint,radius;
     float hPointOffset = 0;
     float lPointOffset = 17.452;
-    float maxHeight = 138;
+    float maxHeight = 800;
 public:
     float getRadius() const;
 
@@ -75,15 +75,16 @@ public:
 
 private:
     int seed = 1337;
-    float noiseFreq = 0.006;
-    int octaves = 26;
-    float lacunarity = 0.817;
-    float fGain = 0.623;
-    float fWeStr = 0.762;
+    float noiseFreq = 0.0005;
+    int octaves = 8;
+    float lacunarity = 2.3;
+    float fGain = 0.5;
+    float fWeStr = 0.6;
     float fPinPonStr = 3;
     float cellJitter = 1.0;
     float domWarpAmp = 50;
-    int noiseTypeSel = 3, fractalTypeSel = 2,cellDistTypeSel = 3, cellReturnTypeSel = 2, domWarpTypeSel = 2;
+    float minValue = 0;
+    int noiseTypeSel = 4, fractalTypeSel = 2,cellDistTypeSel = 3, cellReturnTypeSel = 2, domWarpTypeSel = 2;
     int nSeg;
     Mesh* planet = NULL;
     Atmosphere * skyDome;

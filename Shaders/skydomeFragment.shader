@@ -40,18 +40,6 @@ float SCALE_L = 1.0 / (atmosRadius - planetRadius);
 const int numOutScatter = 10;
 const int numInScatter = 10;
 
-
-mat3 rot3xy( vec2 angle ) {
-    vec2 c = cos( angle );
-    vec2 s = sin( angle );
-
-    return mat3(
-    c.y      ,  0.0, -s.y,
-    s.y * s.x,  c.x,  c.y * s.x,
-    s.y * c.x, -s.x,  c.y * c.x
-    );
-}
-
 vec3 rayDirection(vec3 cameraPosition) {
     vec4 ray = m*FragPos - vec4(cameraPosition, 1.0);
     return normalize(vec3(ray));
@@ -87,7 +75,7 @@ float miePhase( float g, float c, float cc ) {
     b *= sqrt( b );
     b *= 2.0 + gg;
 
-    return 1.5 * a / b;
+    return ( 3.0 / 8.0 / PI ) * a / b;
 }
 
 // Reyleigh

@@ -51,10 +51,11 @@ void Planet::renderGui() {
         ImGui::SetWindowFontScale(2);
         ImGui::PushItemWidth(200);
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+        test = test + ImGui::SliderFloat("minValue", &minValue,-1.0f, 1.0f);
         ImGui::Text("Highest Point offset");
-        test = test + ImGui::SliderFloat("hPoint", &hPointOffset, 0.0f, 100.0f);
+        test = test + ImGui::SliderFloat("hPoint", &hPointOffset, -1000.0f, 1000.0f);
         ImGui::Text("Lowest Point offset");
-        test =test + ImGui::SliderFloat("lPoint", &lPointOffset, 0.0f, 100.0f);
+        test =test + ImGui::SliderFloat("lPoint", &lPointOffset, -1000.0f, 1000.0f);
         ImGui::NewLine();
         test =test + ImGui::SliderFloat("Max height", &maxHeight, 0.0f, 10000.0f);
         test =test + ImGui::SliderFloat("Radius", &radius, 0.0f, 10000.0f);
@@ -62,7 +63,7 @@ void Planet::renderGui() {
         ImGui::NewLine();
         test =test + ImGui::Combo("Noise Type",&noiseTypeSel,noiseTypes, IM_ARRAYSIZE(noiseTypes));
         test =test + ImGui::InputInt("Seed",&seed);
-        test =test + ImGui::SliderFloat("Frequency",&noiseFreq,0.0f,0.1f);
+        test =test + ImGui::InputFloat("Frequency",&noiseFreq,0.0001);
         ImGui::NewLine();
         test =test + ImGui::Combo("Fractal Type",&fractalTypeSel, fractalTypes,IM_ARRAYSIZE(fractalTypes));
         test =test + ImGui::SliderInt("Octaves",&octaves,0.,64);
@@ -72,7 +73,7 @@ void Planet::renderGui() {
         test =test +  ImGui::SliderFloat("Fractal Ping Pong Strength",&fPinPonStr,0.0f,5.0f);
         ImGui::NewLine();
         test =test +  ImGui::Combo("Cellular Distance Function",&cellDistTypeSel,cellDistFunc, IM_ARRAYSIZE(cellDistFunc));
-        test =test +  ImGui::Combo("Cellular Return Type",&cellReturnTypeSel,cellReturnType, IM_ARRAYSIZE(cellDistFunc));
+        test =test +  ImGui::Combo("Cellular Return Type",&cellReturnTypeSel,cellReturnType, IM_ARRAYSIZE(cellReturnType));
         test =test +  ImGui::SliderFloat("Cellular Jitter",&cellJitter,0.0f,10.0f);
         test =test +  ImGui::Combo("Domain Warp Type",&domWarpTypeSel,domainWarpType, IM_ARRAYSIZE(domainWarpType));
         test =test +  ImGui::SliderFloat("Domain Warp Amplitude",&domWarpAmp,0.0f,50.0f);
@@ -87,6 +88,7 @@ void Planet::renderGui() {
 void Planet::setupMesh() {
 
     FastNoiseLite noise;
+
     noise.SetSeed(seed);
     noise.SetNoiseType(_noiseTypes[noiseTypeSel]);
     noise.SetFrequency(noiseFreq);
@@ -104,20 +106,35 @@ void Planet::setupMesh() {
     noise.SetFractalWeightedStrength(fWeStr);
     noise.SetFractalPingPongStrength(fPinPonStr);
 
-
-
-    auto *cubeSphere = new Cubesphere(radius,nSeg,true);
-    cubeSphere->setupNoise(maxHeight,noise);
+    auto *cubeSphere = new Cubesphere(radius,nSeg,true,minValue);
+    cubeSphere->setupNoise(maxHeight,noise,minValue);
     //std::cout<<"Vertex count: "<<cubeSphere->vertexList.size()<<std::endl;
     std::vector<unsigned int> indices = cubeSphere->getIndices();
     highestPoint = cubeSphere->getHPoint();
     lowestPoint = cubeSphere->getLPoint();
     //std::cout<<"hPoint: "<<highestPoint+radius<<" lPoint: "<<lowestPoint-radius<<std::endl;
-    const char *textures[] = {"grassy2.png","grassFlowers.png","mud.png","seamless_rock2.png"};
+    const char *textures[] = {"grassy2.png","grassFlowers.png","mud.png","seamless_rock2.png","snow.jpg"};
+    const char *diffuse[] = { "./Planet/dirt_01_diffuse-1024.png",
+                              "./Planet/grass1-albedo3-1024.png",
+                              "./Planet/sandyground-albedo-1024.png",
+                              "./Planet/snow-packed-albedo-1024.png",
+                              "./Planet/rough-wet-cobble-albedo-1024.png",
+                              "./Planet/sandy-rocks1-albedo-1024.png",
+                              "./Planet/worn-bumpy-rock-albedo-1024.png",
+                              "./Planet/rock-snow-ice-albedo-1024.png",/*,
+                              "./Planet/dirt_01_normal-1024.jpg",
+                              "./Planet/grass1-normal-1024.jpg",
+                              "./Planet/sandyground-normal-1024.jpg",
+                              "./Planet/worn-bumpy-rock-normal-1024.jpg",
+                              "./Planet/rock-snow-ice-normal-1024.jpg",
+                              "./Planet/snow-packed-normal-1024.jpg",
+                              "./Planet/rough-wet-cobble-normal-1024.jpg",
+                              "./Planet/sandy-rocks1-normal-1024.jpg",*/};
+
     delete planet;
-    planet = new Mesh(cubeSphere->vertexList,indices,textures,4);
+    planet = new Mesh(cubeSphere->vertexList,indices,diffuse,8);
     delete cubeSphere;
-    skyDome = new Atmosphere(radius,radius*1.2,cam,_position);
+    skyDome = new Atmosphere(radius-lowestPoint,(radius*1.1)+highestPoint,cam,_position);
 }
 
 float Planet::getRadius() const {

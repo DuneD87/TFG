@@ -22,14 +22,14 @@ class Cubesphere
 {
 public:
     // ctor/dtor
-    Cubesphere(float radius=1.0f, int subdivision=3, bool smooth=true);
+    Cubesphere(float radius=1.0f, int subdivision=3, bool smooth=true,float minValue = 0);
     ~Cubesphere() {}
     std::vector<Vertex> vertexList;
     // getters/setters
     float getRadius() const                 { return radius; }
     void setRadius(float radius);
     float getSideLength() const             { return radius * 2 / sqrt(3.0f); }
-    void setupNoise(float height, FastNoiseLite noise);
+    void setupNoise(float height, FastNoiseLite noise, float minValue = 0);
 
     // for vertex data
     unsigned int getVertexCount() const     { return (unsigned int)vertices.size() / 3; }
@@ -49,7 +49,7 @@ private:
     // static functions
     static void computeFaceNormal(const float v1[3], const float v2[3], const float v3[3], float normal[3]);
     static float computeScaleForLength(const float v[3], float length);
-    static std::vector<float> getUnitPositiveX(unsigned int pointsPerRow);
+    std::vector<float> getUnitPositiveX(unsigned int pointsPerRow);
 
 
     // member functions
@@ -68,6 +68,7 @@ private:
     float radius;                           // circumscribed radius
     int subdivision;
     bool smooth;
+    float minValue;
     std::vector<float> vertices;
     std::vector<float> normals;
     std::vector<float> texCoords;

@@ -42,7 +42,17 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, cons
         text.type = "texture_diffuse";
         text.id = TextureFromFile( path[i],"../Textures/",false,true);
         textures.push_back(text);
+        Texture normal;
     }
+    /*for (auto i = nTextures; i < nTextures * 2; i++)
+    {
+        Texture text;
+        text.path = "../Textures/" + std::string(path[i]);
+        text.type = "texture_normal";
+        text.id = TextureFromFile( path[i],"../Textures/",false,true);
+        textures.push_back(text);
+        Texture normal;
+    }*/
     // now that we have all the required data, set the vertex buffers and its attribute pointers.
     setupMesh();
 }
@@ -75,7 +85,8 @@ void Mesh::bindTextures(Shader &shader,unsigned int depthMap) {
         if (name != "material")
         {
             shader.setInt("material.hasTexture",1);
-            glUniform1i(glGetUniformLocation(shader.ID, (name + number).c_str()), i);
+            //std::cout<<(name + number).c_str()<<std::endl;
+            glUniform1i(glGetUniformLocation(shader.ID, (name +"["+= number+="]").c_str()), i);
             // and finally bind the texture
             glBindTexture(GL_TEXTURE_2D, textures[i].id);
         } else

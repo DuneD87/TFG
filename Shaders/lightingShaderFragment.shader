@@ -51,19 +51,29 @@ in vec3 Normal;
 in vec2 TexCoords;
 in vec4 FragPosLightSpace;
 in vec3 LocalPos;
-uniform sampler2D texture_diffuse1;
-uniform sampler2D texture_diffuse2;
-uniform sampler2D texture_diffuse3;
-uniform sampler2D texture_diffuse4;
+in mat3 tbn;
+in vec3 _viewPos;
+
+in vec3 TangentLightPos;
+in vec3 TangentViewPos;
+in vec3 TangentFragPos;
+uniform sampler2D texture_diffuse[8];
+
+uniform sampler2D texture_normal1;
 uniform int isTerrain;
 uniform float hPoint;
 uniform float lPoint;
-uniform vec3 lightPos;
+
 uniform vec3 viewPos;
 uniform vec3 upVector;
 uniform float pRadius;
 uniform Material material;
 uniform sampler2D shadowMap;
+
+vec3 saturate(vec3 a)
+{
+    return clamp(a,0.0,1.0);
+}
 
 float ShadowCalculation(vec4 fragPosLightSpace, vec3 lightDir)
 {
@@ -124,7 +134,7 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
 }
 vec3 CalcSpotLight(SpotLight light, vec3 norm, vec3 fragPos, vec3 viewDir)
 {
-    vec3 lightDir = normalize(spotLight.position - FragPos);
+    vec3 lightDir = normalize(spotLight.position - TangentFragPos);
     float theta = dot(lightDir, normalize(-light.direction));
     float epsilon   = light.cutOff - light.outerCutOff;
     float intensity = clamp((theta - light.outerCutOff) / epsilon, 0.0, 1.0);
@@ -186,6 +196,16 @@ vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir, vec4 FragPosLightSp
     return (ambient + (1-shadow)*(diffuse + specular));
 }
 
+vec3 _ACESFilmicToneMapping(vec3 x) {
+    float a = 2.51;
+    float b = 0.03;
+    float c = 2.43;
+    float d = 0.59;
+    float e = 0.14;
+    return saturate((x*(a*x+b))/(x*(c*x+d)+e));
+}
+
+
 vec3 CalcTerrainLight(DirLight light, vec3 normal, vec3 viewDir, vec4 FragPosLightSpace, vec3 lightPos,vec4 text)
 {
 
@@ -218,22 +238,8 @@ vec3 CalcTerrainLight(DirLight light, vec3 normal, vec3 viewDir, vec4 FragPosLig
 vec4 createTerrainTexture()
 {
 
-    /*float total = (abs(lPoint - hPoint));
-    float normY = FragPos.y + abs(lPoint);
+    float heights[8] = float[8](0.125,0.250,0.375,0.5,0.625,0.750,0.875,1);
 
-
-    float per = (normY/total);
-    float mix1Val = 0.2;
-    float mix2Val = 0.1;
-    float mix3Val = 0.5;
-    float mix4Val = 0.1;
-    vec4 text = mix(
-    mix(
-        mix(texture(texture_diffuse3,TexCoords),texture(texture_diffuse1,TexCoords),mix1Val),
-        mix(texture(texture_diffuse1,TexCoords),texture(texture_diffuse2,TexCoords),mix2Val),
-        mix3Val),
-        mix(texture(texture_diffuse2,TexCoords),texture(texture_diffuse4,TexCoords),mix4Val),
-    per);*/
     vec4 terrainColor = vec4(0.0, 0.0, 0.0, 1.0);
     vec3 dir = upVector-FragPos;
     float height = length(dir) - pRadius;
@@ -241,8 +247,31 @@ vec4 createTerrainTexture()
     float regionMax = 0.0;
     float regionRange = 0.0;
     float regionWeight = 0.0;
+    int nTextures = 8;
+    for (int i = 0; i < nTextures; i++)
+    {
+        if (i == 0)
+        {
+            regionMin = lPoint;
+            regionMax = lPoint + abs(heights[i]*hPoint);
+        }
+        else if (i < nTextures - 1)
+        {
+            regionMin = lPoint + abs(heights[i-1]*hPoint);
+            regionMax = lPoint + abs(heights[i]*hPoint);
+        }
+        else if (i == nTextures - 1)
+        {
+            regionMin = lPoint + abs(heights[i-1]*hPoint);
+            regionMax = lPoint;
+        }
 
-    // Terrain region 1.
+        regionRange = regionMax - regionMin;
+        regionWeight = (regionRange - abs(height - regionMax)) / regionRange;
+        regionWeight = max(0.0, regionWeight);
+        terrainColor += regionWeight * texture(texture_diffuse[i], TexCoords);
+    }
+   /* // Terrain region 1.
     regionMin = lPoint;
     regionMax = lPoint + abs(0.5*hPoint);
     regionRange = regionMax - regionMin;
@@ -268,11 +297,19 @@ vec4 createTerrainTexture()
 
     // Terrain region 3.
     regionMin = lPoint + abs(0.6*hPoint);
-    regionMax = hPoint;
+    regionMax = hPoint + abs(0.6*hPoint);
     regionRange = regionMax - regionMin;
     regionWeight = (regionRange - abs(height - regionMax)) / regionRange;
     regionWeight = max(0.0, regionWeight);
     terrainColor += regionWeight * texture(texture_diffuse4, TexCoords) ;
+
+    // Terrain region 3.
+    regionMin = lPoint + abs(0.7*hPoint);
+    regionMax = hPoint;
+    regionRange = regionMax - regionMin;
+    regionWeight = (regionRange - abs(height - regionMax)) / regionRange;
+    regionWeight = max(0.0, regionWeight);
+    terrainColor += regionWeight * texture(texture_diffuse5, TexCoords) ;*/
 
     return terrainColor;
 }
@@ -280,7 +317,11 @@ vec4 createTerrainTexture()
 void main()
 {
     // properties
+    // obtain normal from normal map in range [0,1]
     vec3 norm = normalize(Normal);
+    // transform normal vector to range [-1,1]
+    //norm = normalize(norm * 2.0 - 1.0);  // this normal is in tangent space
+
     vec3 viewDir = normalize(viewPos - FragPos);
     // phase 1: Directional lighting
     vec4 text;
@@ -292,10 +333,10 @@ void main()
     vec3 result;
     // phase 2: Point lights
     for(int i = 0; i < nPointLights; i++)
-    result += CalcPointLight(pointLights[i], norm, FragPos, viewDir);
+        result += CalcPointLight(pointLights[i], norm, TangentFragPos, viewDir);
     // phase 3: Spot light
-    result += CalcDirLight(dirLight, norm, viewDir, FragPosLightSpace,lightPos,text);
-    result += CalcSpotLight(spotLight, norm, FragPos, viewDir);
-    FragColor = vec4(result, 1.0);
+    result += CalcDirLight(dirLight, norm, viewDir, FragPosLightSpace,TangentLightPos,text);
+    result += CalcSpotLight(spotLight, norm, TangentFragPos, viewDir);
+    FragColor = vec4(_ACESFilmicToneMapping(result), 1.0);
 
 }

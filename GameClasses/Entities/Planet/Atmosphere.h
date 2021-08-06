@@ -19,6 +19,7 @@ private:
     float planetRadius, atmosRadius;
     Camera *cam;
     Shader atmosShader;
+    Shader atmosShaderIN;
     float viewDistance = 1000000.0f;
     float k_r = 0.166;
     float k_m = 0.0025;
