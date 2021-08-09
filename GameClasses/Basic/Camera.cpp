@@ -2,6 +2,7 @@
 // Created by drive on 1/7/21.
 //
 
+#include <iostream>
 #include "Camera.h"
 #include "../../glm/detail/type_quat.hpp"
 #include "../../glm/gtc/quaternion.hpp"
@@ -12,7 +13,7 @@ Camera::Camera(glm::vec3 position, glm::vec3 up, float yaw, float pitch) : Front
     WorldUp = up;
     Yaw = yaw;
     Pitch = pitch;
-    Roll = 0;
+    Roll = 90;
     updateCameraVectors();
 }
 
@@ -27,15 +28,7 @@ Camera::Camera(float posX, float posY, float posZ, float upX, float upY, float u
 
 glm::mat4 Camera::GetViewMatrix()
 {
-    //FPS camera:  RotationX(pitch) * RotationY(yaw)
-    glm::quat qPitch = glm::angleAxis(-Pitch, glm::vec3(1, 0, 0));
-    glm::quat qYaw = glm::angleAxis(Yaw, glm::vec3(0, 1, 0));
-    glm::quat qRoll = glm::angleAxis(Roll,glm::vec3(0,0,1));
 
-    //For a FPS camera we can omit roll
-    orientation =  qPitch * qYaw;
-    orientation = orientation * qRoll;
-    orientation = glm::normalize(orientation);
     glm::mat4 rotate = glm::mat4_cast(orientation);
 
     glm::mat4 translate = glm::mat4(1.0f);
@@ -60,9 +53,10 @@ void Camera::ProcessKeyboard(Camera_Movement direction, float deltaTime)
     if (direction == DOWN)
         Position -= Up * velocity;
     if (direction == RLEFT)
-        Roll += (SENSITIVITY*1000)*deltaTime;
+        Roll += (SENSITIVITY)*1000*deltaTime;
     if (direction == RRIGHT)
-        Roll -= (SENSITIVITY*1000)*deltaTime;
+        Roll -= (SENSITIVITY)*1000*deltaTime;
+    std::cout<<Roll<<std::endl;
     updateCameraVectors();
 }
 
@@ -95,14 +89,19 @@ void Camera::ProcessMouseScroll(float yoffset) {
         Zoom = 45.0f;
 }
 
+
 void Camera::updateCameraVectors() {
-    glm::vec3 front;
-    front.x = orientation.x;
-    front.y = orientation.y;
-    front.z = orientation.z;
+
+    glm::quat qPYR = glm::quat(glm::vec3(-Pitch, Yaw, -Roll));
+    // reset values
+    Pitch = Yaw = Roll = 0;
+
+    // update qCamera
+    orientation = qPYR * orientation;
+    orientation = glm::normalize(orientation);
 
     Front = glm::conjugate(orientation) * glm::vec3(0.0f, 0.0f, -1.0f);
     // also re-calculate the Right and Up vector
-    Right = glm::conjugate(orientation) * glm::vec3(1.0, 0.0f, 0.0f);
+    Right = glm::conjugate(orientation) * glm::vec3(1.0f, 0.0f, 0.0f);
     Up = glm::conjugate(orientation) * glm::vec3(0.0f, 1.0f, 0.0f);
 }
