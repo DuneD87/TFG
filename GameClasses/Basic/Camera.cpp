@@ -60,9 +60,9 @@ void Camera::ProcessKeyboard(Camera_Movement direction, float deltaTime)
     if (direction == DOWN)
         Position -= Up * velocity;
     if (direction == RLEFT)
-        Roll += (SENSITIVITY*100)*deltaTime;
+        Roll += (SENSITIVITY*1000)*deltaTime;
     if (direction == RRIGHT)
-        Roll -= (SENSITIVITY*100)*deltaTime;
+        Roll -= (SENSITIVITY*1000)*deltaTime;
     updateCameraVectors();
 }
 

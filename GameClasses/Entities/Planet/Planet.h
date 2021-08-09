@@ -86,6 +86,9 @@ private:
     float minValue = 0;
     int noiseTypeSel = 4, fractalTypeSel = 2,cellDistTypeSel = 3, cellReturnTypeSel = 2, domWarpTypeSel = 2;
     int nSeg;
+    float blendFactor = 0.5;
+    float depthBlend = 0.5;
+    unsigned int noiseMap;
     Mesh* planet = NULL;
     Atmosphere * skyDome;
     Camera * cam;

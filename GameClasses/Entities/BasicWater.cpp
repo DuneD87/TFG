@@ -9,9 +9,10 @@ BasicWater::BasicWater(float width, float height, float wSeg, float hSeg, int wa
 :width(width),height(height),wSeg(wSeg),hSeg(hSeg),waterLevel(waterLevel){
     type = 4;
     id = 138;
-
     setupWater();
 }
+
+
 
 void BasicWater::setupWater() {
     std::pair<std::vector<Vertex>,std::vector<unsigned int>> *plane = makePlane(width,height,wSeg,hSeg,0);

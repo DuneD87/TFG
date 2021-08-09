@@ -45,7 +45,7 @@ void BasicTerrain::setupMesh(const char ** path)
             highestPoint = y;
     }
 
-    terrainMesh = new Mesh(vertices,plane->second,path,nText);
+    terrainMesh = new Mesh(vertices,plane->second,path,nText,1);
 }
 
 void BasicTerrain::draw(Shader &shader, bool outLined, int depthMap) {

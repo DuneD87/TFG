@@ -86,12 +86,12 @@ void Atmosphere::renderGui() {
         ImGui::SetWindowFontScale(2);
         ImGui::PushItemWidth(200);
 
-        ImGui::SliderFloat("outterRadius", &atmosRadius, 0.0f, 10000.0f);
+        ImGui::SliderFloat("outterRadius", &atmosRadius, 0.0f, 100000.0f);
 
-        ImGui::SliderFloat("innerRadius", &planetRadius, 0.0f, 10000.0f);
+        ImGui::SliderFloat("innerRadius", &planetRadius, 0.0f, 100000.0f);
         ImGui::NewLine();
         ImGui::SliderFloat("K_R", &k_r, -10.0f, 10.0f);
-        ImGui::SliderFloat("K_M", &k_m, -10.0f, 10.0f);
+        ImGui::SliderFloat("K_M", &k_m, -2.0f, 0.1);
         ImGui::SliderFloat("E", &e, -100.0f, 100);
         ImGui::NewLine();
         ImGui::SliderFloat("G_M",&g_m,-100.0f,100.0f);

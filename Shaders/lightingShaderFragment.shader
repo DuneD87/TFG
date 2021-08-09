@@ -58,8 +58,10 @@ in vec3 TangentLightPos;
 in vec3 TangentViewPos;
 in vec3 TangentFragPos;
 uniform sampler2D texture_diffuse[8];
-
-uniform sampler2D texture_normal1;
+uniform sampler2D texture_normal[8];
+uniform sampler2D texture_height[8];
+uniform float blendFactor;
+uniform float depthBlend;
 uniform int isTerrain;
 uniform float hPoint;
 uniform float lPoint;
@@ -204,6 +206,56 @@ vec3 _ACESFilmicToneMapping(vec3 x) {
     float e = 0.14;
     return saturate((x*(a*x+b))/(x*(c*x+d)+e));
 }
+vec3 blend(vec4 texture1, float a1, vec4 texture2, float a2)
+{
+    float ma = max(texture1.a + a1, texture2.a + a2) - depthBlend;
+
+    float b1 = max(texture1.a + a1 - ma, 0);
+    float b2 = max(texture2.a + a2 - ma, 0);
+
+    return (texture1.rgb * b1 + texture2.rgb * b2) / (b1 + b2);
+}
+vec4 hash4( vec2 p )
+{
+    return fract(sin(vec4( 1.0+dot(p,vec2(37.0,17.0)),
+                    2.0+dot(p,vec2(11.0,47.0)),
+                    3.0+dot(p,vec2(41.0,29.0)),
+                    4.0+dot(p,vec2(23.0,31.0))))*103.0);
+}
+vec4 textureNoTile( sampler2D samp, in vec2 uv )
+{
+    ivec2 iuv = ivec2( floor( uv ) );
+    vec2 fuv = fract( uv );
+
+    // generate per-tile transform
+    vec4 ofa = hash4( iuv + ivec2(0,0) );
+    vec4 ofb = hash4( iuv + ivec2(1,0) );
+    vec4 ofc = hash4( iuv + ivec2(0,1) );
+    vec4 ofd = hash4( iuv + ivec2(1,1) );
+
+    vec2 ddx = dFdx( uv );
+    vec2 ddy = dFdy( uv );
+
+    // transform per-tile uvs
+    ofa.zw = sign( ofa.zw-0.5 );
+    ofb.zw = sign( ofb.zw-0.5 );
+    ofc.zw = sign( ofc.zw-0.5 );
+    ofd.zw = sign( ofd.zw-0.5 );
+
+    // uv's, and derivatives (for correct mipmapping)
+    vec2 uva = uv*ofa.zw + ofa.xy, ddxa = ddx*ofa.zw, ddya = ddy*ofa.zw;
+    vec2 uvb = uv*ofb.zw + ofb.xy, ddxb = ddx*ofb.zw, ddyb = ddy*ofb.zw;
+    vec2 uvc = uv*ofc.zw + ofc.xy, ddxc = ddx*ofc.zw, ddyc = ddy*ofc.zw;
+    vec2 uvd = uv*ofd.zw + ofd.xy, ddxd = ddx*ofd.zw, ddyd = ddy*ofd.zw;
+
+    // fetch and blend
+    vec2 b = smoothstep( 0.25,0.75, fuv );
+
+    return mix( mix( textureGrad( samp, uva, ddxa, ddya ),
+    textureGrad( samp, uvb, ddxb, ddyb ), b.x ),
+    mix( textureGrad( samp, uvc, ddxc, ddyc ),
+    textureGrad( samp, uvd, ddxd, ddyd ), b.x), b.y );
+}
 
 
 vec3 CalcTerrainLight(DirLight light, vec3 normal, vec3 viewDir, vec4 FragPosLightSpace, vec3 lightPos,vec4 text)
@@ -237,91 +289,81 @@ vec3 CalcTerrainLight(DirLight light, vec3 normal, vec3 viewDir, vec4 FragPosLig
 
 vec4 createTerrainTexture()
 {
-
     float heights[8] = float[8](0.125,0.250,0.375,0.5,0.625,0.750,0.875,1);
 
     vec4 terrainColor = vec4(0.0, 0.0, 0.0, 1.0);
     vec3 dir = upVector-FragPos;
+
+    float absHeigth = (abs(lPoint) + abs(hPoint));
+    float height = abs((length(dir) - pRadius) - lPoint) / absHeigth;
+    int nTextures = 8;
+
+    for (int i = 0; i < nTextures; i++)
+    {
+        if (i == 0)
+        {
+            if (height <= heights[i])
+                terrainColor += textureNoTile(texture_diffuse[i],TexCoords);
+        }
+        else if ( i > 0 && i < nTextures - 1)
+        {
+            float a = smoothstep(heights[i - 1],heights[i],height);
+            if (height  > heights[i - 1] && height <=  heights[i])
+                terrainColor += vec4(blend(textureNoTile(texture_diffuse[i - 1],TexCoords),1-a,textureNoTile(texture_diffuse[i],TexCoords),a),1.0);
+        }
+        else if (i == nTextures - 1)
+        {
+            float a = smoothstep(heights[i - 1],heights[i],height);
+            if (height > heights[i - 1])
+                terrainColor += vec4(blend(textureNoTile(texture_diffuse[i - 1],TexCoords),1-a,textureNoTile(texture_diffuse[i],TexCoords),a),1.0);
+        }
+
+    }
+    return terrainColor;
+}
+
+vec3 computeTerrainNormal()
+{
+    float heights[8] = float[8](0.125,0.250,0.375,0.5,0.625,0.750,0.875,1);
+
+    vec3 terrainNormal = vec3(0.0, 0.0, 0.0);
+    vec3 dir = upVector-FragPos;
     float height = length(dir) - pRadius;
-    float regionMin = 0.0;
-    float regionMax = 0.0;
-    float regionRange = 0.0;
-    float regionWeight = 0.0;
+    float absHeigth = (abs(lPoint) + abs(hPoint));
     int nTextures = 8;
     for (int i = 0; i < nTextures; i++)
     {
         if (i == 0)
         {
-            regionMin = lPoint;
-            regionMax = lPoint + abs(heights[i]*hPoint);
+            if (height <= heights[i])
+                terrainNormal += textureNoTile(texture_normal[i],TexCoords).rgb;
         }
-        else if (i < nTextures - 1)
+        else if ( i > 0 && i < nTextures - 1)
         {
-            regionMin = lPoint + abs(heights[i-1]*hPoint);
-            regionMax = lPoint + abs(heights[i]*hPoint);
+            float a = smoothstep(heights[i - 1],heights[i],height);
+            if (height  >= heights[i - 1] && height <=  heights[i])
+                terrainNormal += vec4(blend(textureNoTile(texture_normal[i - 1],TexCoords),1-a,textureNoTile(texture_normal[i],TexCoords),a),1.0).rgb;
         }
         else if (i == nTextures - 1)
         {
-            regionMin = lPoint + abs(heights[i-1]*hPoint);
-            regionMax = lPoint;
+            float a = smoothstep(heights[i - 1],heights[i],height);
+            if (height >= heights[i - 1])
+                terrainNormal +=  vec4(blend(textureNoTile(texture_normal[i - 1],TexCoords),1-a,textureNoTile(texture_normal[i],TexCoords),1-a),1.0).rgb;
         }
 
-        regionRange = regionMax - regionMin;
-        regionWeight = (regionRange - abs(height - regionMax)) / regionRange;
-        regionWeight = max(0.0, regionWeight);
-        terrainColor += regionWeight * texture(texture_diffuse[i], TexCoords);
     }
-   /* // Terrain region 1.
-    regionMin = lPoint;
-    regionMax = lPoint + abs(0.5*hPoint);
-    regionRange = regionMax - regionMin;
-    regionWeight = (regionRange - abs(height - regionMax)) / regionRange;
-    regionWeight = max(0.0, regionWeight);
-    terrainColor += regionWeight * texture(texture_diffuse3, TexCoords);
-
-    // Terrain region 2.
-    regionMin = lPoint + abs(0.4*hPoint);;
-    regionMax = lPoint + abs(0.7*hPoint);
-    regionRange = regionMax - regionMin;
-    regionWeight = (regionRange - abs(height - regionMax)) / regionRange;
-    regionWeight = max(0.0, regionWeight);
-    terrainColor += regionWeight * texture(texture_diffuse1, TexCoords);
-
-    // Terrain region 2.
-    regionMin = lPoint + abs(0.6*hPoint);
-    regionMax = lPoint + abs(0.8*hPoint);
-    regionRange = regionMax - regionMin;
-    regionWeight = (regionRange - abs(height - regionMax)) / regionRange;
-    regionWeight = max(0.0, regionWeight);
-    terrainColor += regionWeight * texture(texture_diffuse2, TexCoords);
-
-    // Terrain region 3.
-    regionMin = lPoint + abs(0.6*hPoint);
-    regionMax = hPoint + abs(0.6*hPoint);
-    regionRange = regionMax - regionMin;
-    regionWeight = (regionRange - abs(height - regionMax)) / regionRange;
-    regionWeight = max(0.0, regionWeight);
-    terrainColor += regionWeight * texture(texture_diffuse4, TexCoords) ;
-
-    // Terrain region 3.
-    regionMin = lPoint + abs(0.7*hPoint);
-    regionMax = hPoint;
-    regionRange = regionMax - regionMin;
-    regionWeight = (regionRange - abs(height - regionMax)) / regionRange;
-    regionWeight = max(0.0, regionWeight);
-    terrainColor += regionWeight * texture(texture_diffuse5, TexCoords) ;*/
-
-    return terrainColor;
+    return terrainNormal;
 }
 
 void main()
 {
     // properties
     // obtain normal from normal map in range [0,1]
-    vec3 norm = normalize(Normal);
-    // transform normal vector to range [-1,1]
-    //norm = normalize(norm * 2.0 - 1.0);  // this normal is in tangent space
-
+    //vec3 norm = normalize(Normal);
+    //FIX FIRST TEXTURE MIX
+    vec3 norm = computeTerrainNormal();
+    norm = norm * 2.0 - 1.0;
+    norm = normalize(tbn * norm);
     vec3 viewDir = normalize(viewPos - FragPos);
     // phase 1: Directional lighting
     vec4 text;
@@ -338,5 +380,4 @@ void main()
     result += CalcDirLight(dirLight, norm, viewDir, FragPosLightSpace,TangentLightPos,text);
     result += CalcSpotLight(spotLight, norm, TangentFragPos, viewDir);
     FragColor = vec4(_ACESFilmicToneMapping(result), 1.0);
-
 }

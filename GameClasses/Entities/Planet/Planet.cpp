@@ -24,12 +24,13 @@ Planet::Planet(float radius, int nSeg, glm::vec3 position, Camera *cam) {
 
 void Planet::draw(Shader &shader, bool outlined, int depthMap) {
 
-
     shader.setInt("isTerrain",1);
     shader.setFloat("hPoint",highestPoint + hPointOffset);
     shader.setFloat("lPoint",lowestPoint - lPointOffset);
     shader.setFloat("pRadius",radius);
     shader.setVec3("upVector",_position);
+    shader.setFloat("blendFactor",blendFactor);
+    shader.setFloat("depthBlend",depthBlend);
     planet->Draw(shader,outlined,depthMap);
     shader.setInt("isTerrain",0);
     skyDome->draw(shader,outlined,-1);
@@ -58,8 +59,10 @@ void Planet::renderGui() {
         test =test + ImGui::SliderFloat("lPoint", &lPointOffset, -1000.0f, 1000.0f);
         ImGui::NewLine();
         test =test + ImGui::SliderFloat("Max height", &maxHeight, 0.0f, 10000.0f);
-        test =test + ImGui::SliderFloat("Radius", &radius, 0.0f, 10000.0f);
-        test =test + ImGui::SliderInt("Num of divisions", &nSeg, 0.0f, 10);
+        test =test + ImGui::SliderFloat("Radius", &radius, 0.0f, 100000.0f);
+        test =test + ImGui::SliderInt("Num of divisions", &nSeg, 0.0f, 20);
+        test =test + ImGui::SliderFloat("DepthBlend", &depthBlend, -1.0f, 1.0f);
+        test =test + ImGui::SliderFloat("BlendFactor", &blendFactor, -1.0f, 1.0f);
         ImGui::NewLine();
         test =test + ImGui::Combo("Noise Type",&noiseTypeSel,noiseTypes, IM_ARRAYSIZE(noiseTypes));
         test =test + ImGui::InputInt("Seed",&seed);
@@ -112,27 +115,32 @@ void Planet::setupMesh() {
     std::vector<unsigned int> indices = cubeSphere->getIndices();
     highestPoint = cubeSphere->getHPoint();
     lowestPoint = cubeSphere->getLPoint();
-    //std::cout<<"hPoint: "<<highestPoint+radius<<" lPoint: "<<lowestPoint-radius<<std::endl;
+    std::cout<<"hPoint: "<<highestPoint<<" lPoint: "<<lowestPoint<<std::endl;
     const char *textures[] = {"grassy2.png","grassFlowers.png","mud.png","seamless_rock2.png","snow.jpg"};
-    const char *diffuse[] = { "./Planet/dirt_01_diffuse-1024.png",
-                              "./Planet/grass1-albedo3-1024.png",
-                              "./Planet/sandyground-albedo-1024.png",
-                              "./Planet/snow-packed-albedo-1024.png",
-                              "./Planet/rough-wet-cobble-albedo-1024.png",
-                              "./Planet/sandy-rocks1-albedo-1024.png",
-                              "./Planet/worn-bumpy-rock-albedo-1024.png",
-                              "./Planet/rock-snow-ice-albedo-1024.png",/*,
-                              "./Planet/dirt_01_normal-1024.jpg",
-                              "./Planet/grass1-normal-1024.jpg",
-                              "./Planet/sandyground-normal-1024.jpg",
-                              "./Planet/worn-bumpy-rock-normal-1024.jpg",
-                              "./Planet/rock-snow-ice-normal-1024.jpg",
-                              "./Planet/snow-packed-normal-1024.jpg",
-                              "./Planet/rough-wet-cobble-normal-1024.jpg",
-                              "./Planet/sandy-rocks1-normal-1024.jpg",*/};
+    const char *diffuse[] = {
+            //DiffuseMap
+            "./Planet/sandy-rocks1-albedo-1024.png",
+            "./Planet/sandyground-albedo-1024.png",
+            "./Planet/rough-wet-cobble-albedo-1024.png",
+            "./Planet/grass1-albedo3-1024.png",
+            "./Planet/dirt_01_diffuse-1024.png",
+            "./Planet/worn-bumpy-rock-albedo-1024.png",
+            "./Planet/rock-snow-ice-albedo-1024.png",
+            "./Planet/snow-packed-albedo-1024.png",
+            //NormalMap
+            "./Planet/sandy-rocks1-normal-1024.jpg",
+            "./Planet/sandyground-normal-1024.jpg",
+            "./Planet/rough-wet-cobble-normal-1024.jpg",
+            "./Planet/grass1-normal-1024.jpg",
+            "./Planet/dirt_01_normal-1024.jpg",
+            "./Planet/worn-bumpy-rock-normal-1024.jpg",
+            "./Planet/rock-snow-ice-normal-1024.jpg",
+            "./Planet/snow-packed-normal-1024.jpg",
 
+              };
+    noiseMap = TextureFromFile("simplex-noise.png","../Textures/Planet/",false,true);
     delete planet;
-    planet = new Mesh(cubeSphere->vertexList,indices,diffuse,8);
+    planet = new Mesh(cubeSphere->vertexList,indices,diffuse,8,0);
     delete cubeSphere;
     skyDome = new Atmosphere(radius-lowestPoint,(radius*1.1)+highestPoint,cam,_position);
 }

@@ -28,13 +28,14 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, cons
     // now that we have all the required data, set the vertex buffers and its attribute pointers.
     setupMesh();
 }
-Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, const char **path, uint nTextures) {
+Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, const char **path, uint nTextures, uint nNoise) {
     this->vertices = vertices;
     this->indices = indices;
     this->position = glm::vec3(0);
     this->scale = glm::vec3(1);
     this->axis = glm::vec3(1);
     this->angle = 0;
+    //Diffuse
     for (auto i = 0; i < nTextures; i++)
     {
         Texture text;
@@ -42,27 +43,36 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, cons
         text.type = "texture_diffuse";
         text.id = TextureFromFile( path[i],"../Textures/",false,true);
         textures.push_back(text);
-        Texture normal;
     }
-    /*for (auto i = nTextures; i < nTextures * 2; i++)
+    //Normal
+    for (auto i = nTextures; i < nTextures * 2; i++)
     {
         Texture text;
         text.path = "../Textures/" + std::string(path[i]);
         text.type = "texture_normal";
         text.id = TextureFromFile( path[i],"../Textures/",false,true);
         textures.push_back(text);
-        Texture normal;
-    }*/
+    }
+    //Noise (for interpolation)
+    for (int i = nTextures * 2; i < (nTextures*2) + nNoise; i++)
+    {
+        Texture text;
+        text.path = "../Textures/" + std::string(path[i]);
+        text.type = "texture_height";
+        text.id = TextureFromFile(path[i],"../Textures/",false,true);
+        textures.push_back(text);
+    }
+
     // now that we have all the required data, set the vertex buffers and its attribute pointers.
     setupMesh();
 }
 
 void Mesh::bindTextures(Shader &shader,unsigned int depthMap) {
     // bind appropriate textures
-    unsigned int diffuseNr  = 1;
-    unsigned int specularNr = 1;
-    unsigned int normalNr   = 1;
-    unsigned int heightNr   = 1;
+    unsigned int diffuseNr  = 0;
+    unsigned int specularNr = 0;
+    unsigned int normalNr   = 0;
+    unsigned int heightNr   = 0;
 
     unsigned int i = 0;
 
@@ -87,6 +97,7 @@ void Mesh::bindTextures(Shader &shader,unsigned int depthMap) {
             shader.setInt("material.hasTexture",1);
             //std::cout<<(name + number).c_str()<<std::endl;
             glUniform1i(glGetUniformLocation(shader.ID, (name +"["+= number+="]").c_str()), i);
+            glActiveTexture(GL_TEXTURE0+i);
             // and finally bind the texture
             glBindTexture(GL_TEXTURE_2D, textures[i].id);
         } else

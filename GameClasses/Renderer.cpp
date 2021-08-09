@@ -47,9 +47,9 @@ Renderer::Renderer(unsigned int scrWidth, unsigned int scrHeight, Camera *camera
 void Renderer::renderScene(vector<Entity*> worldEnts,std::vector<std::pair<std::vector<glm::mat4>,PhysicsObject*>> ents) {
 
     glEnable(GL_DEPTH_TEST); // enable depth testing (is disabled for rendering screen-space quad)
-    //renderShadowMap(worldEnts,ents);
+    renderShadowMap(worldEnts,ents);
 
-    //glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
+    glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
 
     shaders[2].use();
     renderLoopCamera(shaders[2]);
@@ -149,7 +149,7 @@ void Renderer::renderScene(vector<Entity*> worldEnts,std::vector<std::pair<std::
     }
      */
     // now bind back to default framebuffer and draw a quad plane with the attached framebuffer color texture
-    /*glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     glDisable(GL_DEPTH_TEST); // disable depth test so screen-space quad isn't discarded due to depth test.
     // clear all relevant buffers
@@ -159,7 +159,7 @@ void Renderer::renderScene(vector<Entity*> worldEnts,std::vector<std::pair<std::
     shaders[3].use();
     glBindVertexArray(quadVAO);
     glBindTexture(GL_TEXTURE_2D, textColorBuffer);	// use the color attachment texture as the texture of the quad plane
-    glDrawArrays(GL_TRIANGLES, 0, 6);*/
+    glDrawArrays(GL_TRIANGLES, 0, 6);
 
 
 }

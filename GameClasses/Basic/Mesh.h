@@ -77,7 +77,7 @@ unsigned int static TextureFromFile(const char *path, const std::string &directo
     }
     else
     {
-        std::cout << "Texture failed to load at path: " << path << std::endl;
+        std::cout << "Texture failed to load at path: " << filename << std::endl;
         stbi_image_free(data);
     }
 
@@ -105,7 +105,7 @@ public:
 
     Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures);
     Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, const char *path, std::string directory);
-    Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, const char **path, uint nTextures);
+    Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, const char **path, uint nTextures,uint nNoise);
     Mesh();
     Mesh& operator = (const Mesh& copy) noexcept;
     void setModel(glm::mat4 model);
