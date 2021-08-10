@@ -26,6 +26,7 @@ Atmosphere::Atmosphere(float planetRadius, float atmosRadius, Camera *cam,glm::v
 void Atmosphere::draw(Shader &shader, bool outlined, int depthMap) {
     renderGui();
     glEnable(GL_BLEND);
+    //glDisable(GL_CULL_FACE);
     glBlendFunc(GL_SRC_ALPHA, GL_SRC_ALPHA);
 
     glm::mat4 view = this->cam->GetViewMatrix();
@@ -33,18 +34,17 @@ void Atmosphere::draw(Shader &shader, bool outlined, int depthMap) {
     projection = glm::perspective(glm::radians(this->cam->Zoom), (float)3840/2160, 0.1f, 10000000.0f);
     glm::mat4 cameraModel(1.0f);
 
-
-
-
     atmosShader.use();
     atmosShader.setMat4("view",view);
     atmosShader.setMat4("projection",projection);
     atmosShader.setMat4("model", cameraModel);
     atmosShader.setVec3("cameraPosition",cam->Position);
+    atmosShader.setVec3("cameraForward",cam->Front);
     atmosShader.setVec3("planetPosition",_position);
     atmosShader.setFloat("planetRadius",planetRadius);
     atmosShader.setFloat("atmosRadius",atmosRadius);
-
+    atmosShader.setFloat("H",H);
+    atmosShader.setFloat("L",L);
     atmosShader.setFloat("K_R",k_r);
     atmosShader.setFloat("K_M",k_m);
     atmosShader.setFloat("E",e);
@@ -74,7 +74,7 @@ void Atmosphere::draw(Shader &shader, bool outlined, int depthMap) {
     glFrontFace(GL_CCW);
     glDisable(GL_BLEND);
 
-
+    //glEnable(GL_CULL_FACE);
     shader.use();
 }
 
@@ -90,6 +90,8 @@ void Atmosphere::renderGui() {
 
         ImGui::SliderFloat("innerRadius", &planetRadius, 0.0f, 100000.0f);
         ImGui::NewLine();
+        ImGui::SliderFloat("L", &L, 0.0f, 50.0f);
+        ImGui::SliderFloat("H", &H, 0.0f, 50.0f);
         ImGui::SliderFloat("K_R", &k_r, -10.0f, 10.0f);
         ImGui::SliderFloat("K_M", &k_m, -2.0f, 0.1);
         ImGui::SliderFloat("E", &e, -100.0f, 100);

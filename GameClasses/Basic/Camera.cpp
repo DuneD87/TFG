@@ -56,7 +56,6 @@ void Camera::ProcessKeyboard(Camera_Movement direction, float deltaTime)
         Roll += (SENSITIVITY)*1000*deltaTime;
     if (direction == RRIGHT)
         Roll -= (SENSITIVITY)*1000*deltaTime;
-    std::cout<<Roll<<std::endl;
     updateCameraVectors();
 }
 

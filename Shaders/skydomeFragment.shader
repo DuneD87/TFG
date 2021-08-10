@@ -3,6 +3,7 @@
 
 uniform float time;
 uniform vec3 cameraPosition;
+uniform vec3 cameraForward;
 uniform vec3 planetPosition;
 uniform mat4 test;
 
@@ -20,6 +21,7 @@ uniform float atmosRadius;
 uniform float fNumOutScatter;
 uniform float fNumInScatter;
 
+in vec4 worldPos;
 in vec4 FragPos;
 in vec3 Normal;
 in mat4 m;
@@ -141,7 +143,7 @@ vec3 inScatter(vec3 o, vec3 dir, vec2 e, vec3 l) {
 
 void main (void)
 {
-    vec3 dir = rayDirection(cameraPosition);
+    vec3 dir = normalize(cameraPosition - FragPos.xyz);
     vec3 eye = cameraPosition;
 
     vec3 l = normalize(vec3(-2, -4, -2));

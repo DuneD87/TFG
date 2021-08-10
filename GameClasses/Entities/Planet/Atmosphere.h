@@ -24,6 +24,8 @@ private:
     float k_r = 0.166;
     float k_m = 0.0025;
     float e = 14.3;
+    float H = 4.0f;
+    float L = 1.0f;
     float atmosColor[3] = {0.1,0.2,0.8};
     glm::vec3 sunDir = glm::vec3(-2,-4,-2);
     float g_m = -0.85;
