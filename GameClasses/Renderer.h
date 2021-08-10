@@ -32,9 +32,10 @@ public:
     void removeShader(int shaderId);
 
 private:
+    void drawEntities(std::vector<Entity*> worldEnts, glm::mat4 view, glm::mat4 projection, Shader &shader);
     void renderInstanced(std::pair<std::vector<glm::mat4>,PhysicsObject*>ent, Shader &shader);
     void renderShadowMap(vector<Entity*> worldEnts,std::vector<std::pair<std::vector<glm::mat4>,PhysicsObject*>>ents);
-    void renderLoopCamera(Shader shader,bool skybox = false);
+    void renderLoopCamera(Shader shader,glm::mat4 view, glm::mat4 projection,bool skybox = false);
     void renderReflexionTexture(vector<Entity*> worldEnts,std::vector<std::pair<std::vector<glm::mat4>,PhysicsObject*>>ents);
     void setupFrameBuffer();
     void setupSkyBox(const char * path);
