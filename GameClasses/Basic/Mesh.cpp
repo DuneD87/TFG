@@ -38,15 +38,18 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, cons
     //Diffuse
     for (auto i = 0; i < nTextures; i++)
     {
+        std::cout<<std::string(path[i])<<std::endl;
         Texture text;
         text.path = "../Textures/" + std::string(path[i]);
         text.type = "texture_diffuse";
         text.id = TextureFromFile( path[i],"../Textures/",false,true);
         textures.push_back(text);
     }
+    std::cout<<std::endl;
     //Normal
     for (auto i = nTextures; i < nTextures * 2; i++)
     {
+        //std::cout<<std::string(path[i])<<std::endl;
         Texture text;
         text.path = "../Textures/" + std::string(path[i]);
         text.type = "texture_normal";
@@ -56,6 +59,7 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, cons
     //Noise (for interpolation)
     for (int i = nTextures * 2; i < (nTextures*2) + nNoise; i++)
     {
+        //std::cout<<std::string(path[i])<<std::endl;
         Texture text;
         text.path = "../Textures/" + std::string(path[i]);
         text.type = "texture_height";

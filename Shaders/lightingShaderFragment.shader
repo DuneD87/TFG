@@ -328,27 +328,27 @@ vec3 computeTerrainNormal()
 
     vec3 terrainNormal = vec3(0.0, 0.0, 0.0);
     vec3 dir = upVector-FragPos;
-    float height = length(dir) - pRadius;
     float absHeigth = (abs(lPoint) + abs(hPoint));
+    float height = abs((length(dir) - pRadius) - lPoint) / absHeigth;
     int nTextures = 8;
     for (int i = 0; i < nTextures; i++)
     {
         if (i == 0)
         {
             if (height <= heights[i])
-                terrainNormal += textureNoTile(texture_normal[i],TexCoords).rgb;
+                terrainNormal += texture(texture_normal[i],TexCoords).rgb;
         }
         else if ( i > 0 && i < nTextures - 1)
         {
             float a = smoothstep(heights[i - 1],heights[i],height);
-            if (height  >= heights[i - 1] && height <=  heights[i])
-                terrainNormal += vec4(blend(textureNoTile(texture_normal[i - 1],TexCoords),1-a,textureNoTile(texture_normal[i],TexCoords),a),1.0).rgb;
+            if (height  > heights[i - 1] && height <=  heights[i])
+                terrainNormal += vec4(blend(texture(texture_normal[i - 1],TexCoords),1-a,texture(texture_normal[i],TexCoords),a),1.0).rgb;
         }
         else if (i == nTextures - 1)
         {
             float a = smoothstep(heights[i - 1],heights[i],height);
-            if (height >= heights[i - 1])
-                terrainNormal +=  vec4(blend(textureNoTile(texture_normal[i - 1],TexCoords),1-a,textureNoTile(texture_normal[i],TexCoords),1-a),1.0).rgb;
+            if (height > heights[i - 1])
+                terrainNormal += vec4(blend(texture(texture_normal[i - 1],TexCoords),1-a,texture(texture_normal[i],TexCoords),a),1.0).rgb;
         }
 
     }
@@ -360,17 +360,22 @@ void main()
     // properties
     // obtain normal from normal map in range [0,1]
     //vec3 norm = normalize(Normal);
-    //FIX FIRST TEXTURE MIX
-    vec3 norm = computeTerrainNormal();
-    norm = norm * 2.0 - 1.0;
-    norm = normalize(tbn * norm);
-    vec3 viewDir = normalize(viewPos - FragPos);
+    //PARCHEEEE
+    float dist = length(viewPos - FragPos);
+    vec3 norm = Normal;
+    if (dist < 500)//NO MORE FLICKERING HAHA
+    {
+        norm = computeTerrainNormal();
+        norm = norm * 2.0 - 1.0;
+        norm = normalize(tbn * norm);
+    }
+
+    vec3 viewDir = normalize(TangentViewPos - TangentFragPos);
     // phase 1: Directional lighting
     vec4 text;
     if (isTerrain == 1)
     {
         text = createTerrainTexture();
-
     }
     vec3 result;
     // phase 2: Point lights
