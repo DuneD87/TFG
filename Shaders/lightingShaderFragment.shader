@@ -384,8 +384,8 @@ void main()
     //vec3 norm = normalize(Normal);
     //PARCHEEEE
     float dist = length(_viewPos - FragPos);
-    vec3 norm = Normal;
-    if (dist < 2000)//NO MORE FLICKERING HAHA
+    vec3 norm = Normalize(Normal);
+    if (dist < 2000 && isTerrain == 1)//NO MORE FLICKERING HAHA
     {
         norm = computeTerrainNormal();
         norm = norm * 2.0 - 1.0;
