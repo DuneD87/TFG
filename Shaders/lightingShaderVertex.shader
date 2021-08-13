@@ -12,40 +12,38 @@ out vec2 TexCoords;
 out vec4 FragPosLightSpace;
 out vec3 LocalPos;
 out mat3 tbn;
+out vec3 _viewPos;
+out vec2 latLong;
+
 uniform vec3 viewPos;
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 uniform mat4 lightSpaceMatrix;
 uniform vec3 lightPos;
-out mat4 m;
-out mat4 v;
+uniform float pRadius;
 
-out vec3 TangentLightPos;
-out vec3 TangentViewPos;
-out vec3 TangentFragPos;
-out vec3 _viewPos;
 void main()
 {
     FragPos = vec3(model * vec4(aPos, 1.0));
     LocalPos = aPos;
     Normal = mat3(transpose(inverse(model))) * aNormal;
     worldPos = projection * view * vec4(FragPos, 1.0);
-    gl_Position = worldPos;
+
     FragPosLightSpace = lightSpaceMatrix * vec4(FragPos, 1.0);
-    m = model;
-    v = view;
+
     _viewPos = viewPos;
     mat3 normalMatrix = transpose(inverse(mat3(model)));
     vec3 T = normalize(normalMatrix * aTangent);
     vec3 N = normalize(normalMatrix * aNormal);
     T = normalize(T - dot(T, N) * N);
     vec3 B = cross(N, T);
-    mat3 TBN = transpose(mat3(T, B, N));
-    tbn = transpose(TBN);
-    TangentLightPos = TBN * lightPos;
-    TangentViewPos  = TBN * viewPos;
-    TangentFragPos  = TBN * FragPos;
+    mat3 TBN = mat3(T, B, N);
+    tbn = TBN;
     TexCoords = aTexCoords;
+    float lat = acos(worldPos.y / pRadius); //theta
+    float lon = atan(worldPos.x / worldPos.z); //phi
+    latLong = vec2(lat,lon);
+    gl_Position = worldPos;
 
 }

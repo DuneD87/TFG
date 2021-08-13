@@ -33,7 +33,8 @@ void Atmosphere::draw(Shader &shader, bool outlined, int depthMap) {
     glm::mat4 projection;
     projection = glm::perspective(glm::radians(this->cam->Zoom), (float)3840/2160, 0.1f, 10000000.0f);
     glm::mat4 cameraModel(1.0f);
-
+    //std::cout<<"xPos: "<<cam->Position.x<<" yPos: "<<cam->Position.y<<" zPos: "<<cam->Position.z<<std::endl;
+    //std::cout<<"xDir: "<<cam->orientation.x<<" yDir: "<<cam->orientation.y<<" zDir: "<<cam->orientation.z<<std::endl;
     atmosShader.use();
     atmosShader.setMat4("view",view);
     atmosShader.setMat4("projection",projection);
@@ -87,8 +88,8 @@ void Atmosphere::renderGui() {
         ImGui::PushItemWidth(200);
 
         ImGui::SliderFloat("outterRadius", &atmosRadius, 0.0f, 100000.0f);
-
         ImGui::SliderFloat("innerRadius", &planetRadius, 0.0f, 100000.0f);
+        ImGui::SliderFloat("viewDistance", &viewDistance, 0.0f, 10000000.0f);
         ImGui::NewLine();
         ImGui::SliderFloat("L", &L, 0.0f, 50.0f);
         ImGui::SliderFloat("H", &H, 0.0f, 50.0f);
@@ -107,4 +108,8 @@ void Atmosphere::renderGui() {
 
         //if (test) setupMesh();
     }
+}
+
+Atmosphere::~Atmosphere() {
+    delete skyDome;
 }

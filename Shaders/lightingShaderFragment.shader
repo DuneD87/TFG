@@ -53,6 +53,7 @@ in vec4 FragPosLightSpace;
 in vec3 LocalPos;
 in mat3 tbn;
 in vec3 _viewPos;
+in vec2 latlon;
 
 in vec3 TangentLightPos;
 in vec3 TangentViewPos;
@@ -66,7 +67,6 @@ uniform int isTerrain;
 uniform float hPoint;
 uniform float lPoint;
 
-uniform vec3 viewPos;
 uniform vec3 upVector;
 uniform float pRadius;
 uniform Material material;
@@ -286,10 +286,20 @@ vec3 CalcTerrainLight(DirLight light, vec3 normal, vec3 viewDir, vec4 FragPosLig
     float shadow = ShadowCalculation(FragPosLightSpace,lightDir);
     return (ambient + (1-shadow)*(diffuse));
 }
+/*
+    0 - sandy rocks ( beach ? )
+    1 - sandy ground ( kind of wet )
+    2 - rough wet cobble
+    3 - grass
+    4 - dirt
+    5 - bumpy rock
+    6 - rock snow ice
+    7 - snow
+*/
 
 vec4 createTerrainTexture()
 {
-    float heights[8] = float[8](0.125,0.250,0.375,0.5,0.625,0.750,0.875,1);
+    float heights[8] = float[8](0.125,0.250,0.375,0.4,0.725,0.750,0.875,1);
 
     vec4 terrainColor = vec4(0.0, 0.0, 0.0, 1.0);
     vec3 dir = upVector-FragPos;
@@ -297,60 +307,72 @@ vec4 createTerrainTexture()
     float absHeigth = (abs(lPoint) + abs(hPoint));
     float height = abs((length(dir) - pRadius) - lPoint) / absHeigth;
     int nTextures = 8;
-
-    for (int i = 0; i < nTextures; i++)
+    if (latlon.x >= 0.1|| latlon.x <= -0.1)
     {
-        if (i == 0)
+        terrainColor += textureNoTile(texture_diffuse[7],TexCoords);
+    } else
+    {
+        for (int i = 0; i < nTextures; i++)
         {
-            if (height <= heights[i])
+            if (i == 0)
+            {
+                if (height <= heights[i])
                 terrainColor += textureNoTile(texture_diffuse[i],TexCoords);
-        }
-        else if ( i > 0 && i < nTextures - 1)
-        {
-            float a = smoothstep(heights[i - 1],heights[i],height);
-            if (height  > heights[i - 1] && height <=  heights[i])
+            }
+            else if ( i > 0 && i < nTextures - 1)
+            {
+                float a = smoothstep(heights[i - 1],heights[i],height);
+                if (height  > heights[i - 1] && height <=  heights[i])
                 terrainColor += vec4(blend(textureNoTile(texture_diffuse[i - 1],TexCoords),1-a,textureNoTile(texture_diffuse[i],TexCoords),a),1.0);
-        }
-        else if (i == nTextures - 1)
-        {
-            float a = smoothstep(heights[i - 1],heights[i],height);
-            if (height > heights[i - 1])
+            }
+            else if (i == nTextures - 1)
+            {
+                float a = smoothstep(heights[i - 1],heights[i],height);
+                if (height > heights[i - 1])
                 terrainColor += vec4(blend(textureNoTile(texture_diffuse[i - 1],TexCoords),1-a,textureNoTile(texture_diffuse[i],TexCoords),a),1.0);
-        }
+            }
 
+        }
     }
+
     return terrainColor;
 }
 
 vec3 computeTerrainNormal()
 {
-    float heights[8] = float[8](0.125,0.250,0.375,0.5,0.625,0.750,0.875,1);
+    float heights[8] = float[8](0.125,0.250,0.375,0.4,0.725,0.750,0.875,1);
 
     vec3 terrainNormal = vec3(0.0, 0.0, 0.0);
     vec3 dir = upVector-FragPos;
     float absHeigth = (abs(lPoint) + abs(hPoint));
     float height = abs((length(dir) - pRadius) - lPoint) / absHeigth;
     int nTextures = 8;
-    for (int i = 0; i < nTextures; i++)
+    if (latlon.x >= 0.1 || latlon.x <= -0.1)
     {
-        if (i == 0)
+        terrainNormal += textureNoTile(texture_normal[7],TexCoords).rgb;
+    } else
+    {
+        for (int i = 0; i < nTextures; i++)
         {
-            if (height <= heights[i])
-                terrainNormal += texture(texture_normal[i],TexCoords).rgb;
-        }
-        else if ( i > 0 && i < nTextures - 1)
-        {
-            float a = smoothstep(heights[i - 1],heights[i],height);
-            if (height  > heights[i - 1] && height <=  heights[i])
-                terrainNormal += vec4(blend(texture(texture_normal[i - 1],TexCoords),1-a,texture(texture_normal[i],TexCoords),a),1.0).rgb;
-        }
-        else if (i == nTextures - 1)
-        {
-            float a = smoothstep(heights[i - 1],heights[i],height);
-            if (height > heights[i - 1])
-                terrainNormal += vec4(blend(texture(texture_normal[i - 1],TexCoords),1-a,texture(texture_normal[i],TexCoords),a),1.0).rgb;
-        }
+            if (i == 0)
+            {
+                if (height <= heights[i])
+                terrainNormal += texture(texture_normal[i], TexCoords).rgb;
+            }
+            else if (i > 0 && i < nTextures - 1)
+            {
+                float a = smoothstep(heights[i - 1], heights[i], height);
+                if (height  > heights[i - 1] && height <=  heights[i])
+                terrainNormal += vec4(blend(texture(texture_normal[i - 1], TexCoords), 1-a, texture(texture_normal[i], TexCoords), a), 1.0).rgb;
+            }
+            else if (i == nTextures - 1)
+            {
+                float a = smoothstep(heights[i - 1], heights[i], height);
+                if (height > heights[i - 1])
+                terrainNormal += vec4(blend(texture(texture_normal[i - 1], TexCoords), 1-a, texture(texture_normal[i], TexCoords), a), 1.0).rgb;
+            }
 
+        }
     }
     return terrainNormal;
 }
@@ -361,16 +383,16 @@ void main()
     // obtain normal from normal map in range [0,1]
     //vec3 norm = normalize(Normal);
     //PARCHEEEE
-    float dist = length(viewPos - FragPos);
+    float dist = length(_viewPos - FragPos);
     vec3 norm = Normal;
-    if (dist < 500)//NO MORE FLICKERING HAHA
+    if (dist < 2000)//NO MORE FLICKERING HAHA
     {
         norm = computeTerrainNormal();
         norm = norm * 2.0 - 1.0;
         norm = normalize(tbn * norm);
     }
 
-    vec3 viewDir = normalize(TangentViewPos - TangentFragPos);
+    vec3 viewDir = normalize(_viewPos - FragPos);
     // phase 1: Directional lighting
     vec4 text;
     if (isTerrain == 1)
@@ -380,7 +402,7 @@ void main()
     vec3 result;
     // phase 2: Point lights
     for(int i = 0; i < nPointLights; i++)
-        result += CalcPointLight(pointLights[i], norm, TangentFragPos, viewDir);
+        result += CalcPointLight(pointLights[i], norm, FragPos, viewDir);
     // phase 3: Spot light
     result += CalcDirLight(dirLight, norm, viewDir, FragPosLightSpace,TangentLightPos,text);
     result += CalcSpotLight(spotLight, norm, TangentFragPos, viewDir);

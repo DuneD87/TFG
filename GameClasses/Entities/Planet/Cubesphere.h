@@ -17,6 +17,7 @@
 #include <vector>
 #include <map>
 #include <cmath>
+#include <thread>
 
 class Cubesphere
 {
@@ -30,7 +31,8 @@ public:
     void setRadius(float radius);
     float getSideLength() const             { return radius * 2 / sqrt(3.0f); }
     void setupNoise(float height, FastNoiseLite noise, float minValue = 0);
-
+    void buildFace(glm::vec3 faceOrientation, std::vector<int> index, int vertexSize, int indexSize
+                   ,std::vector<Vertex> &vertices, std::vector<unsigned int> &indices);
     // for vertex data
     unsigned int getVertexCount() const     { return (unsigned int)vertices.size() / 3; }
     unsigned int getNormalCount() const     { return (unsigned int)normals.size() / 3; }
@@ -51,7 +53,7 @@ private:
     static float computeScaleForLength(const float v[3], float length);
     std::vector<float> getUnitPositiveX(unsigned int pointsPerRow);
 
-
+    void finishFaceComputation(std::vector<Vertex> verticesn);
     // member functions
     void clearArrays();
     void updateRadius();
@@ -77,9 +79,7 @@ private:
     float lPoint,hPoint;
 public:
     float getLPoint() const;
-
     float getHPoint() const;
-
 private:
     // interleaved
     std::vector<float> interleavedVertices;

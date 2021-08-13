@@ -61,7 +61,7 @@ private:
     float highestPoint, lowestPoint,radius;
     float hPointOffset = 0;
     float lPointOffset = 17.452;
-    float maxHeight = 800;
+    float maxHeight = -5000;
 public:
     float getRadius() const;
 
@@ -75,7 +75,7 @@ public:
 
 private:
     int seed = 1337;
-    float noiseFreq = 0.0005;
+    float noiseFreq = 0.0001;
     int octaves = 8;
     float lacunarity = 2.3;
     float fGain = 0.5;

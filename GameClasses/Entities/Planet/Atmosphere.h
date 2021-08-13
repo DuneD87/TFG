@@ -12,6 +12,7 @@
 class Atmosphere : public Entity {
 public:
     Atmosphere(float planetRadius, float atmosRadius, Camera *cam,glm::vec3 position);
+    ~Atmosphere();
     void draw(Shader &shader, bool outlined = false, int depthMap = -1);
 private:
     void renderGui();

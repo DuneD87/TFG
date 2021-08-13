@@ -31,6 +31,7 @@ Cubesphere::Cubesphere(float radius, int sub, bool smooth, float minValue) : rad
 {
     vertexCountPerRow = (unsigned int)pow(2, sub) + 1;
     vertexCountPerFace = vertexCountPerRow * vertexCountPerRow;
+    std::cout<<vertexCountPerRow<<std::endl;
     lPoint = 0;
     hPoint = 0;
     this->minValue = minValue;
@@ -109,7 +110,7 @@ void Cubesphere::buildVerticesSmooth()
 {
     // generate unit-length verties in +X face
     std::vector<float> unitVertices = Cubesphere::getUnitPositiveX(vertexCountPerRow);
-    std::cout<<"Unit vertices size: "<<unitVertices.size()<<std::endl;
+    std::cout<<"Vertex count per row: "<<vertexCountPerRow<<std::endl;
     // clear memory of prev arrays
     clearArrays();
 
@@ -165,132 +166,45 @@ void Cubesphere::buildVerticesSmooth()
     int lineIndexSize = (int)lineIndices.size(); // line index size of +X face
 
     // build -X face by negating x and z
-    startIndex = vertices.size() / 3;
-    for(int i = 0, j = 0; i < vertexSize; i += 3, j += 2)
-    {
-        Vertex auxVertex;
-        glm::vec3 vertexPos = glm::vec3(-vertices[i], vertices[i+1], -vertices[i+2]);
-        float noiseLevel = noise.GetNoise(-vertices[i], vertices[i+1], -vertices[i+2]) * height;
-        if (noiseLevel > hPoint)
-            hPoint = noiseLevel;
-        if (noiseLevel < lPoint)
-            lPoint = noiseLevel;
-        glm::vec3 dir = glm::normalize(glm::vec3(0) - vertexPos);
-        auxVertex.Position = vertexPos+dir*noiseLevel;
-        auxVertex.Normal = glm::vec3(-normals[i], normals[i+1], -normals[i+2]);
-        auxVertex.TexCoords = glm::vec2(texCoords[j], texCoords[j+1]);
-        vertexList.push_back(auxVertex);
-        addVertex(-vertices[i], vertices[i+1], -vertices[i+2]);
-        addTexCoord(texCoords[j], texCoords[j+1]);
-        addNormal(-normals[i], normals[i+1], -normals[i+2]);
-    }
-    for(int i = 0; i < indexSize; ++i)
-    {
-        indices.push_back(startIndex + indices[i]);
-    }
+
+    std::vector<int> index1 = {0,1,2};
+    std::vector<Vertex> vertices0;
+    std::vector<unsigned int> indices0;
+    buildFace(glm::vec3(-1,1,-1), index1,vertexSize,indexSize,vertices0,indices0);;
+    finishFaceComputation(vertices0);
     // build +Y face by swapping x=>y, y=>-z, z=>-x
-    startIndex = vertices.size() / 3;
-    for(int i = 0, j = 0; i < vertexSize; i += 3, j += 2)
-    {
-        Vertex auxVertex;
-        glm::vec3 vertexPos = glm::vec3(-vertices[i+2], vertices[i], -vertices[i+1]);
-        float noiseLevel = noise.GetNoise(-vertices[i+2], vertices[i], -vertices[i+1]) * height;
-        if (noiseLevel > hPoint)
-            hPoint = noiseLevel;
-        if (noiseLevel < lPoint)
-            lPoint = noiseLevel;
-        glm::vec3 dir = glm::normalize(glm::vec3(0) - vertexPos);
-        auxVertex.Position = vertexPos+dir*noiseLevel;
-        auxVertex.Normal = glm::vec3(-normals[i+2], normals[i], -normals[i+1]);
-        auxVertex.TexCoords = glm::vec2(texCoords[j], texCoords[j+1]);
-        vertexList.push_back(auxVertex);
-
-        addVertex(-vertices[i+2], vertices[i], -vertices[i+1]);
-        addTexCoord(texCoords[j], texCoords[j+1]);
-        addNormal(-normals[i+2], normals[i], -normals[i+1]);
-    }
-    for(int i = 0; i < indexSize; ++i)
-    {
-        indices.push_back(startIndex + indices[i]);
-    }
-
+    std::vector<int> index2 = {2,0,1};
+    std::vector<Vertex> vertices1;
+    std::vector<unsigned int> indices1;
+    buildFace(glm::vec3(-1,1,-1), index2,vertexSize,indexSize,vertices1,indices1);
+    finishFaceComputation(vertices1);
     // build -Y face by swapping x=>-y, y=>z, z=>-x
-    startIndex = vertices.size() / 3;
-    for(int i = 0, j = 0; i < vertexSize; i += 3, j += 2)
-    {
-        Vertex auxVertex;
-        glm::vec3 vertexPos = glm::vec3(-vertices[i+2], -vertices[i], vertices[i+1]);
-        float noiseLevel = noise.GetNoise(-vertices[i+2], -vertices[i], vertices[i+1]) * height;
-        if (noiseLevel > hPoint)
-            hPoint = noiseLevel;
-        if (noiseLevel < lPoint)
-            lPoint = noiseLevel;
-        glm::vec3 dir = glm::normalize(glm::vec3(0) - vertexPos);
-        auxVertex.Position = vertexPos+dir*noiseLevel;
-
-        auxVertex.Normal = glm::vec3(-normals[i+2], -normals[i], normals[i+1]);
-        auxVertex.TexCoords = glm::vec2(texCoords[j], texCoords[j+1]);
-        vertexList.push_back(auxVertex);
-
-        addVertex(-vertices[i+2], -vertices[i], vertices[i+1]);
-        addTexCoord(texCoords[j], texCoords[j+1]);
-        addNormal(-normals[i+2], -normals[i], normals[i+1]);
-    }
-    for(int i = 0; i < indexSize; ++i)
-    {
-        indices.push_back(startIndex + indices[i]);
-    }
-
-    // build +Z face by swapping x=>z, z=>-x
-    startIndex = vertices.size() / 3;
-    for(int i = 0, j = 0; i < vertexSize; i += 3, j += 2)
-    {
-        Vertex auxVertex;
-        glm::vec3 vertexPos = glm::vec3(-vertices[i+2], vertices[i+1], vertices[i]);
-        float noiseLevel = noise.GetNoise(-vertices[i+2], vertices[i+1], vertices[i]) * height;
-        if (noiseLevel > hPoint)
-            hPoint = noiseLevel;
-        if (noiseLevel < lPoint)
-            lPoint = noiseLevel;
-        glm::vec3 dir = glm::normalize(glm::vec3(0) - vertexPos);
-        auxVertex.Position = vertexPos+dir*noiseLevel;
-        auxVertex.Normal = glm::vec3(-normals[i+2], normals[i+1], normals[i]);
-        auxVertex.TexCoords = glm::vec2(texCoords[j], texCoords[j+1]);
-        vertexList.push_back(auxVertex);
-
-        addVertex(-vertices[i+2], vertices[i+1], vertices[i]);
-        addTexCoord(texCoords[j], texCoords[j+1]);
-        addNormal(-normals[i+2], normals[i+1], normals[i]);
-    }
-    for(int i = 0; i < indexSize; ++i)
-    {
-        indices.push_back(startIndex + indices[i]);
-    }
+    std::vector<int> index3 = {2,0,1};
+    std::vector<Vertex> vertices2;
+    std::vector<unsigned int> indices2;
+    buildFace(glm::vec3(-1,-1,1), index3,vertexSize,indexSize,vertices2,indices2);
+    finishFaceComputation(vertices2);
+    // +Z
+    std::vector<Vertex> vertices3;
+    std::vector<unsigned int> indices3;
+    std::vector<int> index4 = {2,1,0};
+    buildFace(glm::vec3(-1,1,1), index4,vertexSize,indexSize,vertices3,indices3);
+    finishFaceComputation(vertices3);
     // build -Z face by swapping x=>-z, z=>x
-    startIndex = vertices.size() / 3;
-    for(int i = 0, j = 0; i < vertexSize; i += 3, j += 2)
-    {
-        Vertex auxVertex;
-        glm::vec3 vertexPos = glm::vec3(vertices[i+2], vertices[i+1], -vertices[i]);
-        float noiseLevel = noise.GetNoise(vertices[i+2], vertices[i+1], -vertices[i]) * height;
-        if (noiseLevel > hPoint)
-            hPoint = noiseLevel;
-        if (noiseLevel < lPoint)
-            lPoint = noiseLevel;
-        glm::vec3 dir = glm::normalize(glm::vec3(0) - vertexPos);
-        auxVertex.Position = vertexPos+dir*noiseLevel;
-        auxVertex.Normal = glm::vec3(normals[i+2], normals[i+1], -normals[i]);
-        auxVertex.TexCoords = glm::vec2(texCoords[j], texCoords[j+1]);
-        vertexList.push_back(auxVertex);
+    std::vector<int> index5 = {2,1,0};
+    std::vector<Vertex> vertices4;
+    std::vector<unsigned int> indices4;
+    buildFace(glm::vec3(1,1,-1), index5,vertexSize,indexSize,vertices4,indices4);
+    finishFaceComputation(vertices4);
 
-        addVertex(vertices[i+2], vertices[i+1], -vertices[i]);
-        addTexCoord(texCoords[j], texCoords[j+1]);
-        addNormal(normals[i+2], normals[i+1], -normals[i]);
-    }
-    for(int i = 0; i < indexSize; ++i)
-    {
-        indices.push_back(startIndex + indices[i]);
-    }
+    indices.insert(indices.end(),indices0.begin(),indices0.end());
+    indices.insert(indices.end(),indices1.begin(),indices1.end());
+    indices.insert(indices.end(),indices2.begin(),indices2.end());
+    indices.insert(indices.end(),indices3.begin(),indices3.end());
+    indices.insert(indices.end(),indices4.begin(),indices4.end());
+
+
+
     // generate interleaved vertex array
     buildInterleavedVertices();
     computeNormals();
@@ -438,6 +352,9 @@ std::vector<float> Cubesphere::getUnitPositiveX(unsigned int pointsPerRow)
 }
 
 void Cubesphere::computeNormals() {
+    //std::vector<std::vector<Mesh>*> diamonds;
+    //std::vector<Mesh> *triangle = new std::vector<Mesh>;
+    int count = 0;
     for (int i = 0; i < indices.size();i+=3)
     {
         unsigned int iA = indices[i];
@@ -472,6 +389,7 @@ void Cubesphere::computeNormals() {
         vertexList[iB].Bitangent = bitangent;
         vertexList[iC].Bitangent = bitangent;
     }
+
 }
 
 float Cubesphere::getLPoint() const {
@@ -488,4 +406,40 @@ void Cubesphere::setupNoise(float height, FastNoiseLite noise, float minValue) {
     this->height = height;
     this->minValue = minValue;
     buildVerticesSmooth();
+}
+
+void Cubesphere::buildFace(glm::vec3 faceOrientation, std::vector<int> index, int vertexSize, int indexSize
+                           ,std::vector<Vertex> &vList, std::vector<unsigned int> &iList) {
+
+    int startIndex = vertices.size() / 3;
+    for(int i = 0, j = 0; i < vertexSize; i += 3, j += 2)
+    {
+        Vertex auxVertex;
+        glm::vec3 vertexPos = glm::vec3(faceOrientation[0] * vertices[i + index[0]], faceOrientation[1] * vertices[i + index[1]], faceOrientation[2] *vertices[i + index[2]]);
+        float noiseLevel = noise.GetNoise(vertexPos.x,vertexPos.y,vertexPos.z) * height;
+        if (noiseLevel > hPoint)
+            hPoint = noiseLevel;
+        if (noiseLevel < lPoint)
+            lPoint = noiseLevel;
+        glm::vec3 dir = glm::normalize(glm::vec3(0) - vertexPos);
+        auxVertex.Position = vertexPos+dir*noiseLevel;
+        auxVertex.Normal = glm::vec3(faceOrientation[0] * normals[i + index[0]], faceOrientation[1] * normals[i + index[1]], faceOrientation[2] * normals[i + index[2]]);
+        auxVertex.TexCoords = glm::vec2(texCoords[j], texCoords[j+1]);
+        vList.push_back(auxVertex);
+
+    }
+    for(int i = 0; i < indexSize; ++i)
+    {
+        iList.push_back(startIndex + indices[i]);
+    }
+}
+
+void Cubesphere::finishFaceComputation(std::vector<Vertex> verticesn) {
+    for (int i = 0; i < verticesn.size();i++)
+    {
+        vertexList.push_back(verticesn[i]);
+        addVertex(verticesn[i].Position.x,verticesn[i].Position.y,verticesn[i].Position.z);
+        addTexCoord(verticesn[i].TexCoords.x, verticesn[i].TexCoords.y);
+        addNormal(verticesn[i].Normal.x, verticesn[i].Normal.y, verticesn[i].Normal.z);
+    }
 }
