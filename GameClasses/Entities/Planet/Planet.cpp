@@ -7,8 +7,9 @@
 #include "Planet.h"
 #include "Cubesphere.h"
 #include "../../Util/FastNoiseLite.h"
+#include "../PhysicsObject.h"
 
-Planet::Planet(float radius, int nSeg, glm::vec3 position, Camera *cam) {
+Planet::Planet(float radius, int nSeg, glm::vec3 position, Camera *cam, std::vector<std::string> path) {
     this->type = 3;
     this->id = 34324;
     this->radius = radius;
@@ -16,7 +17,10 @@ Planet::Planet(float radius, int nSeg, glm::vec3 position, Camera *cam) {
     this->seed = time(NULL);
     _position = position;
     this->cam = cam;
+    this->path = path;
+    bindPlanetTextures();
     setupMesh();
+    //addVegetation();
 }
 
 
@@ -34,7 +38,6 @@ void Planet::draw(Shader &shader, bool outlined, int depthMap) {
     planet->Draw(shader,outlined,depthMap);
     shader.setInt("isTerrain",0);
     skyDome->draw(shader,outlined,-1);
-
 }
 
 Planet::~Planet() {
@@ -43,8 +46,6 @@ Planet::~Planet() {
 }
 
 void Planet::renderGui() {
-
-
 
     bool test = false;
     // 2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
@@ -117,30 +118,11 @@ void Planet::setupMesh() {
     highestPoint = cubeSphere->getHPoint();
     lowestPoint = cubeSphere->getLPoint();
     std::cout<<"hPoint: "<<highestPoint<<" lPoint: "<<lowestPoint<<std::endl;
-    const char *textures[] = {"grassy2.png","grassFlowers.png","mud.png","seamless_rock2.png","snow.jpg"};
-    const char *diffuse[] = {
-            //DiffuseMap
-            "./Planet/sandy-rocks1-albedo-1024.png",
-            "./Planet/sandyground-albedo-1024.png",
-            "./Planet/rough-wet-cobble-albedo-1024.png",
-            "./Planet/grass1-albedo3-1024.png",
-            "./Planet/dirt_01_diffuse-1024.png",
-            "./Planet/worn-bumpy-rock-albedo-1024.png",
-            "./Planet/rock-snow-ice-albedo-1024.png",
-            "./Planet/snow-packed-albedo-1024.png",
-            //NormalMap
-            "./Planet/sandy-rocks1-normal-1024.jpg",
-            "./Planet/sandyground-normal-1024.jpg",
-            "./Planet/rough-wet-cobble-normal-1024.jpg",
-            "./Planet/grass1-normal-1024.jpg",
-            "./Planet/dirt_01_normal-1024.jpg",
-            "./Planet/worn-bumpy-rock-normal-1024.jpg",
-            "./Planet/rock-snow-ice-normal-1024.jpg",
-            "./Planet/snow-packed-normal-1024.jpg",
 
-              };
     delete planet;
-    planet = new Mesh(cubeSphere->vertexList,indices,diffuse,8,0);
+    textures.clear();
+    bindPlanetTextures();
+    planet = new Mesh(cubeSphere->vertexList,indices,textures);
     delete cubeSphere;
     skyDome = new Atmosphere(radius-lowestPoint,(radius*1.1)+highestPoint,cam,_position);
 }
@@ -171,5 +153,38 @@ float Planet::getHighestPoint() const {
 
 float Planet::getLowestPoint() const {
     return lowestPoint;
+}
+
+void Planet::addVegetation() {
+    srand(time(NULL));
+    for (int i = 0; i < planet->vertices.size();i++)
+    {
+        int r = rand()%14;
+        glm::vec3 position = planet->vertices[i].Position;
+        PhysicsObject *ent = new PhysicsObject(-1,0,decoPaths[r]);
+        ent->setPosition(position);
+        planetDeco.push_back(ent);
+    }
+}
+
+void Planet::bindPlanetTextures() {
+    int nTextures = path.size()/2;
+    for (auto i = 0; i < nTextures; i++)
+    {
+        Texture text;
+        text.path = "../Textures/" + path[i];
+        text.type = "texture_diffuse";
+        text.id = TextureFromFile( path[i].c_str(),"../Textures/",false,true);
+        textures.push_back(text);
+    }
+    //Normal
+    for (auto i = nTextures; i < nTextures * 2; i++)
+    {
+        Texture text;
+        text.path = "../Textures/" + path[i];
+        text.type = "texture_normal";
+        text.id = TextureFromFile( path[i].c_str(),"../Textures/",false,true);
+        textures.push_back(text);
+    }
 }
 

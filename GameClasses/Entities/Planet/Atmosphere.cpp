@@ -84,12 +84,14 @@ void Atmosphere::renderGui() {
     // 2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
     {
         ImGui::Begin("Atmospheric Settings",NULL,ImGuiWindowFlags_MenuBar);                          // Create a window called "Hello, world!" and append into it.
-        ImGui::SetWindowFontScale(1);
+        ImGui::SetWindowFontScale(2);
         ImGui::PushItemWidth(200);
 
         ImGui::SliderFloat("outterRadius", &atmosRadius, 0.0f, 100000.0f);
         ImGui::SliderFloat("innerRadius", &planetRadius, 0.0f, 100000.0f);
         ImGui::SliderFloat("viewDistance", &viewDistance, 0.0f, 10000000.0f);
+        ImGui::SliderFloat("Scale",&scale,1.0f,10.0f);
+        skyDome->setScale(glm::vec3(scale));
         ImGui::NewLine();
         ImGui::SliderFloat("L", &L, 0.0f, 50.0f);
         ImGui::SliderFloat("H", &H, 0.0f, 50.0f);

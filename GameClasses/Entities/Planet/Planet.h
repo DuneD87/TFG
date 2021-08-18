@@ -12,14 +12,39 @@
 
 class Planet : public Entity {
 public:
-    Planet(float radius, int nSeg, glm::vec3 position, Camera *cam);
+    Planet(float radius, int nSeg, glm::vec3 position, Camera *cam, std::vector<std::string> path);
     ~Planet();
     void draw(Shader &shader, bool outlined = false, int depthMap = -1);
     void renderGui();
+
+    float getHighestPoint() const;
+    float getLowestPoint() const;
+    float getRadius() const;
+    float getHPointOffset() const;
+    float getLPointOffset() const;
+    float getMaxHeight() const;
+    int getNSeg() const;
 private:
     void setupMesh();
-
-
+    void bindPlanetTextures();
+    void addVegetation();
+    std::vector<Entity*> planetDeco;
+    const char *decoPaths[14] = {
+            "../Models/treeLP1.obj",
+            "../Models/treeLP2.obj",
+            "../Models/grass1.obj",
+            "../Models/grass2.obj",
+            "../Models/rock1.obj",
+            "../Models/rock2.obj",
+            "../Models/rock3.obj",
+            "../Models/rock4.obj",
+            "../Models/bark1.obj",
+            "../Models/bark2.obj",
+            "../Models/shroom1.obj",
+            "../Models/shroom2.obj",
+            "../Models/bush1.obj",
+            "../Models/bush2.obj"
+    };
     const char * noiseTypes[6] = {"Value","OpenSimplex2" ,"Cellular", "OpenSimplex2S", "Perlin", "ValueCubic"};
     const char * fractalTypes[6] = {"None","DomainWarpProg","FBm" ,"DomainWarpInd", "PingPong", "Ridged"};
     const char * cellDistFunc[4] = {"Hybrid","Euclidean","Euclidean Squared","Manhattan"};
@@ -51,29 +76,11 @@ private:
     const FastNoiseLite::DomainWarpType _domWarpType[4] = {FastNoiseLite::DomainWarpType_BasicGrid,
                                                            FastNoiseLite::DomainWarpType_OpenSimplex2,
                                                            FastNoiseLite::DomainWarpType_OpenSimplex2Reduced};
-    std::vector<BasicTerrain*> faces;
-public:
-    float getHighestPoint() const;
 
-    float getLowestPoint() const;
-
-private:
     float highestPoint, lowestPoint,radius;
     float hPointOffset = 0;
     float lPointOffset = 17.452;
     float maxHeight = -5000;
-public:
-    float getRadius() const;
-
-    float getHPointOffset() const;
-
-    float getLPointOffset() const;
-
-    float getMaxHeight() const;
-
-    int getNSeg() const;
-
-private:
     int seed = 1337;
     float noiseFreq = 0.0001;
     int octaves = 8;
@@ -89,9 +96,11 @@ private:
     float blendFactor = 0.5;
     float depthBlend = 0.5;
     unsigned int noiseMap;
+    std::vector<std::string> path;
     Mesh* planet = NULL;
     Atmosphere * skyDome;
     Camera * cam;
+    std::vector<Texture> textures;
 };
 
 

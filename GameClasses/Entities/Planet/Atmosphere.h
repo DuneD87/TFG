@@ -32,6 +32,7 @@ private:
     float g_m = -0.85;
     float numOutScatter = 10.0f;
     float numInScatter = 10.0f;
+    float scale = 1;
 };
 
 

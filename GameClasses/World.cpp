@@ -14,27 +14,38 @@ World::World(const char *scenePath, const char *skyBoxPath, unsigned int scrWidt
     nPointLights = parser.nPointLights;
     renderer->nPointLights = nPointLights;
     renderer->camera = camera;
-    const char *textures[] = {"grassy2.png","grassFlowers.png","mud.png","seamless_rock2.png"};
-    int wSeg= 1024;
-    int divider = 4;
-    /*terrain = new BasicTerrain(8192, 8192, wSeg, wSeg, glm::vec3(0,0,0), textures,4);
-    terrain->translateTerrain(glm::vec3(500));
-    terrain->rotateTerrain(glm::vec4(1,0,0,glm::radians(90.0f)));
-    setupInstanceObjects(wSeg,divider);
 
-    worldEntities.push_back(terrain);
+    std::vector<std::string> diffuse = {
+            //DiffuseMap
+            "Planet/sandy-rocks1-albedo-1024.png",
+            "Planet/sandyground-albedo-1024.png",
+            "Planet/rough-wet-cobble-albedo-1024.png",
+            "Planet/grass1-albedo3-1024.png",
+            "Planet/dirt_01_diffuse-1024.png",
+            "Planet/worn-bumpy-rock-albedo-1024.png",
+            "Planet/rock-snow-ice-albedo-1024.png",
+            "Planet/snow-packed-albedo-1024.png",
+            //NormalMap
+            "Planet/sandy-rocks1-normal-1024.jpg",
+            "Planet/sandyground-normal-1024.jpg",
+            "Planet/rough-wet-cobble-normal-1024.jpg",
+            "Planet/grass1-normal-1024.jpg",
+            "Planet/dirt_01_normal-1024.jpg",
+            "Planet/worn-bumpy-rock-normal-1024.jpg",
+            "Planet/rock-snow-ice-normal-1024.jpg",
+            "Planet/snow-packed-normal-1024.jpg",
 
-    auto *water = new BasicWater(terrain->getWidth(),terrain->getHeight(),256,256,waterLevel);
-    worldEntities.push_back(water);*/
-    Planet *planet = new Planet(40000,9,glm::vec3(0),camera);
+    };
+    std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+    Planet *planet = new Planet(40000,8,glm::vec3(0),camera,diffuse);
+    std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+    std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << "[ms]" << std::endl;
     camera->Position = glm::vec3(59562.6,-20292.2,108728);
     worldEntities.push_back(planet);
 }
 
 void World::renderWorld() {
-
     renderer->renderScene(worldEntities,worldDeco);
-
 }
 
 Renderer* World::getRenderer() {

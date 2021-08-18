@@ -4,10 +4,16 @@
 
 #include "Mesh.h"
 
+#include <utility>
+
 Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures) {
-    this->vertices = vertices;
-    this->indices = indices;
-    this->textures = textures;
+    this->vertices = std::move(vertices);
+    this->indices = std::move(indices);
+    this->textures = std::move(textures);
+    this->position = glm::vec3(0);
+    this->scale = glm::vec3(1);
+    this->axis = glm::vec3(1);
+    this->angle = 0;
     // now that we have all the required data, set the vertex buffers and its attribute pointers.
     setupMesh();
 }

@@ -46,8 +46,8 @@ add_executable(opengltest main.cpp libs/glad.c
         GameClasses/Entities/Planet/Planet.h
         GameClasses/Entities/Planet/Icosphere.cpp
         GameClasses/Entities/Planet/Icosphere.h
-        GameClasses/Entities/Planet/TerrainChunk.cpp
-        GameClasses/Entities/Planet/TerrainChunk.h
+        GameClasses/Entities/Planet/PlanetChunk.cpp
+        GameClasses/Entities/Planet/PlanetChunk.h
         GameClasses/Entities/Planet/Cubesphere.cpp
         GameClasses/Entities/Planet/Cubesphere.h
         libs/imgui.cpp
