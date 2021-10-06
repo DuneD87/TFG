@@ -307,31 +307,26 @@ vec4 createTerrainTexture()
     float absHeigth = (abs(lPoint) + abs(hPoint));
     float height = abs((length(dir) - pRadius) - lPoint) / absHeigth;
     int nTextures = 8;
-    if (latlon.x >= 0.1|| latlon.x <= -0.1)
+    vec4 loadedTextures[8];
+    for (int i = 0; i < nTextures; i++)
     {
-        terrainColor += textureNoTile(texture_diffuse[7],TexCoords);
-    } else
+        loadedTextures[i] = textureNoTile(texture_diffuse[i],TexCoords);
+    }
+    for (int i = 0; i < nTextures; i++)
     {
-        for (int i = 0; i < nTextures; i++)
-        {
-            if (i == 0)
-            {
-                if (height <= heights[i])
-                terrainColor += textureNoTile(texture_diffuse[i],TexCoords);
-            }
-            else if ( i > 0 && i < nTextures - 1)
-            {
-                float a = smoothstep(heights[i - 1],heights[i],height);
-                if (height  > heights[i - 1] && height <=  heights[i])
-                terrainColor += vec4(blend(textureNoTile(texture_diffuse[i - 1],TexCoords),1-a,textureNoTile(texture_diffuse[i],TexCoords),a),1.0);
-            }
-            else if (i == nTextures - 1)
-            {
-                float a = smoothstep(heights[i - 1],heights[i],height);
-                if (height > heights[i - 1])
-                terrainColor += vec4(blend(textureNoTile(texture_diffuse[i - 1],TexCoords),1-a,textureNoTile(texture_diffuse[i],TexCoords),a),1.0);
-            }
 
+        if (i == 0)
+        {
+            if (height <= heights[i])
+                terrainColor += loadedTextures[i];
+        }
+        else if ( i > 0)
+        {
+            float a = smoothstep(heights[i - 1],heights[i],height);
+            if (height  > heights[i - 1] && height <=  heights[i])
+                terrainColor += vec4(blend(loadedTextures[i - 1],1-a,loadedTextures[i],a),1.0);
+            else if (height  > heights[i - 1] && i == nTextures - 1)
+                terrainColor += vec4(blend(loadedTextures[i - 1],1-a,loadedTextures[i],a),1.0);
         }
     }
 
@@ -347,33 +342,28 @@ vec3 computeTerrainNormal()
     float absHeigth = (abs(lPoint) + abs(hPoint));
     float height = abs((length(dir) - pRadius) - lPoint) / absHeigth;
     int nTextures = 8;
-    if (latlon.x >= 0.1 || latlon.x <= -0.1)
+    vec4 loadedTextures[8];
+    for (int i = 0; i < nTextures; i++)
     {
-        terrainNormal += textureNoTile(texture_normal[7],TexCoords).rgb;
-    } else
+        loadedTextures[i] = textureNoTile(texture_normal[i],TexCoords);
+    }
+    for (int i = 0; i < nTextures; i++)
     {
-        for (int i = 0; i < nTextures; i++)
+        if (i == 0)
         {
-            if (i == 0)
-            {
-                if (height <= heights[i])
-                terrainNormal += texture(texture_normal[i], TexCoords).rgb;
-            }
-            else if (i > 0 && i < nTextures - 1)
-            {
-                float a = smoothstep(heights[i - 1], heights[i], height);
-                if (height  > heights[i - 1] && height <=  heights[i])
-                terrainNormal += vec4(blend(texture(texture_normal[i - 1], TexCoords), 1-a, texture(texture_normal[i], TexCoords), a), 1.0).rgb;
-            }
-            else if (i == nTextures - 1)
-            {
-                float a = smoothstep(heights[i - 1], heights[i], height);
-                if (height > heights[i - 1])
-                terrainNormal += vec4(blend(texture(texture_normal[i - 1], TexCoords), 1-a, texture(texture_normal[i], TexCoords), a), 1.0).rgb;
-            }
-
+            if (height <= heights[i])
+                terrainNormal += loadedTextures[i].rgb;
+        }
+        else if (i > 0)
+        {
+            float a = smoothstep(heights[i - 1], heights[i], height);
+            if (height  > heights[i - 1] && height <=  heights[i])
+                terrainNormal += vec4(blend(loadedTextures[i - 1], 1-a, loadedTextures[i], a), 1.0).rgb;
+            else if (height  > heights[i - 1] && i == nTextures - 1)
+                terrainNormal += vec4(blend(loadedTextures[i - 1], 1-a, loadedTextures[i], a), 1.0).rgb;
         }
     }
+
     return terrainNormal;
 }
 
@@ -382,11 +372,11 @@ void main()
     // properties
     // obtain normal from normal map in range [0,1]
     //vec3 norm = normalize(Normal);
-    //PARCHEEEE
     float dist = length(_viewPos - FragPos);
     vec3 norm = normalize(Normal);
-    if (dist < 2000 && isTerrain == 1)//NO MORE FLICKERING HAHA
+    if (dist < 2000 && isTerrain == 1)//Dont calculate normalmap when you cant appreciate it
     {
+        //TODO:Improve blending efect
         norm = computeTerrainNormal();
         norm = norm * 2.0 - 1.0;
         norm = normalize(tbn * norm);
