@@ -53,8 +53,6 @@ in vec4 FragPosLightSpace;
 in vec3 LocalPos;
 in mat3 tbn;
 in vec3 _viewPos;
-in vec2 latlon;
-
 in vec3 TangentLightPos;
 in vec3 TangentViewPos;
 in vec3 TangentFragPos;
@@ -297,103 +295,80 @@ vec3 CalcTerrainLight(DirLight light, vec3 normal, vec3 viewDir, vec4 FragPosLig
     7 - snow
 */
 
-vec4 createTerrainTexture()
+vec4 createTerrainTexture(float heights[8], vec4 loadedTextures[8],float height, int nTextures)
 {
-    float heights[8] = float[8](0.125,0.250,0.375,0.4,0.725,0.750,0.875,1);
-
     vec4 terrainColor = vec4(0.0, 0.0, 0.0, 1.0);
-    vec3 dir = upVector-FragPos;
-
-    float absHeigth = (abs(lPoint) + abs(hPoint));
-    float height = abs((length(dir) - pRadius) - lPoint) / absHeigth;
-    int nTextures = 8;
-    vec4 loadedTextures[8];
-    for (int i = 0; i < nTextures; i++)
+    if (height <= heights[0])
+        terrainColor += loadedTextures[0];
+    for (int i = 1; i < nTextures; i++)
     {
-        loadedTextures[i] = textureNoTile(texture_diffuse[i],TexCoords);
+        float a = smoothstep(heights[i - 1],heights[i],height);
+        if (height  > heights[i - 1] && height <=  heights[i] || (i == nTextures - 1 && height  > heights[i - 1]))
+            terrainColor += vec4(blend(loadedTextures[i - 1],1-a,loadedTextures[i],a),1.0);
     }
-    for (int i = 0; i < nTextures; i++)
-    {
-
-        if (i == 0)
-        {
-            if (height <= heights[i])
-                terrainColor += loadedTextures[i];
-        }
-        else if ( i > 0)
-        {
-            float a = smoothstep(heights[i - 1],heights[i],height);
-            if (height  > heights[i - 1] && height <=  heights[i])
-                terrainColor += vec4(blend(loadedTextures[i - 1],1-a,loadedTextures[i],a),1.0);
-            else if (height  > heights[i - 1] && i == nTextures - 1)
-                terrainColor += vec4(blend(loadedTextures[i - 1],1-a,loadedTextures[i],a),1.0);
-        }
-    }
-
     return terrainColor;
 }
 
-vec3 computeTerrainNormal()
+vec3 computeTerrainNormal(float heights[8], vec4 loadedTextures[8],float height, int nTextures)
 {
-    float heights[8] = float[8](0.125,0.250,0.375,0.4,0.725,0.750,0.875,1);
-
     vec3 terrainNormal = vec3(0.0, 0.0, 0.0);
-    vec3 dir = upVector-FragPos;
-    float absHeigth = (abs(lPoint) + abs(hPoint));
-    float height = abs((length(dir) - pRadius) - lPoint) / absHeigth;
-    int nTextures = 8;
-    vec4 loadedTextures[8];
-    for (int i = 0; i < nTextures; i++)
+    if (height <= heights[0])
+        terrainNormal += loadedTextures[0].rgb;
+    for (int i = 1; i < nTextures; i++)
     {
-        loadedTextures[i] = textureNoTile(texture_normal[i],TexCoords);
+        float a = smoothstep(heights[i - 1], heights[i], height);
+        if (height  > heights[i - 1] && height <=  heights[i] || (i == nTextures - 1 && height  > heights[i - 1]))
+            terrainNormal += vec4(blend(loadedTextures[i - 1], 1-a, loadedTextures[i], a), 1.0).rgb;
     }
-    for (int i = 0; i < nTextures; i++)
-    {
-        if (i == 0)
-        {
-            if (height <= heights[i])
-                terrainNormal += loadedTextures[i].rgb;
-        }
-        else if (i > 0)
-        {
-            float a = smoothstep(heights[i - 1], heights[i], height);
-            if (height  > heights[i - 1] && height <=  heights[i])
-                terrainNormal += vec4(blend(loadedTextures[i - 1], 1-a, loadedTextures[i], a), 1.0).rgb;
-            else if (height  > heights[i - 1] && i == nTextures - 1)
-                terrainNormal += vec4(blend(loadedTextures[i - 1], 1-a, loadedTextures[i], a), 1.0).rgb;
-        }
-    }
-
     return terrainNormal;
 }
 
 void main()
 {
-    // properties
-    // obtain normal from normal map in range [0,1]
-    //vec3 norm = normalize(Normal);
     float dist = length(_viewPos - FragPos);
     vec3 norm = normalize(Normal);
-    if (dist < 2000 && isTerrain == 1)//Dont calculate normalmap when you cant appreciate it
-    {
-        //TODO:Improve blending efect
-        norm = computeTerrainNormal();
-        norm = norm * 2.0 - 1.0;
-        norm = normalize(tbn * norm);
-    }
-
     vec3 viewDir = normalize(_viewPos - FragPos);
-    // phase 1: Directional lighting
     vec4 text;
     if (isTerrain == 1)
     {
-        text = createTerrainTexture();
+        int nTextures = 8;
+        vec4 loadedTextures[8];
+        float heights[8] = float[8](0.125,0.250,0.375,0.4,0.725,0.750,0.875,1);
+
+        vec3 dir = upVector-FragPos;
+        float absHeigth = (abs(lPoint) + abs(hPoint));
+        float height = abs((length(dir) - pRadius) - lPoint) / absHeigth;
+        vec3 pos = normalize(FragPos);
+        float lat = asin(pos.y);
+        for (int i = 0; i < nTextures; i++)
+        {
+            loadedTextures[i] = textureNoTile(texture_diffuse[i],TexCoords);
+        }
+        //text = createTerrainTexture(heights,loadedTextures, height,nTextures);
+        if (lat > 1 || lat < -1)
+            text = loadedTextures[7];
+        else if ((lat > 0.8 && lat <= 1) || (lat < -0.8 && lat >= -1))
+            text = loadedTextures[4];
+        else if ((lat > 0.3 && lat <= 0.8) || (lat < -0.3 && lat >= -0.8))
+            text = loadedTextures[3];
+        else
+            text = loadedTextures[0];
+        vec4 loadedNormal[8];
+        if (dist < 2000)//Dont calculate normalmap when you cant appreciate it
+        {
+            for (int i = 0; i < nTextures; i++)
+            {
+                loadedNormal[i] = textureNoTile(texture_normal[i],TexCoords);
+            }
+            //TODO:Improve blending efect
+            norm = computeTerrainNormal(heights,loadedNormal,height, nTextures);
+            norm = norm * 2.0 - 1.0;
+            norm = normalize(tbn * norm);
+        }
     }
     vec3 result;
-    // phase 2: Point lights
     for(int i = 0; i < nPointLights; i++)
         result += CalcPointLight(pointLights[i], norm, FragPos, viewDir);
-    // phase 3: Spot light
     result += CalcDirLight(dirLight, norm, viewDir, FragPosLightSpace,TangentLightPos,text);
     result += CalcSpotLight(spotLight, norm, TangentFragPos, viewDir);
     FragColor = vec4(_ACESFilmicToneMapping(result), 1.0);

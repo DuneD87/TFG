@@ -37,7 +37,7 @@ World::World(const char *scenePath, const char *skyBoxPath, unsigned int scrWidt
 
     };
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
-    Planet *planet = new Planet(40000,8,glm::vec3(0),camera,diffuse);
+    Planet *planet = new Planet(20000,8,glm::vec3(0),camera,diffuse);
     std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
     std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << "[ms]" << std::endl;
     camera->Position = glm::vec3(29562.6,-20292.2,58728);

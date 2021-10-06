@@ -13,7 +13,6 @@ out vec4 FragPosLightSpace;
 out vec3 LocalPos;
 out mat3 tbn;
 out vec3 _viewPos;
-out vec2 latLong;
 
 uniform vec3 viewPos;
 uniform mat4 model;
@@ -41,9 +40,6 @@ void main()
     mat3 TBN = mat3(T, B, N);
     tbn = TBN;
     TexCoords = aTexCoords;
-    float lat = acos(worldPos.y / pRadius); //theta
-    float lon = atan(worldPos.x / worldPos.z); //phi
-    latLong = vec2(lat,lon);
     gl_Position = worldPos;
 
 }

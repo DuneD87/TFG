@@ -80,9 +80,9 @@ private:
     float highestPoint, lowestPoint,radius;
     float hPointOffset = 0;
     float lPointOffset = 17.452;
-    float maxHeight = -5500;
+    float maxHeight = -2700;
     int seed = 1337;
-    float noiseFreq = 0.0001;
+    float noiseFreq = 0.0002;
     int octaves = 8;
     float lacunarity = 2.3;
     float fGain = 0.5;
