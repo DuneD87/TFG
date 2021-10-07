@@ -82,7 +82,7 @@ private:
     float lPointOffset = 17.452;
     float maxHeight = -2700;
     int seed = 1337;
-    float noiseFreq = 0.0002;
+    float noiseFreq = 0.00015;
     int octaves = 8;
     float lacunarity = 2.3;
     float fGain = 0.5;
