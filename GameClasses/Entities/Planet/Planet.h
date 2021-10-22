@@ -16,7 +16,7 @@ public:
     Planet(float radius, int nSeg, bool hasAtmos, float maxHeight, float noiseFreq, int octaves, float lacunarity,
            float fGain, float fWeStr, float fPinPonStr, float cellJitter, float domWarpAmp, float minValue,
            int noiseTypeSel, int fractalTypeSel, int cellDistTypeSel, int cellReturnTypeSel, int domWarpTypeSel,
-           const std::vector<std::string> &path, const std::vector<std::string> &pathNorm);
+           const std::vector<std::string> &path, const std::vector<std::string> &pathNorm, glm::vec3 position);
 
     ~Planet();
     void draw(Shader &shader, bool outlined = false, int depthMap = -1);

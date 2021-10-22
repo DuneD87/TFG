@@ -64,7 +64,7 @@ uniform float depthBlend;
 uniform int isTerrain;
 uniform float hPoint;
 uniform float lPoint;
-
+uniform vec3 pPosition;
 uniform vec3 upVector;
 uniform float pRadius;
 uniform Material material;
@@ -338,7 +338,7 @@ void main()
         vec3 dir = upVector-FragPos;
         float absHeigth = (abs(lPoint) + abs(hPoint));
         float height = abs((length(dir) - pRadius) - lPoint) / absHeigth;
-        vec3 pos = normalize(FragPos);
+        vec3 pos = normalize(FragPos - pPosition);
         float lat = asin(pos.y);
         for (int i = 0; i < nTextures; i++)
         {

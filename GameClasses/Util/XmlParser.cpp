@@ -81,7 +81,7 @@ Planet *XmlParser::getPlanet(xml_node<> *planet) {
                                     lacunarity,fGain,fWeStr,fPinPonStr,cellJitter,
                                     domWarpAmp,minValue,noiseTypeSel,fractalTypeSel,
                                     cellDistTypeSel,cellReturnTypeSel,domWarpTypeSel,
-                                    pathDiffuse,pathNormal);
+                                    pathDiffuse,pathNormal,position);
     //-------ATMOS SETTINGS-------
     xml_node<> * atmosSettings = planet->first_node("AtmosSettings");
     float atmosRadius = stof(atmosSettings->first_attribute("radius")->value());
@@ -96,8 +96,9 @@ Planet *XmlParser::getPlanet(xml_node<> *planet) {
     float scale = stof(atmosSettings->first_attribute("scale")->value());
     glm::vec3 color = getValues3(atmosSettings->first_node("Color"));
     newPlanet->addCamera(cam);
-    newPlanet->setupAtmosphere(atmosRadius,kr,km,e,h,l,gm,numOutScatter,numInScatter,
-                               scale,color);
+    if (hasAtmos)
+        newPlanet->setupAtmosphere(atmosRadius,kr,km,e,h,l,gm,numOutScatter,numInScatter,
+                                    scale,color);
     return newPlanet;
 }
 

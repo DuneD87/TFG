@@ -23,7 +23,7 @@ Planet::Planet(float radius, int nSeg, glm::vec3 position, Camera *cam, std::vec
 Planet::Planet(float radius, int nSeg, bool hasAtmos, float maxHeight, float noiseFreq, int octaves, float lacunarity,
                float fGain, float fWeStr, float fPinPonStr, float cellJitter, float domWarpAmp, float minValue,
                int noiseTypeSel, int fractalTypeSel, int cellDistTypeSel, int cellReturnTypeSel, int domWarpTypeSel,
-               const std::vector<std::string> &path, const std::vector<std::string> &pathNorm) : radius(radius), nSeg(nSeg), hasAtmos(hasAtmos),
+               const std::vector<std::string> &path, const std::vector<std::string> &pathNorm,glm::vec3 position):radius(radius), nSeg(nSeg), hasAtmos(hasAtmos),
                                                        maxHeight(maxHeight), noiseFreq(noiseFreq), octaves(octaves),
                                                        lacunarity(lacunarity), fGain(fGain), fWeStr(fWeStr),
                                                        fPinPonStr(fPinPonStr), cellJitter(cellJitter),
@@ -34,6 +34,7 @@ Planet::Planet(float radius, int nSeg, bool hasAtmos, float maxHeight, float noi
                                                        domWarpTypeSel(domWarpTypeSel), path(path),
                                                        pathNormal(pathNorm)
 {
+    _position = position;
     this->type = 3;
     setupMesh();
 }
@@ -50,9 +51,11 @@ void Planet::draw(Shader &shader, bool outlined, int depthMap) {
     shader.setVec3("upVector",_position);
     shader.setFloat("blendFactor",blendFactor);
     shader.setFloat("depthBlend",depthBlend);
+    shader.setVec3("pPosition",_position);
     planet->Draw(shader,outlined,depthMap);
     shader.setInt("isTerrain",0);
-    skyDome->draw(shader,outlined,-1);
+    if (hasAtmos)
+        skyDome->draw(shader,outlined,-1);
 }
 
 Planet::~Planet() {
@@ -138,6 +141,7 @@ void Planet::setupMesh() {
     textures.clear();
     bindPlanetTextures();
     planet = new Mesh(cubeSphere->vertexList,indices,textures);
+    planet->position = _position;
     delete cubeSphere;
 
 }

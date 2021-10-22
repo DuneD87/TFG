@@ -143,8 +143,8 @@ vec3 inScatter(vec3 o, vec3 dir, vec2 e, vec3 l) {
 
 void main (void)
 {
-    vec3 dir = normalize(cameraPosition - FragPos.xyz);
-    vec3 eye = cameraPosition;
+    vec3 dir = normalize(cameraPosition - (FragPos.xyz));
+    vec3 eye = cameraPosition - planetPosition;
 
     vec3 l = normalize(vec3(-2, -4, -2));
     vec2 e = rayIntersection(eye, dir, atmosRadius);

@@ -18,6 +18,7 @@ Atmosphere::Atmosphere(float planetRadius, float atmosRadius, Camera *cam,glm::v
     Mesh *modelMesh = new Mesh(cubesphere.vertexList,cubesphere.getIndices(),"","");
     skyDome = new Model();
     skyDome->meshes.push_back(modelMesh);
+    skyDome->setPosition(position);
     _position = position;
     atmosShader = Shader("../Shaders/lightingShaderVertex.shader", "../Shaders/skydomeFragment.shader");
     atmosShaderIN = Shader("../Shaders/lightingShaderVertex.shader", "../Shaders/backup/alternativeScatteringFragment.shader");
