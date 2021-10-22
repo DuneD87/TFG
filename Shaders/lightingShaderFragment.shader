@@ -358,7 +358,11 @@ void main()
         {
             loadedTextures[i] = textureNoTile(texture_diffuse[i],TexCoords);
         }
-        text = createTerrainTexture(heights,loadedTextures, height,nTextures);
+        for (int i = 0; i < nBiomes; i++)
+        {
+            float interBiomes = smoothstep(biomes[i].latStart,biomes[i].latEnd,lat);
+        }
+        //text = createTerrainTexture(heights,loadedTextures, height,nTextures);
         /*vec4 textHeight = vec4(createTerrainTexture(heights,loadedTextures,height,nTextures).rgb,0.2);
         vec4 textHeightDesert = vec4(createTerrainTexture(heights,loadedTextures,height-50,3).rgb,0.0);
         if (lat > 1 || lat < -1)

@@ -75,10 +75,10 @@
                     <Biome latStart = "-1.5"
                            latEnd = "-1">
                         <Textures>
-                            <Texture index = "7"
+                            <Texture index = "1"
                                      hStart = "0.0"
                                      hEnd = "0.5"/>
-                            <Texture index = "6"
+                            <Texture index = "2"
                                      hStart = "0.5"
                                      hEnd = "1.0"/>
                         </Textures>
@@ -86,113 +86,33 @@
                     <Biome latStart = "1.5"
                            latEnd = "1">
                         <Textures>
-                            <Texture index = "7"
+                            <Texture index = "1"
                                      hStart = "0.0"
                                      hEnd = "0.5"/>
-                            <Texture index = "6"
+                            <Texture index = "2"
                                      hStart = "0.5"
                                      hEnd = "1.0"/>
                         </Textures>
                     </Biome>
                     <Biome latStart ="1.0"
-                           latEnd = "0.8">
+                           latEnd = "0.0">
                         <Textures>
-                            <Texture index = "7"
-                                     hStart = "0.6"
-                                     hEnd = "1.0"/>
-                            <Texture index = "5"
-                                     hStart="0.0"
-                                     hEnd="0.4"/>
-                            <Texture index="6"
-                                     hStart="0.4"
-                                     hEnd="0.6"/>
+                            <Texture index = "0"
+                                     hStart = "0.0"
+                                     hEnd = "0.5"/>
+                            <Texture index = "1"
+                                     hStart="0.5"
+                                     hEnd="1.0"/>
                         </Textures>
                     </Biome>
                     <Biome latStart ="-1.0"
-                           latEnd = "-0.8">
+                           latEnd = "0.0">
                         <Textures>
-                            <Texture index = "7"
-                                     hStart = "0.6"
-                                     hEnd = "1.0"/>
-                            <Texture index = "5"
-                                     hStart="0.0"
-                                     hEnd="0.4"/>
-                            <Texture index="6"
-                                     hStart="0.4"
-                                     hEnd="0.6"/>
-                        </Textures>
-                    </Biome>
-                    <Biome latStart="0.8"
-                           latEnd="0.3">
-                        <Textures>
-                            <Texture index="0"
-                                     hStart="0.0"
-                                     hEnd="0.2"/>
-                            <Texture index="1"
-                                     hStart="0.2"
-                                     hEnd="0.3"/>
-                            <Texture index="3"
-                                     hStart="0.3"
-                                     hEnd="0.6"/>
-                            <Texture index="5"
-                                     hStart="0.6"
-                                     hEnd="0.7"/>
-                            <Texture index="6"
-                                     hStart="0.7"
-                                     hEnd="0.8"/>
-                            <Texture index="7"
-                                     hStart="0.8"
-                                     hEnd="1.0"/>
-                        </Textures>
-                    </Biome>
-                    <Biome latStart="-0.8"
-                           latEnd="-0.3">
-                        <Textures>
-                            <Texture index="0"
-                                     hStart="0.0"
-                                     hEnd="0.2"/>
-                            <Texture index="1"
-                                     hStart="0.2"
-                                     hEnd="0.3"/>
-                            <Texture index="3"
-                                     hStart="0.3"
-                                     hEnd="0.6"/>
-                            <Texture index="5"
-                                     hStart="0.6"
-                                     hEnd="0.7"/>
-                            <Texture index="6"
-                                     hStart="0.7"
-                                     hEnd="0.8"/>
-                            <Texture index="7"
-                                     hStart="0.8"
-                                     hEnd="1.0"/>
-                        </Textures>
-                    </Biome>
-                    <Biome latStart="0.3"
-                           latEnd="0.0">
-                        <Textures>
-                            <Texture index="0"
-                                     hStart="0.0"
-                                     hEnd="0.5"/>
-                            <Texture index="4"
+                            <Texture index = "0"
+                                     hStart = "0.0"
+                                     hEnd = "0.5"/>
+                            <Texture index = "1"
                                      hStart="0.5"
-                                     hEnd="0.75"/>
-                            <Texture index="5"
-                                     hStart="0.75"
-                                     hEnd="1.0"/>
-                        </Textures>
-                    </Biome>
-                    <Biome latStart="-0.3"
-                           latEnd="0.0">
-                        <Textures>
-                            <Texture index="0"
-                                     hStart="0.0"
-                                     hEnd="0.5"/>
-                            <Texture index="4"
-                                     hStart="0.5"
-                                     hEnd="0.75"/>
-                            <Texture index="5"
-                                     hStart="0.75"
                                      hEnd="1.0"/>
                         </Textures>
                     </Biome>
