@@ -53,24 +53,11 @@ void Atmosphere::draw(Shader &shader, bool outlined, int depthMap) {
     atmosShader.setVec3("C_R",glm::normalize(glm::vec3(atmosColor[0],atmosColor[1],atmosColor[2])));
     atmosShader.setFloat("G_M",g_m);
     atmosShader.setFloat("MAX",viewDistance);
-
     atmosShader.setFloat("fNumOutScatter",numOutScatter);
     atmosShader.setFloat("fNumInScatter",numInScatter);
 
     skyDome->Draw(atmosShader,outlined,depthMap);
-
     glFrontFace(GL_CW);
-    atmosShader.setVec3("cameraPosition",cam->Position);
-    //atmosShader.setMat4("inverseProjection",glm::inverse(projection));
-    //atmosShader.setMat4("inverseView",glm::inverse(view));
-    atmosShader.setVec3("planetPosition",_position);
-    atmosShader.setFloat("planetRadius",planetRadius);
-    //atmosShader.setFloat("cameraNear",0.1);
-    //atmosShader.setFloat("cameraFar",10000000);
-    atmosShader.setFloat("atmosRadius",atmosRadius);
-    atmosShader.setMat4("view",view);
-    atmosShader.setMat4("projection",projection);
-    atmosShader.setMat4("model", cameraModel);
     skyDome->Draw(atmosShader,outlined,depthMap);
 
     glFrontFace(GL_CCW);

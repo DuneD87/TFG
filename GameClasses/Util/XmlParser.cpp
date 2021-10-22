@@ -99,6 +99,25 @@ Planet *XmlParser::getPlanet(xml_node<> *planet) {
     if (hasAtmos)
         newPlanet->setupAtmosphere(atmosRadius,kr,km,e,h,l,gm,numOutScatter,numInScatter,
                                     scale,color);
+    xml_node<> * biomeRoot = planet->first_node("Biomes");
+    for (xml_node<> * bio = biomeRoot->first_node("Biome");bio;bio = bio->next_sibling())
+    {
+        Biome bioAux;
+        bioAux.latStart = stof(bio->first_attribute("latStart")->value());
+        bioAux.latEnd = stof(bio->first_attribute("latEnd")->value());
+        xml_node<> * textIndex = bio->first_node("Textures");
+
+        for (xml_node<>  * textNode = textIndex->first_node("Texture");textNode;textNode = textNode->next_sibling("Texture"))
+        {
+            TextHeight textHeight;
+            textHeight.index = stoi(textNode->first_attribute("index")->value());
+            textHeight.hStart = stof(textNode->first_attribute("hStart")->value());
+            textHeight.hEnd = stof(textNode->first_attribute("hEnd")->value());
+            bioAux.textHeight.push_back(textHeight);
+        }
+        newPlanet->addBiome(bioAux);
+
+    }
     return newPlanet;
 }
 

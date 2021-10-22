@@ -9,9 +9,20 @@
 #include "Icosphere.h"
 #include "../BasicTerrain.h"
 #include "Atmosphere.h"
+struct TextHeight {
+    int index;
+    float hStart;
+    float hEnd;
+};
+struct Biome {
+    float latStart;
+    float latEnd;
+    std::vector<TextHeight> textHeight;
+};
 
 class Planet : public Entity {
 public:
+
     Planet(float radius, int nSeg, glm::vec3 position, Camera *cam, std::vector<std::string> path);
     Planet(float radius, int nSeg, bool hasAtmos, float maxHeight, float noiseFreq, int octaves, float lacunarity,
            float fGain, float fWeStr, float fPinPonStr, float cellJitter, float domWarpAmp, float minValue,
@@ -22,6 +33,7 @@ public:
     void draw(Shader &shader, bool outlined = false, int depthMap = -1);
     void renderGui();
     void addCamera(Camera * cam);
+    void addBiome(Biome bio);
     void setupAtmosphere(float atmosRadius, float kr, float km, float e, float h, float l,
                          float gm, float numOutScatter, float numInScatter, float scale,
                          glm::vec3 color);
@@ -117,6 +129,8 @@ private:
     Atmosphere * skyDome;
     Camera * cam;
     std::vector<Texture> textures;
+    std::vector<Biome> biomes;
+
 };
 
 

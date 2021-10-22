@@ -52,6 +52,20 @@ void Planet::draw(Shader &shader, bool outlined, int depthMap) {
     shader.setFloat("blendFactor",blendFactor);
     shader.setFloat("depthBlend",depthBlend);
     shader.setVec3("pPosition",_position);
+    shader.setInt("nBiomes",biomes.size());
+    for (int i = 0; i < biomes.size();i++)
+    {
+        shader.setFloat("biomes["+std::to_string(i)+"].latStart",biomes[i].latStart);
+        shader.setFloat("biomes["+std::to_string(i)+"].latEnd",biomes[i].latEnd);
+        shader.setInt("biomes["+std::to_string(i)+"].nTextBiome",biomes[i].textHeight.size());
+        for (int j = 0; j < biomes[i].textHeight.size();j++)
+        {
+            shader.setInt("biomes["+std::to_string(i)+"].textIndex["+std::to_string(j)+"].index",biomes[i].textHeight[j].index);
+            shader.setFloat("biomes["+std::to_string(i)+"].textIndex["+std::to_string(j)+"].hStart",biomes[i].textHeight[j].hStart);
+            shader.setFloat("biomes["+std::to_string(i)+"].textIndex["+std::to_string(j)+"].hEnd",biomes[i].textHeight[j].hEnd);
+        }
+    }
+    shader.setInt("nTextures",path.size());
     planet->Draw(shader,outlined,depthMap);
     shader.setInt("isTerrain",0);
     if (hasAtmos)
@@ -211,10 +225,13 @@ void Planet::addCamera(Camera *cam) {
     this->cam = cam;
 }
 
-void
-Planet::setupAtmosphere(float atmosRadius, float kr, float km, float e, float h, float l, float gm, float numOutScatter,
+void Planet::setupAtmosphere(float atmosRadius, float kr, float km, float e, float h, float l, float gm, float numOutScatter,
                         float numInScatter, float scale, glm::vec3 color) {
     skyDome = new Atmosphere(radius-lowestPoint,(radius*1.1)+highestPoint,cam,_position);
+}
+
+void Planet::addBiome(Biome bio) {
+    biomes.push_back(bio);
 }
 
 
