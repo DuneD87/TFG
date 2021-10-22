@@ -3,10 +3,8 @@
 //
 
 #include "../../../libs/imgui_impl_opengl3.h"
-#include "../../../libs/imgui_impl_glfw.h"
 #include "Planet.h"
 #include "Cubesphere.h"
-#include "../../Util/FastNoiseLite.h"
 #include "../PhysicsObject.h"
 
 Planet::Planet(float radius, int nSeg, glm::vec3 position, Camera *cam, std::vector<std::string> path) {
@@ -21,6 +19,23 @@ Planet::Planet(float radius, int nSeg, glm::vec3 position, Camera *cam, std::vec
     bindPlanetTextures();
     setupMesh();
     //addVegetation();
+}
+Planet::Planet(float radius, int nSeg, bool hasAtmos, float maxHeight, float noiseFreq, int octaves, float lacunarity,
+               float fGain, float fWeStr, float fPinPonStr, float cellJitter, float domWarpAmp, float minValue,
+               int noiseTypeSel, int fractalTypeSel, int cellDistTypeSel, int cellReturnTypeSel, int domWarpTypeSel,
+               const std::vector<std::string> &path, const std::vector<std::string> &pathNorm) : radius(radius), nSeg(nSeg), hasAtmos(hasAtmos),
+                                                       maxHeight(maxHeight), noiseFreq(noiseFreq), octaves(octaves),
+                                                       lacunarity(lacunarity), fGain(fGain), fWeStr(fWeStr),
+                                                       fPinPonStr(fPinPonStr), cellJitter(cellJitter),
+                                                       domWarpAmp(domWarpAmp), minValue(minValue),
+                                                       noiseTypeSel(noiseTypeSel), fractalTypeSel(fractalTypeSel),
+                                                       cellDistTypeSel(cellDistTypeSel),
+                                                       cellReturnTypeSel(cellReturnTypeSel),
+                                                       domWarpTypeSel(domWarpTypeSel), path(path),
+                                                       pathNormal(pathNorm)
+{
+    this->type = 3;
+    setupMesh();
 }
 
 
@@ -124,7 +139,7 @@ void Planet::setupMesh() {
     bindPlanetTextures();
     planet = new Mesh(cubeSphere->vertexList,indices,textures);
     delete cubeSphere;
-    skyDome = new Atmosphere(radius-lowestPoint,(radius*1.1)+highestPoint,cam,_position);
+
 }
 
 float Planet::getRadius() const {
@@ -168,7 +183,7 @@ void Planet::addVegetation() {
 }
 
 void Planet::bindPlanetTextures() {
-    int nTextures = path.size()/2;
+    int nTextures = path.size();
     for (auto i = 0; i < nTextures; i++)
     {
         Texture text;
@@ -178,13 +193,24 @@ void Planet::bindPlanetTextures() {
         textures.push_back(text);
     }
     //Normal
-    for (auto i = nTextures; i < nTextures * 2; i++)
+    for (auto i = 0; i < nTextures ; i++)
     {
         Texture text;
-        text.path = "../Textures/" + path[i];
+        text.path = "../Textures/" + pathNormal[i];
         text.type = "texture_normal";
-        text.id = TextureFromFile( path[i].c_str(),"../Textures/",false,true);
+        text.id = TextureFromFile( pathNormal[i].c_str(),"../Textures/",false,true);
         textures.push_back(text);
     }
 }
+
+void Planet::addCamera(Camera *cam) {
+    this->cam = cam;
+}
+
+void
+Planet::setupAtmosphere(float atmosRadius, float kr, float km, float e, float h, float l, float gm, float numOutScatter,
+                        float numInScatter, float scale, glm::vec3 color) {
+    skyDome = new Atmosphere(radius-lowestPoint,(radius*1.1)+highestPoint,cam,_position);
+}
+
 

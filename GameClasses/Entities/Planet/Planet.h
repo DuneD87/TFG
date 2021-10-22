@@ -13,9 +13,18 @@
 class Planet : public Entity {
 public:
     Planet(float radius, int nSeg, glm::vec3 position, Camera *cam, std::vector<std::string> path);
+    Planet(float radius, int nSeg, bool hasAtmos, float maxHeight, float noiseFreq, int octaves, float lacunarity,
+           float fGain, float fWeStr, float fPinPonStr, float cellJitter, float domWarpAmp, float minValue,
+           int noiseTypeSel, int fractalTypeSel, int cellDistTypeSel, int cellReturnTypeSel, int domWarpTypeSel,
+           const std::vector<std::string> &path, const std::vector<std::string> &pathNorm);
+
     ~Planet();
     void draw(Shader &shader, bool outlined = false, int depthMap = -1);
     void renderGui();
+    void addCamera(Camera * cam);
+    void setupAtmosphere(float atmosRadius, float kr, float km, float e, float h, float l,
+                         float gm, float numOutScatter, float numInScatter, float scale,
+                         glm::vec3 color);
 
     float getHighestPoint() const;
     float getLowestPoint() const;
@@ -77,12 +86,18 @@ private:
                                                            FastNoiseLite::DomainWarpType_OpenSimplex2,
                                                            FastNoiseLite::DomainWarpType_OpenSimplex2Reduced};
 
-    float highestPoint, lowestPoint,radius;
+    float highestPoint, lowestPoint;
     float hPointOffset = 0;
     float lPointOffset = 17.452;
-    float maxHeight = -2700;
     int seed = 1337;
+
+    float radius;
+    int nSeg;
+    bool hasAtmos;
+    float maxHeight = -2700;
     float noiseFreq = 0.00015;
+
+private:
     int octaves = 8;
     float lacunarity = 2.3;
     float fGain = 0.5;
@@ -92,11 +107,12 @@ private:
     float domWarpAmp = 50;
     float minValue = 0;
     int noiseTypeSel = 4, fractalTypeSel = 2,cellDistTypeSel = 3, cellReturnTypeSel = 2, domWarpTypeSel = 2;
-    int nSeg;
+
     float blendFactor = 0.5;
     float depthBlend = 0.5;
     unsigned int noiseMap;
     std::vector<std::string> path;
+    std::vector<std::string> pathNormal;
     Mesh* planet = NULL;
     Atmosphere * skyDome;
     Camera * cam;

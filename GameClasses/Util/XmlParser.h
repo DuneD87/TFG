@@ -13,6 +13,7 @@
 #include <map>
 #include "../Entities/Light.h"
 #include "../Entities/PhysicsObject.h"
+#include "../Entities/Planet/Planet.h"
 #include "../Basic/Model.h"
 #include "rapidxml/rapidxml.hpp"
 #include "BasicShapeBuilder.h"
@@ -25,14 +26,15 @@ public:
 
     int nPointLights;
     int entIndex;
-    XmlParser(std::string path);
+    XmlParser(std::string path,Camera *cam);
 
 private:
     xml_node<> * _rootNode;
     std::string path;
-
+    Camera * cam;
     Light* getLight(xml_node<> *light);
     PhysicsObject* getObject(xml_node<> *model);
+    Planet* getPlanet(xml_node<> *planet);
     vector<Mesh*> getSprites();
 
     glm::vec3 getValues3(xml_node<> *pos);

@@ -39,7 +39,6 @@ Renderer::Renderer(unsigned int scrWidth, unsigned int scrHeight, Camera *camera
     shaders.push_back(waterShader);//8
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
-
     setupFrameBuffer();
     setupSkyBox(skyboxPath);
 }
@@ -421,7 +420,9 @@ void Renderer::drawEntities(std::vector<Entity*> worldEnts, glm::mat4 view, glm:
         {
             worldEnts[i]->draw(shader,false,depthMap);
             if (worldEnts[i]->getType() == 3)
-                dynamic_cast<Planet*>(worldEnts[i])->renderGui();
+            {
+                dynamic_cast<Planet *>(worldEnts[i])->renderGui();
+            }
         }
         else
         {

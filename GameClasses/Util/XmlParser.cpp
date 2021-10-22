@@ -4,8 +4,9 @@
 
 #include "XmlParser.h"
 
-XmlParser::XmlParser(std::string path) {
+XmlParser::XmlParser(std::string path, Camera *cam) {
     this->path = path;
+    this->cam = cam;
     xml_document<> doc;
     // Read the xml file into a vector
     ifstream theFile (this->path);
@@ -30,9 +31,74 @@ XmlParser::XmlParser(std::string path) {
         {
             xml_node<> *light = ent->first_node("Light");
             _ents.push_back(getLight(light));
+        } else if (entType == "Planet")
+        {
+            xml_node<> *planet = ent->first_node("Planet");
+            _ents.push_back(getPlanet(planet));
         }
         entIndex++;
     }
+}
+
+Planet *XmlParser::getPlanet(xml_node<> *planet) {
+    string type = planet->first_attribute("type")->value();
+    bool hasAtmos = stoi(planet->first_attribute("hasAtmos")->value());
+    float radius = stof(planet->first_attribute("radius")->value());
+    int nSeg = stoi(planet->first_attribute("nSeg")->value());
+    glm::vec3 position = getValues3(planet->first_node("Position"));
+    xml_node<> * noiseSettings = planet->first_node("NoiseSettings");
+    //-------NOISE SETTINGS-------
+    float maxHeight = stof(noiseSettings->first_attribute("maxHeight")->value());
+    float noiseFreq = stof(noiseSettings->first_attribute("noiseFreq")->value());
+    int octaves = stoi(noiseSettings->first_attribute("octaves")->value());
+    float lacunarity = stof(noiseSettings->first_attribute("lacunarity")->value());
+    float fGain = stof(noiseSettings->first_attribute("fGain")->value());
+    float fWeStr = stof(noiseSettings->first_attribute("fWeStr")->value());
+    float fPinPonStr = stof(noiseSettings->first_attribute("fPinPonStr")->value());
+    float cellJitter = stof(noiseSettings->first_attribute("cellJitter")->value());
+    float domWarpAmp= stof(noiseSettings->first_attribute("domWarpAmp")->value());
+    float minValue = stof(noiseSettings->first_attribute("minValue")->value());
+    int noiseTypeSel = stoi(noiseSettings->first_attribute("noiseTypeSel")->value());
+    int fractalTypeSel = stoi(noiseSettings->first_attribute("fractalTypeSel")->value());
+    int cellDistTypeSel = stoi(noiseSettings->first_attribute("cellDistTypeSel")->value());
+    int cellReturnTypeSel = stoi(noiseSettings->first_attribute("cellReturnTypeSel")->value());
+    int domWarpTypeSel = stoi(noiseSettings->first_attribute("domWarpTypeSel")->value());
+    //-----TEXTURES-------
+    std::vector<string> pathDiffuse;
+    std::vector<string> pathNormal;
+    xml_node<> * textures = planet->first_node("Textures");
+    xml_node<> * diffPath = textures->first_node("Diffuse");
+    xml_node<> * normPath = textures->first_node("Normal");
+    for (xml_node<> * d = diffPath->first_node("d");d;d = d->next_sibling())
+    {
+        pathDiffuse.push_back(d->value());
+    }
+    for (xml_node<> * n = normPath->first_node("n");n;n = n->next_sibling())
+    {
+        pathNormal.push_back(n->value());
+    }
+    Planet * newPlanet = new Planet(radius,nSeg,hasAtmos,maxHeight,noiseFreq,octaves,
+                                    lacunarity,fGain,fWeStr,fPinPonStr,cellJitter,
+                                    domWarpAmp,minValue,noiseTypeSel,fractalTypeSel,
+                                    cellDistTypeSel,cellReturnTypeSel,domWarpTypeSel,
+                                    pathDiffuse,pathNormal);
+    //-------ATMOS SETTINGS-------
+    xml_node<> * atmosSettings = planet->first_node("AtmosSettings");
+    float atmosRadius = stof(atmosSettings->first_attribute("radius")->value());
+    float kr = stof(atmosSettings->first_attribute("k_r")->value());
+    float km = stof(atmosSettings->first_attribute("k_m")->value());
+    float e = stof(atmosSettings->first_attribute("e")->value());
+    float h = stof(atmosSettings->first_attribute("H")->value());
+    float l = stof(atmosSettings->first_attribute("L")->value());
+    float gm = stof(atmosSettings->first_attribute("g_m")->value());
+    float numOutScatter = stof(atmosSettings->first_attribute("numOutScatter")->value());
+    float numInScatter = stof(atmosSettings->first_attribute("numInScatter")->value());
+    float scale = stof(atmosSettings->first_attribute("scale")->value());
+    glm::vec3 color = getValues3(atmosSettings->first_node("Color"));
+    newPlanet->addCamera(cam);
+    newPlanet->setupAtmosphere(atmosRadius,kr,km,e,h,l,gm,numOutScatter,numInScatter,
+                               scale,color);
+    return newPlanet;
 }
 
 Light* XmlParser::getLight(xml_node<> *light) {
@@ -148,5 +214,7 @@ glm::vec4 XmlParser::getValues4(xml_node<> *rot) {
     float angle = strtof(rot->first_attribute("angle")->value(),NULL);
     return glm::vec4(xRot,yRot,zRot,angle);
 }
+
+
 
 

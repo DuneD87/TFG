@@ -334,7 +334,7 @@ void main()
         int nTextures = 8;
         vec4 loadedTextures[8];
         float heights[8] = float[8](0.125,0.250,0.375,0.4,0.725,0.750,0.875,1);
-
+        float lats[12] = float[12](-1.0,-0.8,1.0f,0.8,-0.8,-0.3,0.8,0.3,-0.3,0.0,0.3,0.0);
         vec3 dir = upVector-FragPos;
         float absHeigth = (abs(lPoint) + abs(hPoint));
         float height = abs((length(dir) - pRadius) - lPoint) / absHeigth;
@@ -345,31 +345,34 @@ void main()
             loadedTextures[i] = textureNoTile(texture_diffuse[i],TexCoords);
         }
         //text = createTerrainTexture(heights,loadedTextures, height,nTextures);
+        vec4 textHeight = vec4(createTerrainTexture(heights,loadedTextures,height,nTextures).rgb,0.2);
+        vec4 textHeightDesert = vec4(createTerrainTexture(heights,loadedTextures,height-50,3).rgb,0.0);
+        if (lat > 1 || lat < -1)
+            text += loadedTextures[7];
+        for (int i = 0 ; i < 11; i++)
+        {
+            float interp = smoothstep(lats[i],lats[i + 1],lat);
+        }
         float a = smoothstep(-1.0f,-0.8,lat);
         float b = smoothstep(1.0f,0.8,lat);
         float c = smoothstep(-0.8,-0.3,lat);
         float d = smoothstep(0.8,0.3,lat);
         float e = smoothstep(0.3,0.0,lat);
         float f = smoothstep(-0.3,0.0,lat);
-        vec4 textHeight = vec4(createTerrainTexture(heights,loadedTextures,height,nTextures).rgb,0.2);
-        vec4 textHeightDesert = vec4(createTerrainTexture(heights,loadedTextures,height-50,3).rgb,0.0);
-        if (lat > 1 || lat < -1)
-            text += loadedTextures[7];
-        else if ((lat > 0.8 && lat <= 1))
+
+        if ((lat > 0.8 && lat <= 1))
             text += vec4(blend(loadedTextures[7], 1-b, loadedTextures[4], b), 1.0);
         else if((lat < -0.8 && lat >= -1))
             text += vec4(blend(loadedTextures[7], 1-a, loadedTextures[4], a), 1.0);
         else if ((lat > 0.3 && lat <= 0.8))
-        {
             text += vec4(blend(loadedTextures[4], 1-d, textHeight, d), 0.0);
-        }
-
         else if  (lat < -0.3 && lat >= -0.8)
             text += vec4(blend(loadedTextures[4], 1-c, textHeight, c), 0.0);
         else if (lat < 0.3 && lat >= 0)
             text += vec4(blend(textHeight, 1-e, textHeightDesert, e), 0.0);
         else if (lat > -0.3 && lat < 0)
             text += vec4(blend(textHeight, 1-f, textHeightDesert, f), 0.0);
+
         vec4 loadedNormal[8];
         if (dist < 2000)//Dont calculate normalmap when you cant appreciate it
         {

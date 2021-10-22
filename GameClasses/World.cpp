@@ -9,13 +9,13 @@
 World::World(const char *scenePath, const char *skyBoxPath, unsigned int scrWidth, unsigned int scrHeight,
              Camera *camera) {
     renderer = new Renderer(scrWidth,scrHeight,camera,skyBoxPath);
-    XmlParser parser(scenePath);
+    XmlParser parser(scenePath,camera);
     worldEntities = parser._ents;
     nPointLights = parser.nPointLights;
     renderer->nPointLights = nPointLights;
     renderer->camera = camera;
 
-    std::vector<std::string> diffuse = {
+    /*std::vector<std::string> diffuse = {
             //DiffuseMap
             "Planet/sandy-rocks1-albedo-1024.png",
             "Planet/sandyground-albedo-1024.png",
@@ -39,9 +39,9 @@ World::World(const char *scenePath, const char *skyBoxPath, unsigned int scrWidt
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
     Planet *planet = new Planet(20000,8,glm::vec3(0),camera,diffuse);
     std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
-    std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << "[ms]" << std::endl;
+    std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << "[ms]" << std::endl;*/
     camera->Position = glm::vec3(29562.6,-20292.2,58728);
-    worldEntities.push_back(planet);
+    //worldEntities.push_back(planet);
 }
 
 void World::renderWorld() {
