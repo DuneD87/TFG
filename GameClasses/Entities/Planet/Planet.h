@@ -119,7 +119,7 @@ private:
     float domWarpAmp = 50;
     float minValue = 0;
     int noiseTypeSel = 4, fractalTypeSel = 2,cellDistTypeSel = 3, cellReturnTypeSel = 2, domWarpTypeSel = 2;
-
+    bool biomeSet = false;
     float blendFactor = 0.5;
     float depthBlend = 0.5;
     unsigned int noiseMap;

@@ -201,29 +201,29 @@
                     <Biome latStart ="1.0"
                            latEnd = "0.8">
                         <Textures>
-                            <Texture index = "7"
-                                     hStart = "0.6"
-                                     hEnd = "1.0"/>
                             <Texture index = "5"
                                      hStart="0.0"
                                      hEnd="0.4"/>
                             <Texture index="6"
                                      hStart="0.4"
                                      hEnd="0.6"/>
+                            <Texture index = "7"
+                                     hStart = "0.6"
+                                     hEnd = "1.0"/>
                         </Textures>
                     </Biome>
                     <Biome latStart ="-1.0"
                            latEnd = "-0.8">
                         <Textures>
-                            <Texture index = "7"
-                                     hStart = "0.6"
-                                     hEnd = "1.0"/>
                             <Texture index = "5"
                                      hStart="0.0"
                                      hEnd="0.4"/>
                             <Texture index="6"
                                      hStart="0.4"
                                      hEnd="0.6"/>
+                            <Texture index = "7"
+                                     hStart = "0.6"
+                                     hEnd = "1.0"/>
                         </Textures>
                     </Biome>
                     <Biome latStart="0.8"

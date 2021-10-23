@@ -44,7 +44,7 @@ struct PointLight {
     vec3 diffuse;
     vec3 specular;
 };
-#define NR_POINT_LIGHTS 128
+#define NR_POINT_LIGHTS 8
 
 uniform PointLight pointLights[NR_POINT_LIGHTS];
 uniform int nPointLights;
@@ -310,6 +310,20 @@ vec3 CalcTerrainLight(DirLight light, vec3 normal, vec3 viewDir, vec4 FragPosLig
     7 - snow
 */
 
+vec4 createTerrainTextHeight(Biome biome, vec4 loadedTextures[maxText], float height)
+{
+    vec4 terrainColor = vec4(0.0, 0.0, 0.0, 1.0);
+    int nText = biome.nTextBiome;
+
+    for (int i = 0; i < nText; i++)
+    {
+        float a = smoothstep(biome.textIndex[i].hStart,biome.textIndex[i].hEnd,height);
+        if (height  > biome.textIndex[i].hStart && height <=  biome.textIndex[i].hEnd  || (i == nTextures - 1 && height  > biome.textIndex[i].hEnd))
+            terrainColor += vec4(blend(loadedTextures[biome.textIndex[i].index],1-a,loadedTextures[biome.textIndex[i + 1].index],a),1.0);
+    }
+    return terrainColor;
+}
+
 vec4 createTerrainTexture(float heights[8], vec4 loadedTextures[maxText],float height, int nTextures)
 {
     vec4 terrainColor = vec4(0.0, 0.0, 0.0, 1.0);
@@ -347,8 +361,6 @@ void main()
     if (isTerrain == 1)
     {
         vec4 loadedTextures[maxText];
-        float heights[8] = float[8](0.125,0.250,0.375,0.4,0.725,0.750,0.875,1);
-        float lats[12] = float[12](-1.0,-0.8,1.0f,0.8,-0.8,-0.3,0.8,0.3,-0.3,0.0,0.3,0.0);
         vec3 dir = upVector-FragPos;
         float absHeigth = (abs(lPoint) + abs(hPoint));
         float height = abs((length(dir) - pRadius) - lPoint) / absHeigth;
@@ -358,10 +370,21 @@ void main()
         {
             loadedTextures[i] = textureNoTile(texture_diffuse[i],TexCoords);
         }
-        for (int i = 0; i < nBiomes; i++)
+        for (int i = 0 ; i < nBiomes; i++)
         {
-            float interBiomes = smoothstep(biomes[i].latStart,biomes[i].latEnd,lat);
+            float a = smoothstep(biomes[i].latStart, biomes[i].latEnd,lat);
+            if (lat >= 0.0)
+            {
+                if (lat < biomes[i].latStart && lat >= biomes[i].latEnd)
+                    text += vec4(blend(createTerrainTextHeight(biomes[i - 1],loadedTextures,height),1-a,createTerrainTextHeight(biomes[i],loadedTextures,height),a),0.0);
+            }
+            else if (lat < 0.0)
+            {
+                if (lat > biomes[i].latStart && lat <= biomes[i].latEnd)
+                    text += vec4(blend(createTerrainTextHeight(biomes[i],loadedTextures,height),1-a,createTerrainTextHeight(biomes[i + 1],loadedTextures,height),a),0.0);
+            }
         }
+        //text = createTerrainTextHeight(biomes[4],loadedTextures,height);
         //text = createTerrainTexture(heights,loadedTextures, height,nTextures);
         /*vec4 textHeight = vec4(createTerrainTexture(heights,loadedTextures,height,nTextures).rgb,0.2);
         vec4 textHeightDesert = vec4(createTerrainTexture(heights,loadedTextures,height-50,3).rgb,0.0);
@@ -392,7 +415,7 @@ void main()
             text += vec4(blend(textHeight, 1-f, textHeightDesert, f), 0.0);
         */
         vec4 loadedNormal[8];
-        if (dist < 2000)//Dont calculate normalmap when you cant appreciate it
+        /*if (dist < 2000)//Dont calculate normalmap when you cant appreciate it
         {
             for (int i = 0; i < nTextures; i++)
             {
@@ -402,7 +425,7 @@ void main()
             norm = computeTerrainNormal(heights,loadedNormal,height, nTextures);
             norm = norm * 2.0 - 1.0;
             norm = normalize(tbn * norm);
-        }
+        }*/
     }
     vec3 result;
     for(int i = 0; i < nPointLights; i++)

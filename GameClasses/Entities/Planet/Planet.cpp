@@ -52,6 +52,7 @@ void Planet::draw(Shader &shader, bool outlined, int depthMap) {
     shader.setFloat("blendFactor",blendFactor);
     shader.setFloat("depthBlend",depthBlend);
     shader.setVec3("pPosition",_position);
+
     shader.setInt("nBiomes",biomes.size());
     for (int i = 0; i < biomes.size();i++)
     {
