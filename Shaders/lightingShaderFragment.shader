@@ -318,38 +318,10 @@ vec4 createTerrainTextHeight(Biome biome, vec4 loadedTextures[maxText], float he
     for (int i = 0; i < nText; i++)
     {
         float a = smoothstep(biome.textIndex[i].hStart,biome.textIndex[i].hEnd,height);
-        if (height  > biome.textIndex[i].hStart && height <=  biome.textIndex[i].hEnd  || (i == nTextures - 1 && height  > biome.textIndex[i].hEnd))
-            terrainColor += vec4(blend(loadedTextures[biome.textIndex[i].index],1-a,loadedTextures[biome.textIndex[i + 1].index],a),1.0);
+        if (height >= biome.textIndex[i].hStart && height <  biome.textIndex[i].hEnd)
+            terrainColor += vec4(blend(loadedTextures[biome.textIndex[i].index],1-a,loadedTextures[biome.textIndex[i + 1].index],a),0.0);
     }
     return terrainColor;
-}
-
-vec4 createTerrainTexture(float heights[8], vec4 loadedTextures[maxText],float height, int nTextures)
-{
-    vec4 terrainColor = vec4(0.0, 0.0, 0.0, 1.0);
-    if (height <= heights[0])
-        terrainColor += loadedTextures[0];
-    for (int i = 1; i < nTextures; i++)
-    {
-        float a = smoothstep(heights[i - 1],heights[i],height);
-        if (height  > heights[i - 1] && height <=  heights[i] || (i == nTextures - 1 && height  > heights[i - 1]))
-            terrainColor += vec4(blend(loadedTextures[i - 1],1-a,loadedTextures[i],a),1.0);
-    }
-    return terrainColor;
-}
-
-vec3 computeTerrainNormal(float heights[8], vec4 loadedTextures[8],float height, int nTextures)
-{
-    vec3 terrainNormal = vec3(0.0, 0.0, 0.0);
-    if (height <= heights[0])
-        terrainNormal += loadedTextures[0].rgb;
-    for (int i = 1; i < nTextures; i++)
-    {
-        float a = smoothstep(heights[i - 1], heights[i], height);
-        if (height  > heights[i - 1] && height <=  heights[i] || (i == nTextures - 1 && height  > heights[i - 1]))
-            terrainNormal += vec4(blend(loadedTextures[i - 1], 1-a, loadedTextures[i], a), 1.0).rgb;
-    }
-    return terrainNormal;
 }
 
 void main()
@@ -361,71 +333,40 @@ void main()
     if (isTerrain == 1)
     {
         vec4 loadedTextures[maxText];
-        vec3 dir = upVector-FragPos;
-        float absHeigth = (abs(lPoint) + abs(hPoint));
-        float height = abs((length(dir) - pRadius) - lPoint) / absHeigth;
-        vec3 pos = normalize(FragPos - pPosition);
-        float lat = asin(pos.y);
         for (int i = 0; i < nTextures; i++)
         {
             loadedTextures[i] = textureNoTile(texture_diffuse[i],TexCoords);
         }
+
+        vec4 loadedNormal[maxText];
+        for (int i = 0; i < nTextures; i++)
+        {
+            loadedNormal[i] = textureNoTile(texture_normal[i],TexCoords);
+        }
+
+        vec3 dir = upVector-FragPos;
+        float absHeigth = (abs(lPoint) + abs(hPoint));
+        float height = abs((length(dir) - pRadius) - lPoint) / absHeigth;
+
+        vec3 pos = normalize(FragPos - pPosition);
+        float lat = asin(pos.y) + 1.57f;//convert to positive 0..3.14
+        lat = lat / 3.14;
         for (int i = 0 ; i < nBiomes; i++)
         {
             float a = smoothstep(biomes[i].latStart, biomes[i].latEnd,lat);
-            if (lat >= 0.0)
+            if (lat <= biomes[i].latStart && lat >  biomes[i].latEnd )
+                text += vec4(blend(createTerrainTextHeight(biomes[i],loadedTextures,height),1-a,createTerrainTextHeight(biomes[i + 1],loadedTextures,height),a),0.0);
+            if (dist < 2000)//Dont calculate normalmap when you cant appreciate it
             {
-                if (lat < biomes[i].latStart && lat >= biomes[i].latEnd)
-                    text += vec4(blend(createTerrainTextHeight(biomes[i - 1],loadedTextures,height),1-a,createTerrainTextHeight(biomes[i],loadedTextures,height),a),0.0);
-            }
-            else if (lat < 0.0)
-            {
-                if (lat > biomes[i].latStart && lat <= biomes[i].latEnd)
-                    text += vec4(blend(createTerrainTextHeight(biomes[i],loadedTextures,height),1-a,createTerrainTextHeight(biomes[i + 1],loadedTextures,height),a),0.0);
-            }
-        }
-        //text = createTerrainTextHeight(biomes[4],loadedTextures,height);
-        //text = createTerrainTexture(heights,loadedTextures, height,nTextures);
-        /*vec4 textHeight = vec4(createTerrainTexture(heights,loadedTextures,height,nTextures).rgb,0.2);
-        vec4 textHeightDesert = vec4(createTerrainTexture(heights,loadedTextures,height-50,3).rgb,0.0);
-        if (lat > 1 || lat < -1)
-            text += loadedTextures[7];
-        for (int i = 0 ; i < 11; i++)
-        {
-            float interp = smoothstep(lats[i],lats[i + 1],lat);
-        }
-        float a = smoothstep(-1.0f,-0.8,lat);
-        float b = smoothstep(1.0f,0.8,lat);
-        float c = smoothstep(-0.8,-0.3,lat);
-        float d = smoothstep(0.8,0.3,lat);
-        float e = smoothstep(0.3,0.0,lat);
-        float f = smoothstep(-0.3,0.0,lat);
 
-        if ((lat > 0.8 && lat <= 1))
-            text += vec4(blend(loadedTextures[7], 1-b, loadedTextures[4], b), 1.0);
-        else if((lat < -0.8 && lat >= -1))
-            text += vec4(blend(loadedTextures[7], 1-a, loadedTextures[4], a), 1.0);
-        else if ((lat > 0.3 && lat <= 0.8))
-            text += vec4(blend(loadedTextures[4], 1-d, textHeight, d), 0.0);
-        else if  (lat < -0.3 && lat >= -0.8)
-            text += vec4(blend(loadedTextures[4], 1-c, textHeight, c), 0.0);
-        else if (lat < 0.3 && lat >= 0)
-            text += vec4(blend(textHeight, 1-e, textHeightDesert, e), 0.0);
-        else if (lat > -0.3 && lat < 0)
-            text += vec4(blend(textHeight, 1-f, textHeightDesert, f), 0.0);
-        */
-        vec4 loadedNormal[8];
-        /*if (dist < 2000)//Dont calculate normalmap when you cant appreciate it
-        {
-            for (int i = 0; i < nTextures; i++)
-            {
-                loadedNormal[i] = textureNoTile(texture_normal[i],TexCoords);
+                //TODO:Improve blending efect
+                norm = createTerrainTextHeight(biomes[i],loadedNormal,height).xyz;
+                norm = norm * 2.0 - 1.0;
+                norm = normalize(tbn * norm);
             }
-            //TODO:Improve blending efect
-            norm = computeTerrainNormal(heights,loadedNormal,height, nTextures);
-            norm = norm * 2.0 - 1.0;
-            norm = normalize(tbn * norm);
-        }*/
+        }
+
+
     }
     vec3 result;
     for(int i = 0; i < nPointLights; i++)

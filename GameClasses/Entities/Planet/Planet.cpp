@@ -52,7 +52,7 @@ void Planet::draw(Shader &shader, bool outlined, int depthMap) {
     shader.setFloat("blendFactor",blendFactor);
     shader.setFloat("depthBlend",depthBlend);
     shader.setVec3("pPosition",_position);
-
+    srand(time(NULL));
     shader.setInt("nBiomes",biomes.size());
     for (int i = 0; i < biomes.size();i++)
     {
@@ -66,6 +66,22 @@ void Planet::draw(Shader &shader, bool outlined, int depthMap) {
             shader.setFloat("biomes["+std::to_string(i)+"].textIndex["+std::to_string(j)+"].hEnd",biomes[i].textHeight[j].hEnd);
         }
     }
+    if (!biomeSet)
+    {
+        for (int i = 0; i < biomes.size();i++)
+        {
+            std::cout<<"Biome: "<<i<<" LAT START: " << biomes[i].latStart<<" ----- LAT END: " << biomes[i].latEnd<<std::endl;
+            for (int j = 0; j < biomes[i].textHeight.size();j++)
+            {
+                std::cout<<"Texture index: "<<biomes[i].textHeight[j].index<<std::endl;
+                std::cout<<"hStart: "<<biomes[i].textHeight[j].hStart<<std::endl;
+                std::cout<<"hEnd: "<<biomes[i].textHeight[j].hEnd<<std::endl;
+                std::cout<<"------------------------------------------------"<<std::endl;
+            }
+            std::cout<<"****************************************************"<<std::endl;
+        }
+        biomeSet = true;
+    }
     shader.setInt("nTextures",path.size());
     planet->Draw(shader,outlined,depthMap);
     shader.setInt("isTerrain",0);
@@ -75,7 +91,8 @@ void Planet::draw(Shader &shader, bool outlined, int depthMap) {
 
 Planet::~Planet() {
     delete planet;
-    delete skyDome;
+    if (hasAtmos)
+        delete skyDome;
 }
 
 void Planet::renderGui() {
