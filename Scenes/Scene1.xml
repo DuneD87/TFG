@@ -115,7 +115,7 @@
             <Planet type ="planet"
                     hasAtmos = "1"
                     radius = "20000"
-                    nSeg = "8">
+                    nSeg = "9">
                 <Position x="0" y="0" z="0"/>
                 <NoiseSettings maxHeight = "-2700.0"
                                noiseFreq = "0.00015"
@@ -133,7 +133,7 @@
                                cellReturnTypeSel = "2"
                                domWarpTypeSel = "2">
                 </NoiseSettings>
-                <AtmosSettings radius = "30000"
+                <AtmosSettings radius = "40000"
                                k_r = "0.166"
                                k_m = "0.0025"
                                e = "14.3"
@@ -142,7 +142,7 @@
                                g_m = "-0.85"
                                numOutScatter = "10.0"
                                numInScatter = "10.0"
-                               scale = "1.0">
+                               scale = "2.0">
                     <Color x="0.1" y="0.2" z="0.8"/>
                 </AtmosSettings>
                 <Textures>
@@ -179,22 +179,8 @@
                                      hEnd = "1.5"/>
                         </Textures>
                     </Biome>
-                    <Biome latStart ="0.85"
-                           latEnd = "0.8">
-                        <Textures>
-                            <Texture index = "6"
-                                     hStart="0.0"
-                                     hEnd="0.4"/>
-                            <Texture index="6"
-                                     hStart="0.4"
-                                     hEnd="0.6"/>
-                            <Texture index = "7"
-                                     hStart = "0.6"
-                                     hEnd = "1.5"/>
-                        </Textures>
-                    </Biome>
 
-                    <Biome latStart="0.8"
+                    <Biome latStart="0.85"
                            latEnd="0.6">
                         <Textures>
                             <Texture index="0"
@@ -233,7 +219,7 @@
                     </Biome>
 
                     <Biome latStart="0.4"
-                           latEnd="0.2">
+                           latEnd="0.15">
                         <Textures>
                             <Texture index="0"
                                      hStart="0.0"
@@ -255,20 +241,7 @@
                                      hEnd="1.5"/>
                         </Textures>
                     </Biome>
-                    <Biome latStart ="0.2"
-                           latEnd = "0.15">
-                        <Textures>
-                            <Texture index = "5"
-                                     hStart="0.0"
-                                     hEnd="0.4"/>
-                            <Texture index="6"
-                                     hStart="0.4"
-                                     hEnd="0.6"/>
-                            <Texture index = "7"
-                                     hStart = "0.6"
-                                     hEnd = "1.5"/>
-                        </Textures>
-                    </Biome>
+
                     <Biome latStart = "0.15"
                            latEnd = "0.0">
                         <Textures>

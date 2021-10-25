@@ -18,6 +18,7 @@ XmlParser::XmlParser(std::string path, Camera *cam) {
     _rootNode = doc.first_node("Scene");
     entIndex = 0;
     nPointLights = 0;
+    nPlanets = 0;
     xml_node<> * entities = _rootNode->first_node("Entities");
     for (xml_node<> * ent = entities->first_node("Entity");ent;ent = ent->next_sibling())
     {
@@ -35,6 +36,7 @@ XmlParser::XmlParser(std::string path, Camera *cam) {
         {
             xml_node<> *planet = ent->first_node("Planet");
             _ents.push_back(getPlanet(planet));
+            nPlanets++;
         }
         entIndex++;
     }
@@ -82,6 +84,7 @@ Planet *XmlParser::getPlanet(xml_node<> *planet) {
                                     domWarpAmp,minValue,noiseTypeSel,fractalTypeSel,
                                     cellDistTypeSel,cellReturnTypeSel,domWarpTypeSel,
                                     pathDiffuse,pathNormal,position);
+    newPlanet->id = nPlanets;
     //-------ATMOS SETTINGS-------
     xml_node<> * atmosSettings = planet->first_node("AtmosSettings");
     float atmosRadius = stof(atmosSettings->first_attribute("radius")->value());

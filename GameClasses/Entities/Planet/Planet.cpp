@@ -71,6 +71,7 @@ void Planet::draw(Shader &shader, bool outlined, int depthMap) {
         for (int i = 0; i < biomes.size();i++)
         {
             std::cout<<"Biome: "<<i<<" LAT START: " << biomes[i].latStart<<" ----- LAT END: " << biomes[i].latEnd<<std::endl;
+            std::cout<<"nTextures: "<<biomes[i].textHeight.size()<<std::endl;
             for (int j = 0; j < biomes[i].textHeight.size();j++)
             {
                 std::cout<<"Texture index: "<<biomes[i].textHeight[j].index<<std::endl;
@@ -100,7 +101,7 @@ void Planet::renderGui() {
     bool test = false;
     // 2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
     {
-        ImGui::Begin("Planet Settings",NULL,ImGuiWindowFlags_MenuBar);                          // Create a window called "Hello, world!" and append into it.
+        ImGui::Begin("Planet Settings" + this->id,NULL,ImGuiWindowFlags_MenuBar);                          // Create a window called "Hello, world!" and append into it.
         ImGui::SetWindowFontScale(2);
         ImGui::PushItemWidth(200);
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
@@ -245,7 +246,10 @@ void Planet::addCamera(Camera *cam) {
 
 void Planet::setupAtmosphere(float atmosRadius, float kr, float km, float e, float h, float l, float gm, float numOutScatter,
                         float numInScatter, float scale, glm::vec3 color) {
-    skyDome = new Atmosphere(radius-lowestPoint,(radius*1.1)+highestPoint,cam,_position);
+    float colorAux[3];
+    for (int i = 0; i < 3; i++)
+        colorAux[i] = color[i];
+    skyDome = new Atmosphere(radius-lowestPoint,(radius*1.1)+highestPoint,cam,kr,km,e,h,l,colorAux,gm,numOutScatter,numInScatter,scale,_position);
 }
 
 void Planet::addBiome(Biome bio) {

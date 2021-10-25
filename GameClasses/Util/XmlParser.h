@@ -32,6 +32,7 @@ private:
     xml_node<> * _rootNode;
     std::string path;
     Camera * cam;
+    int nPlanets;
     Light* getLight(xml_node<> *light);
     PhysicsObject* getObject(xml_node<> *model);
     Planet* getPlanet(xml_node<> *planet);

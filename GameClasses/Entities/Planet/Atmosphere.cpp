@@ -103,3 +103,23 @@ void Atmosphere::renderGui() {
 Atmosphere::~Atmosphere() {
     delete skyDome;
 }
+
+Atmosphere::Atmosphere(float planetRadius, float atmosRadius, Camera *cam, float kR, float kM, float e, float h,
+                       float l, float atmosColor[3], float gM, float numOutScatter, float numInScatter, float scale,glm::vec3 position)
+        : planetRadius(planetRadius), atmosRadius(atmosRadius), cam(cam), k_r(kR), k_m(kM), e(e), H(h), L(l),
+          g_m(gM), numOutScatter(numOutScatter), numInScatter(numInScatter), scale(scale) {
+    for (int i = 0; i < 3; i++)
+        this->atmosColor[i] = atmosColor[i];
+    this->planetRadius = planetRadius;
+    this->atmosRadius = atmosRadius;
+    this->cam = cam;
+    Cubesphere cubesphere(atmosRadius,4,true);
+    cubesphere.setupNoise(0,NULL);
+
+    Mesh *modelMesh = new Mesh(cubesphere.vertexList,cubesphere.getIndices(),"","");
+    skyDome = new Model();
+    skyDome->meshes.push_back(modelMesh);
+    skyDome->setPosition(position);
+    _position = position;
+    atmosShader = Shader("../Shaders/lightingShaderVertex.shader", "../Shaders/skydomeFragment.shader");
+}

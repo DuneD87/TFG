@@ -337,7 +337,6 @@ void main()
         {
             loadedTextures[i] = textureNoTile(texture_diffuse[i],TexCoords);
         }
-
         vec4 loadedNormal[maxText];
         for (int i = 0; i < nTextures; i++)
         {
@@ -349,28 +348,27 @@ void main()
         float height = abs((length(dir) - pRadius) - lPoint) / absHeigth;
 
         vec3 pos = normalize(FragPos - pPosition);
-        float lat = asin(pos.y) + 1.57f;//convert to positive 0..3.14
-        lat = lat / 3.14;
+        float lat = asin(pos.y) + 1.58f;//convert to positive 0..3.14
+        lat = lat / 3.15;
+
         for (int i = 0 ; i < nBiomes; i++)
         {
             float a = smoothstep(biomes[i].latStart, biomes[i].latEnd,lat);
-            if (lat <= biomes[i].latStart && lat >  biomes[i].latEnd )
-                text += vec4(blend(createTerrainTextHeight(biomes[i],loadedTextures,height),1-a,createTerrainTextHeight(biomes[i + 1],loadedTextures,height),a),0.0);
-            if (dist < 2000)//Dont calculate normalmap when you cant appreciate it
-            {
-
-                //TODO:Improve blending efect
-                norm = createTerrainTextHeight(biomes[i],loadedNormal,height).xyz;
-                norm = norm * 2.0 - 1.0;
-                norm = normalize(tbn * norm);
+            if (lat <= biomes[i].latStart && lat >  biomes[i].latEnd ) {
+                text += vec4(blend(createTerrainTextHeight(biomes[i], loadedTextures, height), 1-a, createTerrainTextHeight(biomes[i + 1], loadedTextures, height), a), 0.0);
+                if (dist < 2000)//Dont calculate normalmap when you cant appreciate it
+                {
+                    //TODO:Improve blending efect
+                    norm = createTerrainTextHeight(biomes[i], loadedNormal, height).xyz;
+                    norm = norm * 2.0 - 1.0;
+                    norm = normalize(tbn * norm);
+                }
             }
         }
-
-
     }
     vec3 result;
-    for(int i = 0; i < nPointLights; i++)
-        result += CalcPointLight(pointLights[i], norm, FragPos, viewDir);
+    //for(int i = 0; i < nPointLights; i++)
+        //result += CalcPointLight(pointLights[i], norm, FragPos, viewDir);
     result += CalcDirLight(dirLight, norm, viewDir, FragPosLightSpace,TangentLightPos,text);
     result += CalcSpotLight(spotLight, norm, TangentFragPos, viewDir);
     FragColor = vec4(_ACESFilmicToneMapping(result), 1.0);

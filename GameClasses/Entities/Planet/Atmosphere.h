@@ -12,6 +12,8 @@
 class Atmosphere : public Entity {
 public:
     Atmosphere(float planetRadius, float atmosRadius, Camera *cam,glm::vec3 position);
+    Atmosphere(float planetRadius, float atmosRadius, Camera *cam, float kR, float kM, float e, float h, float l,
+               float atmosColor[3], float gM, float numOutScatter, float numInScatter, float scale,glm::vec3 position);
     ~Atmosphere();
     void draw(Shader &shader, bool outlined = false, int depthMap = -1);
 private:
@@ -19,6 +21,7 @@ private:
     Model * skyDome;
     float planetRadius, atmosRadius;
     Camera *cam;
+private:
     Shader atmosShader;
     Shader atmosShaderIN;
     float viewDistance = 1000000.0f;
