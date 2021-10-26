@@ -115,7 +115,7 @@
             <Planet type ="planet"
                     hasAtmos = "1"
                     radius = "20000"
-                    nSeg = "6">
+                    nSeg = "8">
                 <Position x="0" y="0" z="0"/>
                 <NoiseSettings maxHeight = "-2700.0"
                                noiseFreq = "0.00015"

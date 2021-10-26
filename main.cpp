@@ -59,8 +59,9 @@ void processInput(GLFWwindow *window,World *world)
     if (glfwGetKey(window,GLFW_KEY_C) == GLFW_PRESS)
         cam->ProcessKeyboard(DOWN,deltaTime);
     if (glfwGetKey(window,GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-        cam->MovementSpeed += 10;
-
+        cam->MovementSpeed += 100;
+    if (glfwGetKey(window,GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
+        cam->MovementSpeed -= 100;
     if (glfwGetKey(window,GLFW_KEY_0) == GLFW_PRESS)
         world->getRenderer()->setPostProcess(5);
     if (glfwGetKey(window,GLFW_KEY_1) == GLFW_PRESS)
