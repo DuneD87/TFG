@@ -53,7 +53,7 @@ void BasicTerrain::draw(Shader &shader, bool outLined, int depthMap) {
     shader.setFloat("hPoint",highestPoint);
     shader.setFloat("lPoint",lowestPoint);
     shader.setVec3("upVector",upVector);
-    terrainMesh->Draw(shader,outLined,depthMap);
+    terrainMesh->Draw(shader,outLined,depthMap,false,false);
     shader.setInt("isTerrain",0);
 }
 

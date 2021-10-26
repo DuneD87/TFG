@@ -28,6 +28,6 @@ void BasicWater::setupWater() {
 }
 
 void BasicWater::draw(Shader &shader, bool outlined, int depthMap) {
-    waterMesh->Draw(shader,false,-1);
+    waterMesh->Draw(shader,false,-1,false,false);
 }
 

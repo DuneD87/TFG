@@ -13,7 +13,7 @@
 // settings
  unsigned int SCR_WIDTH = 1920;
  unsigned int SCR_HEIGHT = 1080;
-bool spotLightEnabled = false, enableCursor = true,fullScreen = true;
+bool spotLightEnabled = false, enableCursor = true,fullScreen = true,wireframe=false;
 auto *cam = new Camera(glm::vec3(6000.0f, 1000.0f, 6000.0f));
 float lastX = SCR_WIDTH/2, lastY = SCR_HEIGHT/2,pitch = 0, yaw = -90, fov = 45;
 
@@ -33,6 +33,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 {
     if(action == GLFW_RELEASE) return; //only handle press events
     if(key == GLFW_KEY_L) spotLightEnabled = !spotLightEnabled;
+    else if (key == GLFW_KEY_N) wireframe = !wireframe;
 }
 
 void processInput(GLFWwindow *window,World *world)
@@ -57,7 +58,6 @@ void processInput(GLFWwindow *window,World *world)
         cam->ProcessKeyboard(RRIGHT,deltaTime);
     if (glfwGetKey(window,GLFW_KEY_C) == GLFW_PRESS)
         cam->ProcessKeyboard(DOWN,deltaTime);
-
     if (glfwGetKey(window,GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
         cam->MovementSpeed += 10;
 
@@ -108,8 +108,8 @@ GLFWwindow * createWindow()
     // glfw: initialize and configure
     // ------------------------------
     glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4.5);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4.5);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 #ifdef __APPLE__
@@ -158,8 +158,14 @@ GLFWwindow * createWindow()
         return NULL;
     }
     stbi_set_flip_vertically_on_load(true);
+    glPatchParameteri(GL_PATCH_VERTICES,3);
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
+    GLint MaxPatchVertices = 0;
+    glGetIntegerv(GL_MAX_PATCH_VERTICES, &MaxPatchVertices);
+    printf("Max supported patch vertices %d\n", MaxPatchVertices);
+
+
     /*glEnable(GL_STENCIL_TEST);
     glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
     glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
@@ -200,6 +206,10 @@ int main()
 
 
         processInput(window, world);
+        if (wireframe)
+            glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+        else
+            glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
         world->renderWorld();
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)

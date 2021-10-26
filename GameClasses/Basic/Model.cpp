@@ -9,9 +9,9 @@ Model::Model(std::string const &path, bool gamma) : gammaCorrection(gamma)
     loadModel(path);
 }
 
-void Model::Draw(Shader &shader, bool outlined, unsigned int depthMap) {
+void Model::Draw(Shader &shader, bool outlined, unsigned int depthMap, bool wireframe, bool patches) {
     for (int i = 0; i < meshes.size();i++)
-        meshes[i]->Draw(shader, outlined,depthMap);
+        meshes[i]->Draw(shader, outlined,depthMap,wireframe,patches);
 }
 
 void Model::loadModel(const std::string &path) {

@@ -19,7 +19,12 @@ Renderer::Renderer(unsigned int scrWidth, unsigned int scrHeight, Camera *camera
                                  glm::vec3(1.0f, 1.0f, 1.0f),1.0,0.09,0.032,-1,-1);
     // build and compile our shader zprogram
     // ------------------------------------
-    Shader lightShader("../Shaders/lightingShaderVertex.shader", "../Shaders/lightingShaderFragment.shader");
+    Shader lightShader("../Shaders/lightingShaderVertex.shader",
+                       "../Shaders/lightingShaderFragment.shader",
+                       "../Shaders/lightingShaderTCS.shader",
+                       "../Shaders/lightingShaderTES.shader");
+    /*Shader lightShader("../Shaders/lightingShaderVertex.shader",
+                       "../Shaders/lightingShaderFragment.shader");*/
     Shader spriteShader("../Shaders/lightingShaderVertex.shader","../Shaders/alphaTextureTest.fs");
     Shader outlineShader = Shader("../Shaders/lightingShaderVertex.shader", "../Shaders/singleColorShader.fs");
     Shader screenShader = Shader("../Shaders/PostProcess/screenShader.vs","../Shaders/PostProcess/screenShader.fs");

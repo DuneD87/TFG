@@ -52,7 +52,6 @@ void Planet::draw(Shader &shader, bool outlined, int depthMap) {
     shader.setFloat("blendFactor",blendFactor);
     shader.setFloat("depthBlend",depthBlend);
     shader.setVec3("pPosition",_position);
-    srand(time(NULL));
     shader.setInt("nBiomes",biomes.size());
     for (int i = 0; i < biomes.size();i++)
     {
@@ -84,7 +83,7 @@ void Planet::draw(Shader &shader, bool outlined, int depthMap) {
         biomeSet = true;
     }
     shader.setInt("nTextures",path.size());
-    planet->Draw(shader,outlined,depthMap);
+    planet->Draw(shader,outlined,depthMap,true,true);
     shader.setInt("isTerrain",0);
     if (hasAtmos)
         skyDome->draw(shader,outlined,-1);
@@ -174,6 +173,7 @@ void Planet::setupMesh() {
     textures.clear();
     bindPlanetTextures();
     planet = new Mesh(cubeSphere->vertexList,indices,textures);
+
     planet->position = _position;
     delete cubeSphere;
 
