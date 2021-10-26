@@ -28,7 +28,7 @@ void Atmosphere::draw(Shader &shader, bool outlined, int depthMap) {
     renderGui();
     glEnable(GL_BLEND);
     //glDisable(GL_CULL_FACE);
-    glBlendFunc(GL_SRC_ALPHA, GL_SRC_ALPHA);
+    glBlendFunc(GL_SRC_ALPHA,GL_SRC_ALPHA);
 
     glm::mat4 view = this->cam->GetViewMatrix();
     glm::mat4 projection;
@@ -55,14 +55,11 @@ void Atmosphere::draw(Shader &shader, bool outlined, int depthMap) {
     atmosShader.setFloat("MAX",viewDistance);
     atmosShader.setFloat("fNumOutScatter",numOutScatter);
     atmosShader.setFloat("fNumInScatter",numInScatter);
-
-    skyDome->Draw(atmosShader,outlined,depthMap);
     glFrontFace(GL_CW);
     skyDome->Draw(atmosShader,outlined,depthMap);
-
     glFrontFace(GL_CCW);
+    skyDome->Draw(atmosShader,outlined,depthMap);
     glDisable(GL_BLEND);
-
     //glEnable(GL_CULL_FACE);
     shader.use();
 }
