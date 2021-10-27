@@ -6,9 +6,9 @@
 #define OPENGLTEST_SHADER_H
 
 #include <glad/glad.h> // include glad to get all the required OpenGL headers
-#include "../../glm/glm.hpp"
-#include "../../glm/gtc/matrix_transform.hpp"
-#include "../../glm/gtc/type_ptr.hpp"
+#include "../Util/glm/glm.hpp"
+#include "../Util/glm/gtc/matrix_transform.hpp"
+#include "../Util/glm/gtc/type_ptr.hpp"
 #include <string>
 #include <vector>
 #include <fstream>

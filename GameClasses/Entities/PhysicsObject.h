@@ -14,6 +14,7 @@ public:
     ~PhysicsObject();
 
     void draw(Shader &shader, bool outlined, int depthMap);
+    std::string toString();
 };
 
 

@@ -5,10 +5,10 @@
 #ifndef OPENGLTEST_CAMERA_H
 #define OPENGLTEST_CAMERA_H
 #include <glad/glad.h>
-#include "../../glm/glm.hpp"
-#include "../../glm/gtc/matrix_transform.hpp"
-#include "../../glm/detail/type_quat.hpp"
-#include "../../glm/ext/quaternion_common.hpp"
+#include "../Util/glm/glm.hpp"
+#include "../Util/glm/gtc/matrix_transform.hpp"
+#include "../Util/glm/detail/type_quat.hpp"
+#include "../Util/glm/ext/quaternion_common.hpp"
 
 #include <vector>
 

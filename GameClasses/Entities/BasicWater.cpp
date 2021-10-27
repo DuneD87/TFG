@@ -31,3 +31,7 @@ void BasicWater::draw(Shader &shader, bool outlined, int depthMap) {
     waterMesh->Draw(shader,false,-1,false,false);
 }
 
+std::string BasicWater::toString() {
+    return std::string();
+}
+

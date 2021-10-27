@@ -32,3 +32,7 @@ void PhysicsObject::draw(Shader &shader, bool outlined, int depthMap) {
 PhysicsObject::~PhysicsObject() {
     delete entityModel;
 }
+
+std::string PhysicsObject::toString() {
+    return std::string();
+}

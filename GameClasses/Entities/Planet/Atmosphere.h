@@ -17,6 +17,7 @@ public:
     ~Atmosphere();
     void draw(Shader &shader, bool outlined = false, int depthMap = -1);
     void setSunDir(glm::vec3 sunDir);
+    std::string toString();
 private:
     void renderGui();
     Model * skyDome;

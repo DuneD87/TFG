@@ -4,11 +4,11 @@
 #include <iostream>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include "GameClasses/Renderer.h"
-#include "GameClasses/World.h"
-#include "libs/imgui.h"
-#include "libs/imgui_impl_glfw.h"
-#include "libs/imgui_impl_opengl3.h"
+#include "GameClasses/Base/Renderer.h"
+#include "GameClasses/Base/World.h"
+#include "GameClasses/Util/libs/imgui.h"
+#include "GameClasses/Util/libs/imgui_impl_glfw.h"
+#include "GameClasses/Util/libs/imgui_impl_opengl3.h"
 
 // settings
  unsigned int SCR_WIDTH = 1920;

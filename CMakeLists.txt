@@ -14,10 +14,10 @@ elseif (APPLE)
     list (APPEND CMAKE_PREFIX_PATH "/usr/local/lib/cmake/ReactPhysics3D")
 endif ()
 
-add_executable(opengltest main.cpp libs/glad.c
+add_executable(opengltest main.cpp GameClasses/Util/libs/glad.c
         GameClasses/Basic/Shader.cpp
         GameClasses/Basic/Shader.h
-        libs/stb_image.h
+        GameClasses/Util/libs/stb_image.h
         GameClasses/Basic/Camera.cpp
         GameClasses/Basic/Camera.h
         GameClasses/Basic/Mesh.cpp
@@ -29,40 +29,35 @@ add_executable(opengltest main.cpp libs/glad.c
         GameClasses/Util/XmlParser.cpp
         GameClasses/Util/XmlParser.h
         GameClasses/Util/BasicShapeBuilder.h
-        GameClasses/Renderer.cpp
-        GameClasses/Renderer.h
+        GameClasses/Base/Renderer.cpp
+        GameClasses/Base/Renderer.h
         GameClasses/Entities/Entity.cpp
         GameClasses/Entities/Entity.h
-        GameClasses/World.cpp
-        GameClasses/World.h
+        GameClasses/Base/World.cpp
+        GameClasses/Base/World.h
         GameClasses/Entities/PhysicsObject.cpp
         GameClasses/Entities/PhysicsObject.h
-        GameClasses/Entities/BasicTerrain.cpp
-        GameClasses/Entities/BasicTerrain.h
+        OldStuff/BasicTerrain.cpp
+        OldStuff/BasicTerrain.h
         GameClasses/Util/Math.h
         GameClasses/Entities/BasicWater.cpp
         GameClasses/Entities/BasicWater.h
         GameClasses/Entities/Planet/Planet.cpp
         GameClasses/Entities/Planet/Planet.h
-        GameClasses/Entities/Planet/Icosphere.cpp
-        GameClasses/Entities/Planet/Icosphere.h
-        GameClasses/Entities/Planet/PlanetChunk.cpp
-        GameClasses/Entities/Planet/PlanetChunk.h
         GameClasses/Entities/Planet/Cubesphere.cpp
         GameClasses/Entities/Planet/Cubesphere.h
-        libs/imgui.cpp
-        libs/imgui.h
-        libs/imgui_impl_glfw.cpp
-        libs/imgui_impl_glfw.h
-        libs/imgui_widgets.cpp
-        libs/imgui_demo.cpp
-        libs/imgui_draw.cpp
-        libs/imgui_internal.h
-        libs/imgui_tables.cpp
-        libs/imgui_impl_opengl3.cpp
-        libs/imgui_impl_opengl3.h
+        GameClasses/Util/libs/imgui.cpp
+        GameClasses/Util/libs/imgui.h
+        GameClasses/Util/libs/imgui_impl_glfw.cpp
+        GameClasses/Util/libs/imgui_impl_glfw.h
+        GameClasses/Util/libs/imgui_widgets.cpp
+        GameClasses/Util/libs/imgui_demo.cpp
+        GameClasses/Util/libs/imgui_draw.cpp
+        GameClasses/Util/libs/imgui_internal.h
+        GameClasses/Util/libs/imgui_tables.cpp
+        GameClasses/Util/libs/imgui_impl_opengl3.cpp
+        GameClasses/Util/libs/imgui_impl_opengl3.h
         GameClasses/Entities/Planet/Atmosphere.cpp
         GameClasses/Entities/Planet/Atmosphere.h
-        GameClasses/Entities/Planet/Sphere.cpp
-        GameClasses/Entities/Planet/Sphere.h)
+        )
 target_link_libraries(opengltest glfw GL X11 pthread Xrandr Xi dl assimp ReactPhysics3D::ReactPhysics3D)

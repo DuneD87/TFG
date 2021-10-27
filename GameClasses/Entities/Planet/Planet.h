@@ -6,8 +6,7 @@
 #define OPENGLTEST_PLANET_H
 
 #include "../Entity.h"
-#include "Icosphere.h"
-#include "../BasicTerrain.h"
+#include "../../../OldStuff/BasicTerrain.h"
 #include "Atmosphere.h"
 struct TextHeight {
     int index;
@@ -45,6 +44,7 @@ public:
     float getLPointOffset() const;
     float getMaxHeight() const;
     int getNSeg() const;
+    std::string toString();
 private:
     void setupMesh();
     void bindPlanetTextures();

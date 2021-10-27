@@ -5,8 +5,8 @@
 #ifndef OPENGLTEST_LIGHT_H
 #define OPENGLTEST_LIGHT_H
 #include <iostream>
-#include "../../glm/glm.hpp"
-#include "../../glm/gtc/matrix_transform.hpp"
+#include "../Util/glm/glm.hpp"
+#include "../Util/glm/gtc/matrix_transform.hpp"
 #include "Entity.h"
 
 class Light : public Entity {
@@ -32,6 +32,7 @@ public:
     void setCutOff(float cutOff);
     void setOuterCutOff(float outerCutOff);
     void draw(Shader &shader,bool outlined, int depthMap);
+    std::string toString();
 private:
     glm::vec3 position,ambient,diffuse,specular,direction;
     std::string subType;

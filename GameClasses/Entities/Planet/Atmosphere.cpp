@@ -3,10 +3,9 @@
 //
 
 #include "Atmosphere.h"
-#include "Icosphere.h"
-#include "Sphere.h"
-#include "../../../libs/imgui_impl_opengl3.h"
-#include "../../../libs/imgui_impl_glfw.h"
+
+#include "../../Util/libs/imgui_impl_opengl3.h"
+#include "../../Util/libs/imgui_impl_glfw.h"
 
 Atmosphere::Atmosphere(float planetRadius, float atmosRadius, Camera *cam,glm::vec3 position) {
     this->planetRadius = planetRadius;
@@ -124,4 +123,8 @@ Atmosphere::Atmosphere(float planetRadius, float atmosRadius, Camera *cam, float
 
 void Atmosphere::setSunDir(glm::vec3 sunDir) {
     this->sunDir = sunDir;
+}
+
+std::string Atmosphere::toString() {
+    return std::string();
 }

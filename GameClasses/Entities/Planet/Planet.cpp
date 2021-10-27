@@ -2,7 +2,7 @@
 // Created by drive on 2/8/21.
 //
 
-#include "../../../libs/imgui_impl_opengl3.h"
+#include "../../Util/libs/imgui_impl_opengl3.h"
 #include "Planet.h"
 #include "Cubesphere.h"
 #include "../PhysicsObject.h"
@@ -259,6 +259,10 @@ void Planet::addBiome(Biome bio) {
 void Planet::setSunDir(glm::vec3 sunDir) {
     if (this->hasAtmos)
         skyDome->setSunDir(sunDir);
+}
+
+std::string Planet::toString() {
+    return std::string();
 }
 
 
