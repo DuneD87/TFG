@@ -15,6 +15,7 @@ Renderer::Renderer(unsigned int scrWidth, unsigned int scrHeight, Camera *camera
     this->scrWidth = scrWidth;
     this->scrHeight = scrHeight;
     this->camera = camera;
+    sunDir = glm::vec3(-1);
     spotLight =  Light("spotLight",glm::vec3(0.0f, 0.0f, 0.0f),glm::vec3(1.0f, 1.0f, 1.0f),
                                  glm::vec3(1.0f, 1.0f, 1.0f),1.0,0.09,0.032,-1,-1);
     // build and compile our shader zprogram
@@ -95,8 +96,7 @@ void Renderer::renderScene(vector<Entity*> worldEnts,std::vector<std::pair<std::
         renderInstanced(ents[i],shaders[6]);
 
 
-    ImGui::Render();
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
    // shaders[1].use();
     /*for (int i = 0; i < effects.size();i++)
     {
@@ -438,18 +438,18 @@ void Renderer::drawEntities(std::vector<Entity*> worldEnts, glm::mat4 view, glm:
             renderLoopCamera(shader,view,projection);
 
         }
-
-        if (worldEnts[i]->getType() == 2 && dynamic_cast<Light*>(worldEnts[i])->getSubType() == "dirLight")
-        {
-            sunDir = dynamic_cast<Light*>(worldEnts[i])->getDirection();
-        }
-        else if (worldEnts[i]->getType() == 3)
+        if (worldEnts[i]->getType() == 3)
         {
             sunPos = camera->Position
                      //+ glm::vec3(0.0f,dynamic_cast<BasicTerrain*>(worldEnts[i])->getHighestPoint(),0.0f)
                      + camera->Front * 100.0f;
+            dynamic_cast<Planet*>(worldEnts[i])->setSunDir(sunDir);
         }
     }
+}
+
+void Renderer::setSunDir(glm::vec3 sunDirection) {
+    this->sunDir = sunDirection;
 }
 
 

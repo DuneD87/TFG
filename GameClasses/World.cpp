@@ -5,16 +5,20 @@
 #include "World.h"
 #include "Entities/BasicWater.h"
 #include "Entities/Planet/Planet.h"
+#include "../libs/imgui.h"
+#include "../libs/imgui_impl_opengl3.h"
 
 World::World(const char *scenePath, const char *skyBoxPath, unsigned int scrWidth, unsigned int scrHeight,
              Camera *camera) {
     renderer = new Renderer(scrWidth,scrHeight,camera,skyBoxPath);
-    XmlParser parser(scenePath,camera);
-    worldEntities = parser._ents;
-    nPointLights = parser.nPointLights;
+    parser =  new XmlParser(scenePath,camera);
+    worldEntities = parser->_ents;
+    nPointLights = parser->nPointLights;
     renderer->nPointLights = nPointLights;
     renderer->camera = camera;
-
+    this->sun = parser->sun;
+    sunYaw=90;
+    sunPitch=0;
     /*std::vector<std::string> diffuse = {
             //DiffuseMap
             "Planet/sandy-rocks1-albedo-1024.png",
@@ -45,7 +49,22 @@ World::World(const char *scenePath, const char *skyBoxPath, unsigned int scrWidt
 }
 
 void World::renderWorld() {
+
+    renderer->setSunDir(sun->getDirection());
     renderer->renderScene(worldEntities,worldDeco);
+    ImGui::Begin("World Settings",NULL,ImGuiWindowFlags_MenuBar);                          // Create a window called "Hello, world!" and append into it.
+    ImGui::SetWindowFontScale(2);
+    float xzLen = cos(glm::radians(sunPitch));
+    float x = xzLen * cos(glm::radians(sunYaw));
+    float y = sin(glm::radians(sunPitch));
+    float z = xzLen * sin(glm::radians(-sunYaw));
+    sun->setDirection(glm::vec3(x,y,z));
+    ImGui::SliderFloat("Sun yaw",&sunYaw,-180,180);
+    ImGui::SliderFloat("Sun pitch",&sunPitch,-90,90);
+    bool saveWorld = ImGui::Button("Save");
+    ImGui::End();
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
 Renderer* World::getRenderer() {
@@ -56,6 +75,7 @@ World::~World() {
     for (auto ent : worldEntities)
         delete ent;
     delete renderer;
+    delete parser;
 }
 
 void World::setupInstanceObjects(int wSeg, int divider) {

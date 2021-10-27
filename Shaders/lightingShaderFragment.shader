@@ -327,7 +327,7 @@ vec4 createTerrainTextHeight(Biome biome, vec4 loadedTextures[maxText], float he
 void main()
 {
     float dist = length(_viewPos - FragPos);
-    vec3 norm = normalize(Normal);
+    vec3 norm = Normal;
     vec3 viewDir = normalize(_viewPos - FragPos);
     vec4 text = vec4(0,0,0,1);
     if (isTerrain == 1)

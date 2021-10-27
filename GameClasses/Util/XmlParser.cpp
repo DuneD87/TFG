@@ -152,6 +152,7 @@ Light* XmlParser::getLight(xml_node<> *light) {
             glm::vec3 direction = getValues3(dir);
             auto lightAux = new Light(typePre,ambient,diffuse,specular,direction,entIndex);
             lightAux->setDirection(direction);
+            this->sun = lightAux;
             return lightAux;
         }
 }
@@ -236,6 +237,10 @@ glm::vec4 XmlParser::getValues4(xml_node<> *rot) {
     float zRot = strtof(rot->first_attribute("z")->value(),NULL);
     float angle = strtof(rot->first_attribute("angle")->value(),NULL);
     return glm::vec4(xRot,yRot,zRot,angle);
+}
+
+XmlParser::~XmlParser() {
+
 }
 
 

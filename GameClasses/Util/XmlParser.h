@@ -23,11 +23,11 @@ class XmlParser {
 public:
 
     vector<Entity*> _ents;
-
+    Light *sun;
     int nPointLights;
     int entIndex;
     XmlParser(std::string path,Camera *cam);
-
+    ~XmlParser();
 private:
     xml_node<> * _rootNode;
     std::string path;

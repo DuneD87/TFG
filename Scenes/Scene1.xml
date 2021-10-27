@@ -117,8 +117,8 @@
                     radius = "20000"
                     nSeg = "8">
                 <Position x="0" y="0" z="0"/>
-                <NoiseSettings maxHeight = "-2700.0"
-                               noiseFreq = "0.00015"
+                <NoiseSettings maxHeight = "-1200.0"
+                               noiseFreq = "0.0001"
                                octaves = "8"
                                lacunarity = "2.3"
                                fGain = "0.5"
@@ -128,7 +128,7 @@
                                domWarpAmp = "50"
                                minValue = "0"
                                noiseTypeSel = "4"
-                               fractalTypeSel = "2"
+                               fractalTypeSel = "4"
                                cellDistTypeSel = "3"
                                cellReturnTypeSel = "2"
                                domWarpTypeSel = "2">
@@ -169,7 +169,7 @@
                 </Textures>
                 <Biomes>
                     <Biome latStart = "1"
-                           latEnd = "0.85">
+                           latEnd = "0.75">
                         <Textures>
                             <Texture index = "7"
                                      hStart = "0.0"
@@ -180,7 +180,7 @@
                         </Textures>
                     </Biome>
 
-                    <Biome latStart="0.85"
+                    <Biome latStart="0.75"
                            latEnd="0.6">
                         <Textures>
                             <Texture index="0"

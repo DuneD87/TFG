@@ -28,8 +28,11 @@ private:
     Mesh waterPlane;
     PhysicsObject * water;
     vector<Entity*> worldEntities;
+    Light *sun;
+    float sunYaw,sunPitch;
     vector<std::pair<std::vector<glm::mat4>,PhysicsObject*>> worldDeco;
     Renderer *renderer;
+    XmlParser *parser;
 };
 
 

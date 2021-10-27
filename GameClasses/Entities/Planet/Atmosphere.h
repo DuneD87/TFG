@@ -16,6 +16,7 @@ public:
                float atmosColor[3], float gM, float numOutScatter, float numInScatter, float scale,glm::vec3 position);
     ~Atmosphere();
     void draw(Shader &shader, bool outlined = false, int depthMap = -1);
+    void setSunDir(glm::vec3 sunDir);
 private:
     void renderGui();
     Model * skyDome;

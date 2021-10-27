@@ -37,7 +37,7 @@ public:
     void setupAtmosphere(float atmosRadius, float kr, float km, float e, float h, float l,
                          float gm, float numOutScatter, float numInScatter, float scale,
                          glm::vec3 color);
-
+    void setSunDir(glm::vec3 sunDir);
     float getHighestPoint() const;
     float getLowestPoint() const;
     float getRadius() const;

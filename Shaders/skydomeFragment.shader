@@ -6,7 +6,7 @@ uniform vec3 cameraPosition;
 uniform vec3 cameraForward;
 uniform vec3 planetPosition;
 uniform mat4 test;
-
+uniform vec3 sunDir;
 
 uniform float K_R;
 uniform float K_M;
@@ -146,7 +146,7 @@ void main (void)
     vec3 dir = normalize(cameraPosition - (FragPos.xyz));
     vec3 eye = cameraPosition - planetPosition;
 
-    vec3 l = normalize(vec3(-2, -4, -2));
+    vec3 l = normalize(sunDir);
     vec2 e = rayIntersection(eye, dir, atmosRadius);
     vec2 f = rayIntersection(eye, dir, planetRadius);
 

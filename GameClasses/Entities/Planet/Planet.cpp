@@ -256,4 +256,9 @@ void Planet::addBiome(Biome bio) {
     biomes.push_back(bio);
 }
 
+void Planet::setSunDir(glm::vec3 sunDir) {
+    if (this->hasAtmos)
+        skyDome->setSunDir(sunDir);
+}
+
 

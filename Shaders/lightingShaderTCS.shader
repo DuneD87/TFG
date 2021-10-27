@@ -40,13 +40,13 @@ out patch OutputPatch oPatch;
 float GetTessLevel(float Distance0, float Distance1)
 {
     float AvgDistance = (Distance0 + Distance1) / 2.0;
-    if (AvgDistance <= 500.0)
-        return 16.0;
     if (AvgDistance <= 2000.0)
+        return 16.0;
+    if (AvgDistance <= 4000.0)
+        return 8.0;
+    else if (AvgDistance <= 8000.0)
         return 4.0;
-    else if (AvgDistance <= 4000.0)
-        return 3.0;
-    else if (AvgDistance <= 10000.0)
+    else if (AvgDistance <= 16000.0)
         return 2.0;
     else
         return 1.0;
