@@ -12,8 +12,8 @@
 
 #ifndef GEOMETRY_CUBESPHERE_H
 #define GEOMETRY_CUBESPHERE_H
-#include "../../Basic/Mesh.h"
-#include "../../Util/FastNoiseLite.h"
+#include "../Basic/Mesh.h"
+#include "FastNoiseLite.h"
 #include <vector>
 #include <map>
 #include <cmath>

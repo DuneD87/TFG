@@ -147,11 +147,13 @@ Light* XmlParser::getLight(xml_node<> *light) {
             return lightAux;
         } else if (typePre == "dirLight")
         {
-            xml_node<> * dir = light->first_node("Direction");
+            xml_node<> * dir = light->first_node("Orientation");
+            float sunPitch = stof(dir->first_attribute("pitch")->value());
+            float sunYaw = stof(dir->first_attribute("yaw")->value());
 
-            glm::vec3 direction = getValues3(dir);
-            auto lightAux = new Light(typePre,ambient,diffuse,specular,direction,entIndex);
-            lightAux->setDirection(direction);
+            glm::vec2 orientation(sunPitch,sunYaw);
+            auto lightAux = new Light(typePre,ambient,diffuse,specular,orientation,entIndex);
+            lightAux->setDirection(orientation);
             this->sun = lightAux;
             return lightAux;
         }
@@ -224,6 +226,66 @@ vector<Mesh*> XmlParser::getSprites() {
     return res;
 }
 
+vector<string> XmlParser::split (string s, string delimiter) {
+    size_t pos_start = 0, pos_end, delim_len = delimiter.length();
+    string token;
+    vector<string> res;
+
+    while ((pos_end = s.find (delimiter, pos_start)) != string::npos) {
+        token = s.substr (pos_start, pos_end - pos_start);
+        pos_start = pos_end + delim_len;
+        res.push_back (token);
+    }
+
+    res.push_back (s.substr (pos_start));
+    return res;
+}
+
+void XmlParser::saveWorld() {
+
+    xml_document<> doc;
+    // Read the xml file into a vector
+    ifstream theFile (this->path);
+    vector<char> buffer((istreambuf_iterator<char>(theFile)), istreambuf_iterator<char>());
+    buffer.push_back('\0');
+    // Parse the buffer using the xml file parsing library into doc
+    doc.parse<0>(&buffer[0]);
+    // Find our root node
+    _rootNode = doc.first_node("Scene");
+    xml_node<> * ents = _rootNode->first_node("Entities");
+    for (xml_node<> * ent = ents->first_node("Entity");ent;ent = ent->next_sibling())
+    {
+        string entType = ent->first_attribute("type")->value();
+        if (entType == "Light")
+        {
+            xml_node<> *light = ent->first_node("Light");
+            string typePre = light->first_attribute("type")->value();
+            if (typePre == "dirLight")
+            {
+                xml_node<> * dir = light->first_node("Orientation");
+
+                string sunSettings = sun->toString();
+                vector<string> res = split(sunSettings,":");
+                vector<string> col = split(res[1],",");
+                dir->first_attribute("pitch")->value(col[0].c_str());
+                dir->first_attribute("yaw")->value(col[1].c_str());
+            }
+
+        } else if (entType == "Planet")
+        {
+            xml_node<> *planet = ent->first_node("Planet");
+
+        }
+    }
+    ofstream file;
+    file.open(path.c_str());
+    std::string data;
+    rapidxml::print(std::back_inserter(data),doc);
+    file << data;
+    file.close();
+}
+
+
 glm::vec3 XmlParser::getValues3(xml_node<> *pos) {
     float xPos = strtof(pos->first_attribute("x")->value(),NULL);
     float yPos = strtof(pos->first_attribute("y")->value(),NULL);
@@ -239,9 +301,17 @@ glm::vec4 XmlParser::getValues4(xml_node<> *rot) {
     return glm::vec4(xRot,yRot,zRot,angle);
 }
 
+void XmlParser::setValues3(xml_node<> *origin, std::vector<string> dir) {
+    origin->first_attribute("x")->value(dir[0].c_str());
+    origin->first_attribute("y")->value(dir[1].c_str());
+    origin->first_attribute("z")->value(dir[2].c_str());
+}
+
 XmlParser::~XmlParser() {
 
 }
+
+
 
 
 

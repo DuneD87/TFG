@@ -16,9 +16,9 @@ public:
 public:
     Light(std::string lightType, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular, float constant,
           float linear, float quadratic, int entId, int lightIndex);
-    Light(std::string lightType, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular,glm::vec3 direction, int entId);
+    Light(std::string lightType, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular,glm::vec2 orientation, int entId);
     std::string getSubType();
-    glm::vec3 getDirection();
+    glm::vec2 getDirection();
     glm::vec3 getAmbient();
     glm::vec3 getDiffuse();
     glm::vec3 getSpecular();
@@ -28,13 +28,14 @@ public:
     void setAmbient(glm::vec3 ambient);
     void setDiffuse(glm::vec3 diffuse);
     void setSpecular(glm::vec3 specular);
-    void setDirection(glm::vec3 direction);
+    void setDirection(glm::vec2 orientation);
     void setCutOff(float cutOff);
     void setOuterCutOff(float outerCutOff);
     void draw(Shader &shader,bool outlined, int depthMap);
     std::string toString();
 private:
-    glm::vec3 position,ambient,diffuse,specular,direction;
+    glm::vec3 position,ambient,diffuse,specular;
+    glm::vec2 orientation;
     std::string subType;
     int lightIndex;
     float constant,linear,quadratic,cutOff,outerCutOff;

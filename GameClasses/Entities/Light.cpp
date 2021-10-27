@@ -18,13 +18,13 @@ Light::Light(std::string lightType, glm::vec3 ambient, glm::vec3 diffuse, glm::v
     this->lightIndex = lightIndex;
 }
 
-Light::Light(std::string lightType, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular, glm::vec3 direction,
+Light::Light(std::string lightType, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular, glm::vec2 orientation,
              int entId){
     this->subType = lightType;
     this->ambient = ambient;
     this->diffuse = diffuse;
     this->specular = specular;
-    this->direction = direction;
+    this->orientation = orientation;
     this->id = entId;
     this->type = 2;
 }
@@ -45,8 +45,8 @@ std::string Light::getSubType() {
     return this->subType;
 }
 
-void Light::setDirection(glm::vec3 direction) {
-    this->direction = direction;
+void Light::setDirection(glm::vec2 orientation) {
+    this->orientation = orientation;
 }
 
 void Light::setCutOff(float cutOff) {
@@ -81,8 +81,8 @@ glm::vec3 Light::getAmbient() {
     return this->ambient;
 }
 
-glm::vec3 Light::getDirection() {
-    return this->direction;
+glm::vec2 Light::getDirection() {
+    return this->orientation;
 }
 
 void Light::draw(Shader &shader,bool outlined, int depthMap) {
@@ -96,7 +96,12 @@ void Light::draw(Shader &shader,bool outlined, int depthMap) {
         shader.setFloat("pointLights["+std::to_string(this->lightIndex)+"].quadratic", this->getQuadratic());
     }
     else if (this->getSubType() == "dirLight") {
-        shader.setVec3("dirLight.direction", this->getDirection());
+        float xzLen = cos(glm::radians(orientation[0]));
+        float x = xzLen * cos(glm::radians(orientation[1]));
+        float y = sin(glm::radians(orientation[0]));
+        float z = xzLen * sin(glm::radians(-orientation[1]));
+        glm::vec3 dir(x,y,z);
+        shader.setVec3("dirLight.direction", dir);
         shader.setVec3("dirLight.ambient",this->getAmbient());
         shader.setVec3("dirLight.diffuse", this->getDiffuse());
         shader.setVec3("dirLight.specular",this->getSpecular());
@@ -108,7 +113,8 @@ Light::~Light() {
 }
 
 std::string Light::toString() {
-    return std::string();
+    return std::string("Orientation:"+ std::to_string(orientation[0]) + ","
+                                + std::to_string(orientation[1]));
 }
 
 

@@ -7,7 +7,7 @@
 
 #include "../Entity.h"
 #include "../../Basic/Camera.h"
-#include "Cubesphere.h"
+#include "../../Util/Cubesphere.h"
 
 class Atmosphere : public Entity {
 public:

@@ -4,7 +4,7 @@
 
 #include "../../Util/libs/imgui_impl_opengl3.h"
 #include "Planet.h"
-#include "Cubesphere.h"
+#include "../../Util/Cubesphere.h"
 #include "../PhysicsObject.h"
 
 Planet::Planet(float radius, int nSeg, glm::vec3 position, Camera *cam, std::vector<std::string> path) {
@@ -262,7 +262,20 @@ void Planet::setSunDir(glm::vec3 sunDir) {
 }
 
 std::string Planet::toString() {
-    return std::string();
+    std::stringstream ststr;
+    ststr<< "ocatves:"<<octaves<<"\n"
+         << "lacunarity:"<<lacunarity<<"\n"
+         << "fGain:"<<fGain<<"\n"
+         << "fWeStr:"<<fWeStr<<"\n"
+         << "fPinPonStr:"<<fPinPonStr<<"\n"
+         << "cellJitter:"<<cellJitter<<"\n"
+         << "domWarpAmp:"<<domWarpAmp<<"\n"
+         << "noiseTypeSel:"<<noiseTypeSel<<"\n"
+         << "fractalTypeSel:"<<fractalTypeSel<<"\n"
+         << "cellDistTypeSel:"<<cellDistTypeSel<<"\n"
+         << "cellReturnTypeSel:"<<cellReturnTypeSel<<"\n"
+         << "domWarpTypeSel:"<<domWarpTypeSel<<"\n";
+    return ststr.str();
 }
 
 

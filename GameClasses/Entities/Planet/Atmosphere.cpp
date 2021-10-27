@@ -126,5 +126,16 @@ void Atmosphere::setSunDir(glm::vec3 sunDir) {
 }
 
 std::string Atmosphere::toString() {
-    return std::string();
+   std::stringstream ststr;
+   ststr<< "kr:"<<k_r<<"\n"
+        << "km:"<<k_m<<"\n"
+        << "e:"<<e<<"\n"
+        << "h:"<<H<<"\n"
+        << "l:"<<L<<"\n"
+        << "gm:"<<g_m<<"\n"
+        << "nOutScatter:"<<numOutScatter<<"\n"
+        << "nInScatter:"<<numInScatter<<"\n"
+        << "scale:"<<scale<<"\n"
+        << "color:"<<atmosColor[0]<<","<<atmosColor[1]<<","<<atmosColor[2]<<"\n";
+   return ststr.str();
 }

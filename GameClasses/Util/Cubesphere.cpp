@@ -14,7 +14,7 @@
 #include <iomanip>
 #include <cmath>
 #include "Cubesphere.h"
-#include "../../Util/FastNoiseLite.h"
+#include "FastNoiseLite.h"
 
 
 
