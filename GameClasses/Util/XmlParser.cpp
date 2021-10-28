@@ -19,6 +19,14 @@ XmlParser::XmlParser(std::string path, Camera *cam) {
     entIndex = 0;
     nPointLights = 0;
     nPlanets = 0;
+    xml_node<> * cameraNode = _rootNode->first_node("Camera");
+    xml_node<> * camPosNode = cameraNode->first_node("Position");
+    xml_node<> * camOrient = cameraNode->first_node("Orientation");
+
+    cam->Position = getValues3(camPosNode);
+    cam->Pitch = stof(camOrient->first_attribute("pitch")->value());
+    cam->Yaw = stof(camOrient->first_attribute("yaw")->value());
+    cam->Roll = stof(camOrient->first_attribute("roll")->value());
     xml_node<> * entities = _rootNode->first_node("Entities");
     for (xml_node<> * ent = entities->first_node("Entity");ent;ent = ent->next_sibling())
     {
@@ -252,6 +260,27 @@ void XmlParser::saveWorld() {
     doc.parse<0>(&buffer[0]);
     // Find our root node
     _rootNode = doc.first_node("Scene");
+    xml_node<> * camNode = _rootNode->first_node("Camera");
+    xml_node<> * camNodePos = camNode->first_node("Position");
+
+    std::string x = std::to_string(cam->Position.x);
+    std::string y = std::to_string(cam->Position.y);
+    std::string z = std::to_string(cam->Position.z);
+    camNodePos->first_attribute("x")->value(x.c_str());
+    camNodePos->first_attribute("y")->value(y.c_str());
+    camNodePos->first_attribute("z")->value(z.c_str());
+
+    xml_node<> * camOrientation = camNode->first_node("Orientation");
+    std::string x1 = std::to_string(cam->oldPitch);
+    std::string y1 = std::to_string(cam->oldYaw);
+    std::string z1 = std::to_string(cam->oldRoll);
+    camOrientation->first_attribute("pitch")->value(x1.c_str());
+    camOrientation->first_attribute("yaw")->value(y1.c_str());
+    camOrientation->first_attribute("roll")->value(z1.c_str());
+
+    //std::string w = std::to_string(cam->orientation.w);
+
+    //camOrientation->first_attribute("w")->value(w.c_str());
     xml_node<> * ents = _rootNode->first_node("Entities");
     for (xml_node<> * ent = ents->first_node("Entity");ent;ent = ent->next_sibling())
     {

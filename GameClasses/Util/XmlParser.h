@@ -45,7 +45,6 @@ private:
     glm::vec3 getValues3(xml_node<> *pos);
     glm::vec4 getValues4(xml_node<> *rot);
     void setValues3(xml_node<> *origin, std::vector<string> val);
-
     vector<string> split(string s, string delimiter);
 };
 

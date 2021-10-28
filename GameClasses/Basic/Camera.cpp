@@ -90,7 +90,9 @@ void Camera::ProcessMouseScroll(float yoffset) {
 
 
 void Camera::updateCameraVectors() {
-
+    oldPitch = -Pitch;
+    oldYaw = Yaw;
+    oldRoll = -Roll;
     glm::quat qPYR = glm::quat(glm::vec3(-Pitch, Yaw, -Roll));
     // reset values
     Pitch = Yaw = Roll = 0;

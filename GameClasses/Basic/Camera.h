@@ -32,9 +32,9 @@ const float ZOOM        =  45.0f;
 class Camera {
 public:
     // euler Angles
-    float Yaw;
-    float Pitch;
-    float Roll;
+    float Yaw,oldYaw;
+    float Pitch,oldPitch;
+    float Roll,oldRoll;
     // camera options
     float MovementSpeed;
     float MouseSensitivity;
