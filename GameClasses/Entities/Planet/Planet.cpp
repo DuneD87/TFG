@@ -53,6 +53,7 @@ void Planet::draw(Shader &shader, bool outlined, int depthMap) {
     shader.setFloat("depthBlend",depthBlend);
     shader.setVec3("pPosition",_position);
     shader.setInt("nBiomes",biomes.size());
+    shader.setInt("nTextures",path.size());
     for (int i = 0; i < biomes.size();i++)
     {
         shader.setFloat("biomes["+std::to_string(i)+"].latStart",biomes[i].latStart);
@@ -263,7 +264,7 @@ void Planet::setSunDir(glm::vec3 sunDir) {
 
 std::string Planet::toString() {
     std::stringstream ststr;
-    ststr<< "ocatves:"<<octaves<<"\n"
+    ststr<< "octaves:"<<octaves<<"\n"
          << "lacunarity:"<<lacunarity<<"\n"
          << "fGain:"<<fGain<<"\n"
          << "fWeStr:"<<fWeStr<<"\n"
@@ -274,7 +275,7 @@ std::string Planet::toString() {
          << "fractalTypeSel:"<<fractalTypeSel<<"\n"
          << "cellDistTypeSel:"<<cellDistTypeSel<<"\n"
          << "cellReturnTypeSel:"<<cellReturnTypeSel<<"\n"
-         << "domWarpTypeSel:"<<domWarpTypeSel<<"\n";
+         << "domWarpTypeSel:"<<domWarpTypeSel;
     return ststr.str();
 }
 
