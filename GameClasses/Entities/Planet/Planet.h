@@ -44,6 +44,8 @@ public:
     float getLPointOffset() const;
     float getMaxHeight() const;
     int getNSeg() const;
+    bool hasAtmosphere() const;
+    std::string getAtmosSettings() const;
     std::string toString();
 private:
     void setupMesh();
@@ -106,19 +108,18 @@ private:
     float radius;
     int nSeg;
     bool hasAtmos;
-    float maxHeight = -2700;
-    float noiseFreq = 0.00015;
+    float maxHeight;
+    float noiseFreq;
 
-private:
-    int octaves = 8;
-    float lacunarity = 2.3;
-    float fGain = 0.5;
-    float fWeStr = 0.6;
-    float fPinPonStr = 3;
-    float cellJitter = 1.0;
-    float domWarpAmp = 50;
-    float minValue = 0;
-    int noiseTypeSel = 4, fractalTypeSel = 2,cellDistTypeSel = 3, cellReturnTypeSel = 2, domWarpTypeSel = 2;
+    int octaves;
+    float lacunarity;
+    float fGain;
+    float fWeStr;
+    float fPinPonStr;
+    float cellJitter;
+    float domWarpAmp;
+    float minValue;
+    int noiseTypeSel,fractalTypeSel,cellDistTypeSel, cellReturnTypeSel, domWarpTypeSel;
     bool biomeSet = false;
     float blendFactor = 0.5;
     float depthBlend = 0.5;

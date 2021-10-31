@@ -29,6 +29,7 @@ public:
     int entIndex;
     void saveWorld();
     XmlParser(std::string path,Camera *cam);
+    void readData();
     ~XmlParser();
 private:
     xml_node<> * _rootNode;

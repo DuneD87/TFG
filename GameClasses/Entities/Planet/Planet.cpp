@@ -102,7 +102,7 @@ void Planet::renderGui() {
     // 2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
     {
         ImGui::Begin("Planet Settings" + this->id,NULL,ImGuiWindowFlags_MenuBar);                          // Create a window called "Hello, world!" and append into it.
-        ImGui::SetWindowFontScale(2);
+        ImGui::SetWindowFontScale(1);
         ImGui::PushItemWidth(200);
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
         test = test + ImGui::SliderFloat("minValue", &minValue,-1.0f, 1.0f);
@@ -264,7 +264,9 @@ void Planet::setSunDir(glm::vec3 sunDir) {
 
 std::string Planet::toString() {
     std::stringstream ststr;
-    ststr<< "octaves:"<<octaves<<"\n"
+    ststr<< "maxHeight:"<<maxHeight<<"\n"
+         << "noiseFreq:"<<noiseFreq<<"\n"
+         << "octaves:"<<octaves<<"\n"
          << "lacunarity:"<<lacunarity<<"\n"
          << "fGain:"<<fGain<<"\n"
          << "fWeStr:"<<fWeStr<<"\n"
@@ -277,6 +279,14 @@ std::string Planet::toString() {
          << "cellReturnTypeSel:"<<cellReturnTypeSel<<"\n"
          << "domWarpTypeSel:"<<domWarpTypeSel;
     return ststr.str();
+}
+
+bool Planet::hasAtmosphere() const {
+    return this->hasAtmos;
+}
+
+std::string Planet::getAtmosSettings() const {
+    return skyDome->toString();
 }
 
 

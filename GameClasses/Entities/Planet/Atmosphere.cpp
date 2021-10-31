@@ -69,7 +69,7 @@ void Atmosphere::renderGui() {
     // 2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
     {
         ImGui::Begin("Atmospheric Settings",NULL,ImGuiWindowFlags_MenuBar);                          // Create a window called "Hello, world!" and append into it.
-        ImGui::SetWindowFontScale(2);
+        ImGui::SetWindowFontScale(1);
         ImGui::PushItemWidth(200);
 
         ImGui::SliderFloat("outterRadius", &atmosRadius, 0.0f, 100000.0f);
@@ -127,15 +127,15 @@ void Atmosphere::setSunDir(glm::vec3 sunDir) {
 
 std::string Atmosphere::toString() {
    std::stringstream ststr;
-   ststr<< "kr:"<<k_r<<"\n"
-        << "km:"<<k_m<<"\n"
+   ststr<< "k_r:"<<k_r<<"\n"
+        << "k_m:"<<k_m<<"\n"
         << "e:"<<e<<"\n"
-        << "h:"<<H<<"\n"
-        << "l:"<<L<<"\n"
-        << "gm:"<<g_m<<"\n"
-        << "nOutScatter:"<<numOutScatter<<"\n"
-        << "nInScatter:"<<numInScatter<<"\n"
+        << "H:"<<H<<"\n"
+        << "L:"<<L<<"\n"
+        << "g_m:"<<g_m<<"\n"
+        << "numOutScatter:"<<numOutScatter<<"\n"
+        << "numInScatter:"<<numInScatter<<"\n"
         << "scale:"<<scale<<"\n"
-        << "color:"<<atmosColor[0]<<","<<atmosColor[1]<<","<<atmosColor[2]<<"\n";
+        << "color:"<<atmosColor[0]<<","<<atmosColor[1]<<","<<atmosColor[2];
    return ststr.str();
 }

@@ -12,6 +12,7 @@ World::World(const char *scenePath, const char *skyBoxPath, unsigned int scrWidt
              Camera *camera) {
     renderer = new Renderer(scrWidth,scrHeight,camera,skyBoxPath);
     parser =  new XmlParser(scenePath,camera);
+    parser->readData();
     worldEntities = parser->_ents;
     nPointLights = parser->nPointLights;
     renderer->nPointLights = nPointLights;
@@ -26,7 +27,7 @@ void World::renderWorld() {
 
     renderer->renderScene(worldEntities,worldDeco);
     ImGui::Begin("World Settings",NULL,ImGuiWindowFlags_MenuBar);
-    ImGui::SetWindowFontScale(2);
+    ImGui::SetWindowFontScale(1);
     float xzLen = cos(glm::radians(sunPitch));
     float x = xzLen * cos(glm::radians(sunYaw));
     float y = sin(glm::radians(sunPitch));

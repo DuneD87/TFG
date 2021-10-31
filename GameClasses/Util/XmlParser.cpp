@@ -29,7 +29,7 @@ XmlParser::XmlParser(std::string path, Camera *cam) {
     cam->Roll = stof(camOrient->first_attribute("roll")->value());
     cam->updateCameraVectors();
     xml_node<> * entities = _rootNode->first_node("Entities");
-    for (xml_node<> * ent = entities->first_node("Entity");ent;ent = ent->next_sibling())
+    for (xml_node<> * ent = entities->first_node("Entity");ent;ent = ent->next_sibling("Entity"))
     {
         string entType = ent->first_attribute("type")->value();
         if (entType == "PhysicsObject")
@@ -49,10 +49,15 @@ XmlParser::XmlParser(std::string path, Camera *cam) {
         }
         entIndex++;
     }
+    theFile.close();
 }
 
+void XmlParser::readData() {
+
+}
+
+
 Planet *XmlParser::getPlanet(xml_node<> *planet) {
-    string type = planet->first_attribute("type")->value();
     int id = stoi(planet->first_attribute("id")->value());
     bool hasAtmos = stoi(planet->first_attribute("hasAtmos")->value());
     float radius = stof(planet->first_attribute("radius")->value());
@@ -259,7 +264,7 @@ void XmlParser::saveWorld() {
     vector<char> buffer((istreambuf_iterator<char>(theFile)), istreambuf_iterator<char>());
     buffer.push_back('\0');
     // Parse the buffer using the xml file parsing library into doc
-    doc.parse<parse_no_data_nodes>(&buffer[0]);
+    doc.parse<parse_full | parse_no_data_nodes>(&buffer[0]);
     // Find our root node
     _rootNode = doc.first_node("Scene");
     xml_node<> * camNode = _rootNode->first_node("Camera");
@@ -268,20 +273,19 @@ void XmlParser::saveWorld() {
     std::string x = std::to_string(cam->Position.x);
     std::string y = std::to_string(cam->Position.y);
     std::string z = std::to_string(cam->Position.z);
-    camNodePos->first_attribute("x")->value(x.c_str());
-    camNodePos->first_attribute("y")->value(y.c_str());
-    camNodePos->first_attribute("z")->value(z.c_str());
+    camNodePos->first_attribute("x")->value(doc.allocate_string(x.c_str()));
+    camNodePos->first_attribute("y")->value(doc.allocate_string(y.c_str()));
+    camNodePos->first_attribute("z")->value(doc.allocate_string(z.c_str()));
     xml_node<> * camOrientation = camNode->first_node("Orientation");
     cam->updateCameraVectors();
     std::string x1 = std::to_string(cam->oldPitch);
     std::string y1 = std::to_string(cam->oldYaw);
     std::string z1 = std::to_string(cam->oldRoll);
-    camOrientation->first_attribute("pitch")->value(x1.c_str());
-    camOrientation->first_attribute("yaw")->value(y1.c_str());
-    camOrientation->first_attribute("roll")->value(z1.c_str());
-
+    camOrientation->first_attribute("pitch")->value(doc.allocate_string(x1.c_str()));
+    camOrientation->first_attribute("yaw")->value(doc.allocate_string(y1.c_str()));
+    camOrientation->first_attribute("roll")->value(doc.allocate_string(z1.c_str()));
     xml_node<> * ents = _rootNode->first_node("Entities");
-    for (xml_node<> * ent = ents->first_node("Entity");ent;ent = ent->next_sibling())
+    for (xml_node<> * ent = ents->first_node("Entity");ent;ent = ent->next_sibling("Entity"))
     {
         string entType = ent->first_attribute("type")->value();
         if (entType == "Light")
@@ -295,27 +299,56 @@ void XmlParser::saveWorld() {
                 string sunSettings = sun->toString();
                 vector<string> res = split(sunSettings,":");
                 vector<string> col = split(res[1],",");
-                dir->first_attribute("pitch")->value(col[0].c_str());
-                dir->first_attribute("yaw")->value(col[1].c_str());
+                dir->first_attribute("pitch")->value(doc.allocate_string(col[0].c_str()));
+                dir->first_attribute("yaw")->value(doc.allocate_string(col[1].c_str()));
             }
 
         } else if (entType == "Planet")
         {
             xml_node<> *planet = ent->first_node("Planet");
             int id = stoi(planet->first_attribute("id")->value());
+
             for (auto _ent : _ents)
             {
                 if (_ent->id == id && _ent->getType() == 3)
                 {
+
                     xml_node<>* noiseSettings  = planet->first_node("NoiseSettings");
-                    string pSettings = dynamic_cast<Planet*>(_ent)->toString();
+                    Planet * auxPlanet = dynamic_cast<Planet*>(_ent);
+                    string pSettings = auxPlanet->toString();
                     vector<string> res = split(pSettings,"\n");
-                    for (int i = 0; i < res.size();i++)
+                    for (const auto& attr : res)
                     {
-                        vector<string> namVal = split(res[i],":");
-                        string name = namVal[0];
-                        string val = namVal[1];
-                        noiseSettings->first_attribute(namVal[0].c_str())->value(namVal[1].c_str());
+                        vector<string> namVal = split(attr,":");
+                        const char* name = namVal[0].c_str();
+                        const char* val = doc.allocate_string(namVal[1].c_str());
+                        noiseSettings->first_attribute(name)->value(val);
+
+                    }
+                    if (auxPlanet->hasAtmosphere())
+                    {
+                        string atmosSettings = auxPlanet->getAtmosSettings();
+                        vector<string> atmosRes = split(atmosSettings,"\n");
+                        for (const auto& attr : atmosRes)
+                        {
+                            xml_node<> * atmosSettingsNode = planet->first_node("AtmosSettings");
+                            vector<string> namVal = split(attr,":");
+                            const char * name = namVal[0].c_str();
+                            const char * val = namVal[1].c_str();
+                            if (namVal[0] != "color")
+                            {
+                                atmosSettingsNode->first_attribute(name)->value(doc.allocate_string(val));
+                            }
+                            else
+                            {
+                                vector<string> colorVal = split(val,",");
+                                xml_node<> * colorNode = atmosSettingsNode->first_node("Color");
+                                colorNode->first_attribute("x")->value(doc.allocate_string(colorVal[0].c_str()));
+                                colorNode->first_attribute("y")->value(doc.allocate_string(colorVal[1].c_str()));
+                                colorNode->first_attribute("z")->value(doc.allocate_string(colorVal[2].c_str()));
+
+                            }
+                        }
                     }
                 }
             }
@@ -354,6 +387,7 @@ void XmlParser::setValues3(xml_node<> *origin, std::vector<string> dir) {
 XmlParser::~XmlParser() {
 
 }
+
 
 
 
