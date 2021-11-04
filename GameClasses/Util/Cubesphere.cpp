@@ -443,3 +443,5 @@ void Cubesphere::finishFaceComputation(std::vector<Vertex> verticesn) {
         addNormal(verticesn[i].Normal.x, verticesn[i].Normal.y, verticesn[i].Normal.z);
     }
 }
+
+

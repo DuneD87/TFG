@@ -19,6 +19,17 @@
 #include <cmath>
 #include <thread>
 
+struct TextHeight {
+    int index;
+    float hStart;
+    float hEnd;
+};
+struct Biome {
+    float latStart;
+    float latEnd;
+    std::vector<TextHeight> textHeight;
+};
+
 class Cubesphere
 {
 public:
@@ -26,6 +37,7 @@ public:
     Cubesphere(float radius=1.0f, int subdivision=3, bool smooth=true,float minValue = 0);
     ~Cubesphere() {}
     std::vector<Vertex> vertexList;
+    
     // getters/setters
     float getRadius() const                 { return radius; }
     void setRadius(float radius);
@@ -40,12 +52,13 @@ public:
     unsigned int getIndexCount() const      { return (unsigned int)indices.size(); }
     unsigned int getTriangleCount() const   { return getIndexCount() / 3; }
     std::vector<unsigned int> getIndices() const  { return indices; }
+
+    float getLPoint() const;
+    float getHPoint() const;
   // draw only single face, valid ID is 0~5
 
     // debug
     void printSelf() const;
-
-protected:
 
 private:
     // static functions
@@ -77,10 +90,6 @@ private:
     std::vector<unsigned int> indices;
     std::vector<unsigned int> lineIndices;
     float lPoint,hPoint;
-public:
-    float getLPoint() const;
-    float getHPoint() const;
-private:
     // interleaved
     std::vector<float> interleavedVertices;
     int interleavedStride;                  // # of bytes to hop to the next vertex (should be 32 bytes)

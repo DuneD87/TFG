@@ -24,8 +24,7 @@ uniform float fNumInScatter;
 in vec4 worldPos;
 in vec4 FragPos;
 in vec3 Normal;
-in mat4 m;
-in mat4 v;
+
 
 out vec4 FragColor;
 
@@ -42,10 +41,6 @@ float SCALE_L = 1.0 / (atmosRadius - planetRadius);
 const int numOutScatter = 10;
 const int numInScatter = 10;
 
-vec3 rayDirection(vec3 cameraPosition) {
-    vec4 ray = m*FragPos - vec4(cameraPosition, 1.0);
-    return normalize(vec3(ray));
-}
 
 vec2 rayIntersection(vec3 p, vec3 dir, float radius ) {
     float b = dot( p, dir );

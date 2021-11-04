@@ -17,6 +17,7 @@
 
 
 struct Vertex {
+
     // position
     glm::vec3 Position;
     // normal
@@ -27,6 +28,7 @@ struct Vertex {
     glm::vec3 Tangent;
     // bitangent
     glm::vec3 Bitangent;
+
 };
 
 struct Texture {

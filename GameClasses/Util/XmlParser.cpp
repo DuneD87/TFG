@@ -136,6 +136,7 @@ Planet *XmlParser::getPlanet(xml_node<> *planet) {
         newPlanet->addBiome(bioAux);
 
     }
+    //newPlanet->computeBiomes();
     return newPlanet;
 }
 

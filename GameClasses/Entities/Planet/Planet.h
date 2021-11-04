@@ -8,16 +8,6 @@
 #include "../Entity.h"
 #include "../../../OldStuff/BasicTerrain.h"
 #include "Atmosphere.h"
-struct TextHeight {
-    int index;
-    float hStart;
-    float hEnd;
-};
-struct Biome {
-    float latStart;
-    float latEnd;
-    std::vector<TextHeight> textHeight;
-};
 
 class Planet : public Entity {
 public:
@@ -33,6 +23,7 @@ public:
     void renderGui();
     void addCamera(Camera * cam);
     void addBiome(Biome bio);
+    void setupUniformBuffers();
     void setupAtmosphere(float atmosRadius, float kr, float km, float e, float h, float l,
                          float gm, float numOutScatter, float numInScatter, float scale,
                          glm::vec3 color);

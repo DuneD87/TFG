@@ -118,7 +118,7 @@ Atmosphere::Atmosphere(float planetRadius, float atmosRadius, Camera *cam, float
     skyDome->meshes.push_back(modelMesh);
     skyDome->setPosition(position);
     _position = position;
-    atmosShader = Shader("../Shaders/lightingShaderVertex.shader", "../Shaders/skydomeFragment.shader");
+    atmosShader = Shader("../Shaders/skydomeVertex.shader", "../Shaders/skydomeFragment.shader");
 }
 
 void Atmosphere::setSunDir(glm::vec3 sunDir) {

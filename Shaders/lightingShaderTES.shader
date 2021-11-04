@@ -2,20 +2,18 @@
 
 layout(triangles, equal_spacing, ccw) in;
 
-uniform vec3 viewPos;
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
-uniform mat4 lightSpaceMatrix;
-uniform vec3 lightPos;
-uniform float pRadius;
 
-
-in vec3 WorldPos_ES_in[];
 in vec2 TexCoord_ES_in[];
+in vec3 WorldPos_ES_in[];
+in vec3 LocalPos_ES_in[];
 in vec3 Normal_ES_in[];
 in vec3 viewPos_ES_in[];
 in mat3 tbn_ES_in[];
+
+
 struct OutputPatch
 {
     vec3 WorldPos_B030;
@@ -33,11 +31,13 @@ struct OutputPatch
 };
 in patch OutputPatch oPatch;
 
-out vec3 FragPos;
 out vec2 TexCoords;
+out vec3 FragPos;
+out vec3 LocalPos;
 out vec3 Normal;
 out vec3 _viewPos;
 out mat3 tbn;
+
 vec2 interpolate2D(vec2 v0, vec2 v1, vec2 v2)
 {
     return vec2(gl_TessCoord.x) * v0 + vec2(gl_TessCoord.y) * v1 + vec2(gl_TessCoord.z) * v2;
@@ -56,6 +56,7 @@ void main()
     // Interpolate the attributes of the output vertex using the barycentric coordinates
     TexCoords = interpolate2D(oPatch.TexCoord[0], oPatch.TexCoord[1], oPatch.TexCoord[2]);
     Normal = interpolate3D(oPatch.Normal[0], oPatch.Normal[1], oPatch.Normal[2]);
+    LocalPos = interpolate3D(LocalPos_ES_in[0],LocalPos_ES_in[1],LocalPos_ES_in[2]);
     float u = gl_TessCoord.x;
     float v = gl_TessCoord.y;
     float w = gl_TessCoord.z;
@@ -80,6 +81,7 @@ void main()
 
     _viewPos = viewPos_ES_in[0];
     tbn = interpolateMat3D(tbn_ES_in[0],tbn_ES_in[1],tbn_ES_in[2]);
+
     // Displace the vertex along the normal
 
     gl_Position =  projection * view * vec4(FragPos, 1.0);

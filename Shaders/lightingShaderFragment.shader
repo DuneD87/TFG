@@ -1,7 +1,7 @@
 #version 410 core
 out vec4 FragColor;
 #define maxText 16
-#define maxBiomes 16
+#define maxBiomes 8
 struct Material {
     sampler2D diffuse;
     sampler2D specular;
@@ -20,15 +20,15 @@ struct DirLight {
     vec3 specular;
 };
 struct TextHeight {
-    int index;
-    float hStart;
-    float hEnd;
+    int index;//4
+    float hStart;//4
+    float hEnd;//4
 };
 struct Biome {
-    float latStart;
-    float latEnd;
-    int nTextBiome;
-    TextHeight[maxText] textIndex;
+    float latStart;//4  0
+    float latEnd;//4    4
+    int nTextBiome;//4  8
+    TextHeight[maxText] textIndex;//12*16=192   200
 };
 uniform DirLight dirLight;
 
@@ -69,6 +69,7 @@ in vec3 _viewPos;
 in vec3 TangentLightPos;
 in vec3 TangentViewPos;
 in vec3 TangentFragPos;
+
 uniform sampler2D texture_diffuse[maxText];
 uniform sampler2D texture_normal[maxText];
 uniform int nTextures;
@@ -84,6 +85,8 @@ uniform vec3 upVector;
 uniform float pRadius;
 uniform Material material;
 uniform sampler2D shadowMap;
+
+const float PI = 3.14159265359;
 
 vec3 saturate(vec3 a)
 {
@@ -310,18 +313,37 @@ vec3 CalcTerrainLight(DirLight light, vec3 normal, vec3 viewDir, vec4 FragPosLig
     7 - snow
 */
 
-vec4 createTerrainTextHeight(Biome biome, vec4 loadedTextures[maxText], float height)
+vec4 createTerrainTextHeight(vec4 loadedTextures[maxText],vec4 loadedNormals[maxText],Biome biome, float height, vec3 norm)
 {
     vec4 terrainColor = vec4(0.0, 0.0, 0.0, 1.0);
     int nText = biome.nTextBiome;
-
-    for (int i = 0; i < nText; i++)
+    float a = smoothstep(biome.textIndex[0].hStart,biome.textIndex[0].hEnd,height);
+    if (height >= biome.textIndex[0].hStart && height <  biome.textIndex[0].hEnd) {
+        terrainColor += vec4(blend(loadedTextures[biome.textIndex[0].index],1-a,loadedTextures[biome.textIndex[0].index],a),0.0);
+        //norm += blend(loadedNormals[biome.textIndex[0].index],1-a,loadedNormals[biome.textIndex[0].index],a);
+    }
+    for (int i = 1; i < nText; i++)
     {
         float a = smoothstep(biome.textIndex[i].hStart,biome.textIndex[i].hEnd,height);
         if (height >= biome.textIndex[i].hStart && height <  biome.textIndex[i].hEnd)
-            terrainColor += vec4(blend(loadedTextures[biome.textIndex[i].index],1-a,loadedTextures[biome.textIndex[i + 1].index],a),0.0);
+        {
+            terrainColor += vec4(blend(loadedTextures[biome.textIndex[i - 1].index],1-a,loadedTextures[biome.textIndex[i].index],a),0.0);
+            //rnorm += blend(loadedNormals[biome.textIndex[i].index],1-a,loadedNormals[biome.textIndex[i].index],a);
+        }
+
     }
     return terrainColor;
+}
+
+vec4 biomeInterpolation(vec4 loadedTextures[maxText],vec4 loadedNormals[maxText], int index, float lat, float height, vec3 norm)
+{
+    vec4 result = vec4(0.0);
+    float a = smoothstep(biomes[index].latStart, biomes[index].latEnd,lat);
+    if (lat <= biomes[index].latStart && lat > biomes[index].latEnd)
+    {
+        result += vec4(blend(createTerrainTextHeight(loadedTextures,loadedNormals,biomes[index - 1], height,norm), 1-a, createTerrainTextHeight(loadedTextures,loadedNormals,biomes[index], height,norm), a), 0.0);
+    }
+    return result;
 }
 
 void main()
@@ -337,10 +359,10 @@ void main()
         {
             loadedTextures[i] = textureNoTile(texture_diffuse[i],TexCoords);
         }
-        vec4 loadedNormal[maxText];
+        vec4 loadedNormals[maxText];
         for (int i = 0; i < nTextures; i++)
         {
-            loadedNormal[i] = textureNoTile(texture_normal[i],TexCoords);
+            loadedNormals[i] = textureNoTile(texture_normal[i],TexCoords);
         }
 
         vec3 dir = upVector-FragPos;
@@ -348,23 +370,20 @@ void main()
         float height = abs((length(dir) - pRadius) - lPoint) / absHeigth;
 
         vec3 pos = normalize(FragPos - pPosition);
-        float lat = asin(pos.y) + 1.58f;//convert to positive 0..3.14
-        lat = lat / 3.15;
+        float lat = atan(pos.y,sqrt(pos.x*pos.x+pos.z*pos.z)) + PI/2.0;//convert to positive 0..3.14
+        lat = lat / PI;
 
-        for (int i = 0 ; i < nBiomes; i++)
+        if (lat <= biomes[0].latStart && lat > biomes[0].latEnd )
         {
-            float a = smoothstep(biomes[i].latStart, biomes[i].latEnd,lat);
-            if (lat <= biomes[i].latStart && lat >  biomes[i].latEnd ) {
-                text += vec4(blend(createTerrainTextHeight(biomes[i], loadedTextures, height), 1-a, createTerrainTextHeight(biomes[i + 1], loadedTextures, height), a), 0.0);
-                if (dist < 2000)//Dont calculate normalmap when you cant appreciate it
-                {
-                    //TODO:Improve blending efect
-                    norm = createTerrainTextHeight(biomes[i], loadedNormal, height).xyz;
-                    norm = norm * 2.0 - 1.0;
-                    norm = normalize(tbn * norm);
-                }
-            }
+            text += createTerrainTextHeight(loadedTextures,loadedNormals,biomes[0], height, norm);
         }
+        for (int i = 1; i < nBiomes; i++)
+        {
+            text += biomeInterpolation(loadedTextures,loadedNormals,i,lat,height,norm);
+        }
+
+
+
     }
     vec3 result;
     //for(int i = 0; i < nPointLights; i++)

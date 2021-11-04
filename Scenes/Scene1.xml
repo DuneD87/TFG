@@ -1,7 +1,7 @@
 <Scene>
 	<Camera type="cam">
-		<Orientation pitch="-3.185484" yaw="88.962959" roll="118.608437"/>
-		<Position x="-27386.824219" y="25225.953125" z="40988.941406"/>
+		<Orientation pitch="-3.367669" yaw="27.426830" roll="-6.981916"/>
+		<Position x="45767.203125" y="23473.304688" z="23991.484375"/>
 	</Camera>
 	<Entities>
 		<Entity type="Light">
@@ -14,8 +14,8 @@
 		</Entity>
 		<Entity type="Light">
 			<Light type="dirLight">
-				<Orientation pitch="0.155124" yaw="42.323002"/>
-				<Ambient x="0.05" y="0.05f" z="0.05f"/>
+				<Orientation pitch="-90.000000" yaw="180.000000"/>
+				<Ambient x="0.005" y="0.005f" z="0.005f"/>
 				<Diffuse x="0.9" y="0.9f" z="0.9"/>
 				<Specular x="1.0" y="1.0" z="1.0"/>
 			</Light>
@@ -73,9 +73,9 @@
 		</Entity>
 		<Entity type="Planet">
 			<Planet id="1" type="planet" hasAtmos="1" radius="20000" nSeg="8">
-				<Position x="0" y="0" z="0"/>
+				<Position x="50000" y="0" z="0"/>
 				<NoiseSettings maxHeight="-1200" noiseFreq="0.0001" octaves="8" lacunarity="2.3" fGain="0.5" fWeStr="0.6" fPinPonStr="3" cellJitter="1" domWarpAmp="50" minValue="0" noiseTypeSel="4" fractalTypeSel="4" cellDistTypeSel="3" cellReturnTypeSel="2" domWarpTypeSel="2"/>
-				<AtmosSettings radius="40000" k_r="0.166" k_m="0.0025" e="14.3" H="4.0" L="1.0" g_m="-0.85" numOutScatter="10.0" numInScatter="10.0" scale="1.0">
+				<AtmosSettings radius="40000" k_r="0.166" k_m="0.0025" e="14.3" H="4" L="1" g_m="-0.85" numOutScatter="10" numInScatter="10" scale="1">
 					<Color x="0.1" y="0.2" z="0.8"/>
 				</AtmosSettings>
 				<Textures>

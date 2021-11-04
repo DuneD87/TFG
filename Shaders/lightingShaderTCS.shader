@@ -3,20 +3,24 @@
 // define the number of CPs in the output patch
 layout (vertices = 3) out;
 
-in vec3 _viewPos[];
-
 // attributes of the input CPs
-in vec3 FragPos[];
 in vec2 TexCoords[];
+in vec3 _viewPos[];
+in vec3 FragPos[];
+in vec3 LocalPos[];
 in vec3 Normal[];
 in mat3 tbn[];
 
+
+
 // attributes of the output CPs
-out vec3 WorldPos_ES_in[];
 out vec2 TexCoord_ES_in[];
+out vec3 WorldPos_ES_in[];
+out vec3 LocalPos_ES_in[];
 out vec3 Normal_ES_in[];
 out vec3 viewPos_ES_in[];
 out mat3 tbn_ES_in[];
+
 
 struct OutputPatch
 {
@@ -41,11 +45,11 @@ float GetTessLevel(float Distance0, float Distance1)
 {
     float AvgDistance = (Distance0 + Distance1) / 2.0;
     if (AvgDistance <= 2000.0)
-        return 16.0;
+        return 5.0;
     if (AvgDistance <= 4000.0)
-        return 8.0;
-    else if (AvgDistance <= 8000.0)
         return 4.0;
+    else if (AvgDistance <= 8000.0)
+        return 3.0;
     else if (AvgDistance <= 16000.0)
         return 2.0;
     else
@@ -108,6 +112,7 @@ void main()
 
     tbn_ES_in[gl_InvocationID] = tbn[gl_InvocationID];
     viewPos_ES_in[gl_InvocationID] = _viewPos[gl_InvocationID];
+
     // Calculate the distance from the camera to the three control points
 
     CalcPositions();

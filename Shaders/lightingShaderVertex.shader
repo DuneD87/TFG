@@ -5,6 +5,7 @@ layout (location = 2) in vec2 aTexCoords;
 layout (location = 3) in vec3 aTangent;
 layout (location = 4) in vec3 aBitangent;
 
+
 out vec3 FragPos;
 out vec4 worldPos;
 out vec3 Normal;
@@ -19,7 +20,6 @@ uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 uniform mat4 lightSpaceMatrix;
-uniform vec3 lightPos;
 uniform float pRadius;
 
 void main()
@@ -27,7 +27,6 @@ void main()
     FragPos = vec3(model * vec4(aPos, 1.0));
     LocalPos = aPos;
     Normal = normalize(mat3(transpose(inverse(model))) * aNormal);
-    worldPos = projection * view * vec4(FragPos, 1.0);
 
     FragPosLightSpace = lightSpaceMatrix * vec4(FragPos, 1.0);
 
