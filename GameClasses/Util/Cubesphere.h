@@ -37,7 +37,6 @@ public:
     Cubesphere(float radius=1.0f, int subdivision=3, bool smooth=true,float minValue = 0);
     ~Cubesphere() {}
     std::vector<Vertex> vertexList;
-    
     // getters/setters
     float getRadius() const                 { return radius; }
     void setRadius(float radius);
