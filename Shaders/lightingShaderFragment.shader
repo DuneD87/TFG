@@ -313,7 +313,7 @@ vec3 CalcTerrainLight(DirLight light, vec3 normal, vec3 viewDir, vec4 FragPosLig
     7 - snow
 */
 
-vec4 createTerrainTextHeight(vec4 loadedTextures[maxText],vec4 loadedNormals[maxText],Biome biome, float height, vec3 norm)
+vec4 createTerrainTextHeight(vec4 loadedTextures[maxText],vec4 loadedNormals[maxText],Biome biome, float height, inout vec3 norm)
 {
     vec4 terrainColor = vec4(0.0, 0.0, 0.0, 1.0);
     int nText = biome.nTextBiome;
@@ -321,6 +321,8 @@ vec4 createTerrainTextHeight(vec4 loadedTextures[maxText],vec4 loadedNormals[max
     if (height >= biome.textIndex[0].hStart && height <  biome.textIndex[0].hEnd) {
         terrainColor += vec4(blend(loadedTextures[biome.textIndex[0].index],1-a,loadedTextures[biome.textIndex[0].index],a),0.0);
         //norm += blend(loadedNormals[biome.textIndex[0].index],1-a,loadedNormals[biome.textIndex[0].index],a);
+        //norm = norm * 2.0 - 1.0;
+        //norm = normalize(tbn * norm);
     }
     for (int i = 1; i < nText; i++)
     {
@@ -328,20 +330,25 @@ vec4 createTerrainTextHeight(vec4 loadedTextures[maxText],vec4 loadedNormals[max
         if (height >= biome.textIndex[i].hStart && height <  biome.textIndex[i].hEnd)
         {
             terrainColor += vec4(blend(loadedTextures[biome.textIndex[i - 1].index],1-a,loadedTextures[biome.textIndex[i].index],a),0.0);
-            //rnorm += blend(loadedNormals[biome.textIndex[i].index],1-a,loadedNormals[biome.textIndex[i].index],a);
+            //norm += blend(loadedNormals[biome.textIndex[i].index],1-a,loadedNormals[biome.textIndex[i].index],a);
+            //norm = norm * 2.0 - 1.0;
+            //norm = normalize(tbn * norm);
         }
 
     }
     return terrainColor;
 }
 
-vec4 biomeInterpolation(vec4 loadedTextures[maxText],vec4 loadedNormals[maxText], int index, float lat, float height, vec3 norm)
+vec4 biomeInterpolation(vec4 loadedTextures[maxText],vec4 loadedNormals[maxText], int index, float lat, float height, inout vec3 norm)
 {
     vec4 result = vec4(0.0);
     float a = smoothstep(biomes[index].latStart, biomes[index].latEnd,lat);
     if (lat <= biomes[index].latStart && lat > biomes[index].latEnd)
     {
-        result += vec4(blend(createTerrainTextHeight(loadedTextures,loadedNormals,biomes[index - 1], height,norm), 1-a, createTerrainTextHeight(loadedTextures,loadedNormals,biomes[index], height,norm), a), 0.0);
+        if (index == 0)
+            result += createTerrainTextHeight(loadedTextures,loadedNormals,biomes[0], height,norm);
+        else
+            result += vec4(blend(createTerrainTextHeight(loadedTextures,loadedNormals,biomes[index - 1], height,norm), 1-a, createTerrainTextHeight(loadedTextures,loadedNormals,biomes[index], height,norm), a), 0.0);
     }
     return result;
 }
@@ -360,32 +367,30 @@ void main()
             loadedTextures[i] = textureNoTile(texture_diffuse[i],TexCoords);
         }
         vec4 loadedNormals[maxText];
-        for (int i = 0; i < nTextures; i++)
+        /*for (int i = 0; i < nTextures; i++)
         {
             loadedNormals[i] = textureNoTile(texture_normal[i],TexCoords);
-        }
+        }*/
 
         vec3 dir = upVector-FragPos;
         float absHeigth = (abs(lPoint) + abs(hPoint));
         float height = abs((length(dir) - pRadius) - lPoint) / absHeigth;
 
-        vec3 pos = normalize(FragPos - pPosition);
+        vec3 pos = (FragPos - pPosition)/pRadius;
         float lat = atan(pos.y,sqrt(pos.x*pos.x+pos.z*pos.z)) + PI/2.0;//convert to positive 0..3.14
         lat = lat / PI;
 
-        if (lat <= biomes[0].latStart && lat > biomes[0].latEnd )
+        /*if (lat <= biomes[0].latStart && lat > biomes[0].latEnd )
         {
             text += createTerrainTextHeight(loadedTextures,loadedNormals,biomes[0], height, norm);
-        }
-        for (int i = 1; i < nBiomes; i++)
+        }*/
+        for (int i = 0; i < nBiomes; i++)
         {
             text += biomeInterpolation(loadedTextures,loadedNormals,i,lat,height,norm);
         }
 
-
-
     }
-    vec3 result;
+    vec3 result = vec3(0.0);
     //for(int i = 0; i < nPointLights; i++)
         //result += CalcPointLight(pointLights[i], norm, FragPos, viewDir);
     result += CalcDirLight(dirLight, norm, viewDir, FragPosLightSpace,TangentLightPos,text);

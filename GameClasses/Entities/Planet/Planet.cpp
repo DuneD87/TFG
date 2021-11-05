@@ -36,6 +36,7 @@ Planet::Planet(float radius, int nSeg, bool hasAtmos, float maxHeight, float noi
 {
     _position = position;
     this->type = 3;
+    bindPlanetTextures();
     setupMesh();
 }
 
@@ -54,21 +55,18 @@ void Planet::draw(Shader &shader, bool outlined, int depthMap) {
     shader.setVec3("pPosition",_position);
     shader.setInt("nBiomes",biomes.size());
     shader.setInt("nTextures",path.size());
-    if (!biomeSet)
+
+    for (int i = 0; i < biomes.size();i++)
     {
-        for (int i = 0; i < biomes.size();i++)
+        shader.setFloat("biomes["+std::to_string(i)+"].latStart",biomes[i].latStart);
+        shader.setFloat("biomes["+std::to_string(i)+"].latEnd",biomes[i].latEnd);
+        shader.setInt("biomes["+std::to_string(i)+"].nTextBiome",biomes[i].textHeight.size());
+        for (int j = 0; j < biomes[i].textHeight.size();j++)
         {
-            shader.setFloat("biomes["+std::to_string(i)+"].latStart",biomes[i].latStart);
-            shader.setFloat("biomes["+std::to_string(i)+"].latEnd",biomes[i].latEnd);
-            shader.setInt("biomes["+std::to_string(i)+"].nTextBiome",biomes[i].textHeight.size());
-            for (int j = 0; j < biomes[i].textHeight.size();j++)
-            {
-                shader.setInt("biomes["+std::to_string(i)+"].textIndex["+std::to_string(j)+"].index",biomes[i].textHeight[j].index);
-                shader.setFloat("biomes["+std::to_string(i)+"].textIndex["+std::to_string(j)+"].hStart",biomes[i].textHeight[j].hStart);
-                shader.setFloat("biomes["+std::to_string(i)+"].textIndex["+std::to_string(j)+"].hEnd",biomes[i].textHeight[j].hEnd);
-            }
+            shader.setInt("biomes["+std::to_string(i)+"].textIndex["+std::to_string(j)+"].index",biomes[i].textHeight[j].index);
+            shader.setFloat("biomes["+std::to_string(i)+"].textIndex["+std::to_string(j)+"].hStart",biomes[i].textHeight[j].hStart);
+            shader.setFloat("biomes["+std::to_string(i)+"].textIndex["+std::to_string(j)+"].hEnd",biomes[i].textHeight[j].hEnd);
         }
-        biomeSet = true;
     }
 
     /*if (!biomeSet)
@@ -107,7 +105,7 @@ void Planet::renderGui() {
     // 2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
     {
         ImGui::Begin("Planet Settings" + this->id,NULL,ImGuiWindowFlags_MenuBar);                          // Create a window called "Hello, world!" and append into it.
-        ImGui::SetWindowFontScale(2);
+        ImGui::SetWindowFontScale(1);
         ImGui::PushItemWidth(200);
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
         test = test + ImGui::SliderFloat("minValue", &minValue,-1.0f, 1.0f);
@@ -175,8 +173,6 @@ void Planet::setupMesh() {
     lowestPoint = cubeSphere->getLPoint();
     std::cout<<"hPoint: "<<highestPoint<<" lPoint: "<<lowestPoint<<std::endl;
 
-    textures.clear();
-    bindPlanetTextures();
     planet = new Mesh(cubeSphere->vertexList,indices,textures);
 
     planet->position = _position;

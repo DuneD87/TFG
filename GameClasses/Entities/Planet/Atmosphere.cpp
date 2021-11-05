@@ -31,7 +31,7 @@ void Atmosphere::draw(Shader &shader, bool outlined, int depthMap) {
 
     glm::mat4 view = this->cam->GetViewMatrix();
     glm::mat4 projection;
-    projection = glm::perspective(glm::radians(this->cam->Zoom), (float)3840/2160, 0.1f, 10000000.0f);
+    projection = glm::perspective(glm::radians(this->cam->Zoom), (float)1920/1080, 0.1f, 10000000.0f);
     glm::mat4 cameraModel(1.0f);
     //std::cout<<"xPos: "<<cam->Position.x<<" yPos: "<<cam->Position.y<<" zPos: "<<cam->Position.z<<std::endl;
     //std::cout<<"xDir: "<<cam->orientation.x<<" yDir: "<<cam->orientation.y<<" zDir: "<<cam->orientation.z<<std::endl;
