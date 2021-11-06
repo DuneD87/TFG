@@ -1,7 +1,7 @@
 #version 410 core
 out vec4 FragColor;
-#define maxText 16
-#define maxBiomes 8
+#define maxText 8
+#define maxBiomes 6
 struct Material {
     sampler2D diffuse;
     sampler2D specular;
@@ -81,7 +81,6 @@ uniform int isTerrain;
 uniform float hPoint;
 uniform float lPoint;
 uniform vec3 pPosition;
-uniform vec3 upVector;
 uniform float pRadius;
 uniform Material material;
 uniform sampler2D shadowMap;
@@ -124,7 +123,7 @@ float ShadowCalculation(vec4 fragPosLightSpace, vec3 lightDir)
 
     // keep the shadow at 0.0 when outside the far_plane region of the light's frustum.
     if(projCoords.z > 1.0)
-    shadow = 0.0;
+        shadow = 0.0;
 
     return shadow;
 }
@@ -313,42 +312,35 @@ vec3 CalcTerrainLight(DirLight light, vec3 normal, vec3 viewDir, vec4 FragPosLig
     7 - snow
 */
 
-vec4 createTerrainTextHeight(vec4 loadedTextures[maxText],vec4 loadedNormals[maxText],Biome biome, float height, inout vec3 norm)
+vec4 createTerrainTextHeight(vec4 loadedTextures[maxText],Biome biome, float height)
 {
     vec4 terrainColor = vec4(0.0, 0.0, 0.0, 1.0);
     int nText = biome.nTextBiome;
-    float a = smoothstep(biome.textIndex[0].hStart,biome.textIndex[0].hEnd,height);
-    if (height >= biome.textIndex[0].hStart && height <  biome.textIndex[0].hEnd) {
-        terrainColor += vec4(blend(loadedTextures[biome.textIndex[0].index],1-a,loadedTextures[biome.textIndex[0].index],a),0.0);
-        //norm += blend(loadedNormals[biome.textIndex[0].index],1-a,loadedNormals[biome.textIndex[0].index],a);
-        //norm = norm * 2.0 - 1.0;
-        //norm = normalize(tbn * norm);
-    }
-    for (int i = 1; i < nText; i++)
+    for (int i = 0; i < nText; i++)
     {
         float a = smoothstep(biome.textIndex[i].hStart,biome.textIndex[i].hEnd,height);
         if (height >= biome.textIndex[i].hStart && height <  biome.textIndex[i].hEnd)
         {
-            terrainColor += vec4(blend(loadedTextures[biome.textIndex[i - 1].index],1-a,loadedTextures[biome.textIndex[i].index],a),0.0);
-            //norm += blend(loadedNormals[biome.textIndex[i].index],1-a,loadedNormals[biome.textIndex[i].index],a);
-            //norm = norm * 2.0 - 1.0;
-            //norm = normalize(tbn * norm);
+            if (i == 0)
+                terrainColor += vec4(blend(loadedTextures[biome.textIndex[0].index],1-a,loadedTextures[biome.textIndex[0].index],a),0.0);
+            else
+                terrainColor += vec4(blend(loadedTextures[biome.textIndex[i - 1].index],1-a,loadedTextures[biome.textIndex[i].index],a),0.0);
         }
 
     }
     return terrainColor;
 }
 
-vec4 biomeInterpolation(vec4 loadedTextures[maxText],vec4 loadedNormals[maxText], int index, float lat, float height, inout vec3 norm)
+vec4 biomeInterpolation(vec4 loadedTextures[maxText], int index, float lat, float height)
 {
     vec4 result = vec4(0.0);
-    float a = smoothstep(biomes[index].latStart, biomes[index].latEnd,lat);
     if (lat <= biomes[index].latStart && lat > biomes[index].latEnd)
     {
+        float a = smoothstep(biomes[index].latStart, biomes[index].latEnd,lat);
         if (index == 0)
-            result += createTerrainTextHeight(loadedTextures,loadedNormals,biomes[0], height,norm);
+            result += createTerrainTextHeight(loadedTextures,biomes[0], height);
         else
-            result += vec4(blend(createTerrainTextHeight(loadedTextures,loadedNormals,biomes[index - 1], height,norm), 1-a, createTerrainTextHeight(loadedTextures,loadedNormals,biomes[index], height,norm), a), 0.0);
+            result += vec4(blend(createTerrainTextHeight(loadedTextures,biomes[index - 1], height), 1-a, createTerrainTextHeight(loadedTextures,biomes[index], height), a), 0.0);
     }
     return result;
 }
@@ -366,27 +358,18 @@ void main()
         {
             loadedTextures[i] = textureNoTile(texture_diffuse[i],TexCoords);
         }
-        vec4 loadedNormals[maxText];
-        /*for (int i = 0; i < nTextures; i++)
-        {
-            loadedNormals[i] = textureNoTile(texture_normal[i],TexCoords);
-        }*/
 
-        vec3 dir = upVector-FragPos;
+        vec3 dir = pPosition-FragPos;
         float absHeigth = (abs(lPoint) + abs(hPoint));
         float height = abs((length(dir) - pRadius) - lPoint) / absHeigth;
 
-        vec3 pos = (FragPos - pPosition)/pRadius;
+        vec3 pos = (dir)/pRadius;
         float lat = atan(pos.y,sqrt(pos.x*pos.x+pos.z*pos.z)) + PI/2.0;//convert to positive 0..3.14
         lat = lat / PI;
 
-        /*if (lat <= biomes[0].latStart && lat > biomes[0].latEnd )
-        {
-            text += createTerrainTextHeight(loadedTextures,loadedNormals,biomes[0], height, norm);
-        }*/
         for (int i = 0; i < nBiomes; i++)
         {
-            text += biomeInterpolation(loadedTextures,loadedNormals,i,lat,height,norm);
+            text += biomeInterpolation(loadedTextures,i,lat,height);
         }
 
     }

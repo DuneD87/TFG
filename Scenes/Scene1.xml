@@ -29,7 +29,7 @@
 			</Light>
 		</Entity>
 		<Entity type="Planet">
-			<Planet id="1" type="planet" hasAtmos="1" radius="20000" nSeg="9">
+			<Planet id="1" type="planet" hasAtmos="1" radius="20000" nSeg="8">
 				<Position x="50000" y="0" z="0"/>
 				<NoiseSettings maxHeight="-1200" noiseFreq="0.0001" octaves="8" lacunarity="2.3" fGain="0.5" fWeStr="0.6" fPinPonStr="3" cellJitter="1" domWarpAmp="50" minValue="0" noiseTypeSel="4" fractalTypeSel="4" cellDistTypeSel="3" cellReturnTypeSel="2" domWarpTypeSel="2"/>
 				<AtmosSettings radius="40000" k_r="0.166" k_m="0.0025" e="14.3" H="4" L="1" g_m="-0.85" numOutScatter="10" numInScatter="10" scale="1">

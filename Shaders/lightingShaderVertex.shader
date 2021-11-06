@@ -31,13 +31,13 @@ void main()
     FragPosLightSpace = lightSpaceMatrix * vec4(FragPos, 1.0);
 
     _viewPos = viewPos;
-    mat3 normalMatrix = transpose(inverse(mat3(model)));
+    /*mat3 normalMatrix = transpose(inverse(mat3(model)));
     vec3 T = normalize(normalMatrix * aTangent);
     vec3 N = normalize(normalMatrix * aNormal);
     T = normalize(T - dot(T, N) * N);
     vec3 B = cross(N, T);
     mat3 TBN = mat3(T, B, N);
-    tbn = TBN;
+    tbn = TBN;*/
     TexCoords = aTexCoords;
     gl_Position = worldPos;
 

@@ -80,7 +80,7 @@ void main()
                 oPatch.WorldPos_B111 * 6.0 * w * u * v;
 
     _viewPos = viewPos_ES_in[0];
-    tbn = interpolateMat3D(tbn_ES_in[0],tbn_ES_in[1],tbn_ES_in[2]);
+    //tbn = interpolateMat3D(tbn_ES_in[0],tbn_ES_in[1],tbn_ES_in[2]);
 
     // Displace the vertex along the normal
 

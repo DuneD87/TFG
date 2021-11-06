@@ -49,7 +49,6 @@ void Planet::draw(Shader &shader, bool outlined, int depthMap) {
     shader.setFloat("hPoint",highestPoint + hPointOffset);
     shader.setFloat("lPoint",lowestPoint - lPointOffset);
     shader.setFloat("pRadius",radius);
-    shader.setVec3("upVector",_position);
     shader.setFloat("blendFactor",blendFactor);
     shader.setFloat("depthBlend",depthBlend);
     shader.setVec3("pPosition",_position);
