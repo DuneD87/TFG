@@ -148,6 +148,9 @@ void main (void)
     e.y = min(e.y, f.x);
 
     vec3 I = inScatter(eye, dir, e, -l);
-
-    FragColor = vec4(I, 1.0);
+    const float C = 1.0;
+    const float far = 1000000000.0;
+    const float offset = 1.0;
+    gl_FragDepth = (log(C * worldPos.z + offset) / log(C * far + offset));
+    FragColor = vec4(I, 0.8);
 }

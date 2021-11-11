@@ -27,8 +27,8 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, cons
     this->angle = 0;
     Texture baseText;
     baseText.path = "../Textures/" + std::string(path);
-    baseText.type = "texture_specular";
-    baseText.id = TextureFromFile( path,"../Textures/",false);
+    baseText.type = "texture_diffuse";
+    baseText.id = TextureFromFile( path,"../Textures/",false,true);
     textures.push_back(baseText);
 
     // now that we have all the required data, set the vertex buffers and its attribute pointers.

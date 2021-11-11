@@ -60,6 +60,7 @@ void XmlParser::readData() {
 Planet *XmlParser::getPlanet(xml_node<> *planet) {
     int id = stoi(planet->first_attribute("id")->value());
     bool hasAtmos = stoi(planet->first_attribute("hasAtmos")->value());
+    bool hasWater = stoi(planet->first_attribute("hasWater")->value());
     float radius = stof(planet->first_attribute("radius")->value());
     int nSeg = stoi(planet->first_attribute("nSeg")->value());
     glm::vec3 position = getValues3(planet->first_node("Position"));
@@ -98,7 +99,7 @@ Planet *XmlParser::getPlanet(xml_node<> *planet) {
                                     lacunarity,fGain,fWeStr,fPinPonStr,cellJitter,
                                     domWarpAmp,minValue,noiseTypeSel,fractalTypeSel,
                                     cellDistTypeSel,cellReturnTypeSel,domWarpTypeSel,
-                                    pathDiffuse,pathNormal,position);
+                                    pathDiffuse,pathNormal,position,hasWater);
     newPlanet->id = id;
     //-------ATMOS SETTINGS-------
     xml_node<> * atmosSettings = planet->first_node("AtmosSettings");

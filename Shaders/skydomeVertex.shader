@@ -14,6 +14,8 @@ uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 uniform float pRadius;
+uniform float near;
+uniform float far;
 
 void main()
 {

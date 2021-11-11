@@ -8,6 +8,7 @@
 #include "../Entity.h"
 #include "../../../OldStuff/BasicTerrain.h"
 #include "Atmosphere.h"
+#include "WaterSphere.h"
 
 class Planet : public Entity {
 public:
@@ -16,7 +17,7 @@ public:
     Planet(float radius, int nSeg, bool hasAtmos, float maxHeight, float noiseFreq, int octaves, float lacunarity,
            float fGain, float fWeStr, float fPinPonStr, float cellJitter, float domWarpAmp, float minValue,
            int noiseTypeSel, int fractalTypeSel, int cellDistTypeSel, int cellReturnTypeSel, int domWarpTypeSel,
-           const std::vector<std::string> &path, const std::vector<std::string> &pathNorm, glm::vec3 position);
+           const std::vector<std::string> &path, const std::vector<std::string> &pathNorm, glm::vec3 position,bool hasWater);
 
     ~Planet();
     void draw(Shader &shader, bool outlined = false, int depthMap = -1);
@@ -98,7 +99,7 @@ private:
 
     float radius;
     int nSeg;
-    bool hasAtmos;
+    bool hasAtmos, hasWater;
     float maxHeight;
     float noiseFreq;
 
@@ -122,7 +123,7 @@ private:
     Camera * cam;
     std::vector<Texture> textures;
     std::vector<Biome> biomes;
-
+    WaterSphere *water;
 };
 
 

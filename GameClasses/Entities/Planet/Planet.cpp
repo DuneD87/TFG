@@ -23,7 +23,7 @@ Planet::Planet(float radius, int nSeg, glm::vec3 position, Camera *cam, std::vec
 Planet::Planet(float radius, int nSeg, bool hasAtmos, float maxHeight, float noiseFreq, int octaves, float lacunarity,
                float fGain, float fWeStr, float fPinPonStr, float cellJitter, float domWarpAmp, float minValue,
                int noiseTypeSel, int fractalTypeSel, int cellDistTypeSel, int cellReturnTypeSel, int domWarpTypeSel,
-               const std::vector<std::string> &path, const std::vector<std::string> &pathNorm,glm::vec3 position):radius(radius), nSeg(nSeg), hasAtmos(hasAtmos),
+               const std::vector<std::string> &path, const std::vector<std::string> &pathNorm,glm::vec3 position, bool hasWater):radius(radius), nSeg(nSeg), hasAtmos(hasAtmos),
                                                        maxHeight(maxHeight), noiseFreq(noiseFreq), octaves(octaves),
                                                        lacunarity(lacunarity), fGain(fGain), fWeStr(fWeStr),
                                                        fPinPonStr(fPinPonStr), cellJitter(cellJitter),
@@ -32,10 +32,11 @@ Planet::Planet(float radius, int nSeg, bool hasAtmos, float maxHeight, float noi
                                                        cellDistTypeSel(cellDistTypeSel),
                                                        cellReturnTypeSel(cellReturnTypeSel),
                                                        domWarpTypeSel(domWarpTypeSel), path(path),
-                                                       pathNormal(pathNorm)
+                                                       pathNormal(pathNorm), hasWater(hasWater)
 {
     _position = position;
     this->type = 3;
+
     bindPlanetTextures();
     setupMesh();
 }
@@ -45,6 +46,9 @@ Planet::Planet(float radius, int nSeg, bool hasAtmos, float maxHeight, float noi
 
 void Planet::draw(Shader &shader, bool outlined, int depthMap) {
 
+    shader.use();
+    shader.setFloat("near",0.1f);
+    shader.setFloat("far",1000000.0f);
     shader.setInt("isTerrain",1);
     shader.setFloat("hPoint",highestPoint + hPointOffset);
     shader.setFloat("lPoint",lowestPoint - lPointOffset);
@@ -85,11 +89,15 @@ void Planet::draw(Shader &shader, bool outlined, int depthMap) {
         }
         biomeSet = true;
     }*/
+
     shader.setInt("nTextures",path.size());
     planet->Draw(shader,outlined,depthMap,true,true);
     shader.setInt("isTerrain",0);
+    if (hasWater)
+        water->draw(shader,outlined,depthMap);
     if (hasAtmos)
         skyDome->draw(shader,outlined,-1);
+
 }
 
 Planet::~Planet() {
@@ -163,6 +171,8 @@ void Planet::setupMesh() {
     noise.SetFractalGain(fGain);
     noise.SetFractalWeightedStrength(fWeStr);
     noise.SetFractalPingPongStrength(fPinPonStr);
+
+
 
     auto *cubeSphere = new Cubesphere(radius,nSeg,true,minValue);
     cubeSphere->setupNoise(maxHeight,noise,minValue);
@@ -247,9 +257,12 @@ void Planet::addCamera(Camera *cam) {
 void Planet::setupAtmosphere(float atmosRadius, float kr, float km, float e, float h, float l, float gm, float numOutScatter,
                         float numInScatter, float scale, glm::vec3 color) {
     float colorAux[3];
+    if (this->cam == NULL) std::cout<<"wtff \n";
     for (int i = 0; i < 3; i++)
         colorAux[i] = color[i];
-    skyDome = new Atmosphere(radius-lowestPoint,(radius*1.1)+highestPoint,cam,kr,km,e,h,l,colorAux,gm,numOutScatter,numInScatter,scale,_position);
+    skyDome = new Atmosphere(atmosRadius-lowestPoint,atmosRadius+highestPoint,cam,kr,km,e,h,l,colorAux,gm,numOutScatter,numInScatter,scale,_position);
+    if (hasWater)
+        water = new WaterSphere(radius,radius,cam,_position);
 }
 
 void Planet::addBiome(Biome bio) {
