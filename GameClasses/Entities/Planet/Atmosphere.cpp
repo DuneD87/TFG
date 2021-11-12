@@ -28,17 +28,13 @@ void Atmosphere::draw(Shader &shader, bool outlined, int depthMap) {
     glEnable(GL_BLEND);
     //glDisable(GL_CULL_FACE);
     glBlendFunc(GL_SRC_ALPHA,GL_SRC_ALPHA);
-    float near = 0.1f;
-    float far = 10000000.0f;
     glm::mat4 view = this->cam->GetViewMatrix();
     glm::mat4 projection;
-    projection = glm::perspective(glm::radians(this->cam->Zoom), (float)1920/1080, near, far);
+    projection = glm::perspective(glm::radians(this->cam->Zoom), (float)setting_scrWidth/setting_scrHeight, setting_near, setting_far);
     glm::mat4 cameraModel(1.0f);
     //std::cout<<"xPos: "<<cam->Position.x<<" yPos: "<<cam->Position.y<<" zPos: "<<cam->Position.z<<std::endl;
     //std::cout<<"xDir: "<<cam->orientation.x<<" yDir: "<<cam->orientation.y<<" zDir: "<<cam->orientation.z<<std::endl;
     atmosShader.use();
-    atmosShader.setFloat("near",near);
-    atmosShader.setFloat("far",far);
     atmosShader.setMat4("view",view);
     atmosShader.setMat4("projection",projection);
     atmosShader.setMat4("model", cameraModel);
@@ -72,7 +68,7 @@ void Atmosphere::renderGui() {
     // 2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
     {
         ImGui::Begin("Atmospheric Settings",NULL,ImGuiWindowFlags_MenuBar);                          // Create a window called "Hello, world!" and append into it.
-        ImGui::SetWindowFontScale(2);
+        ImGui::SetWindowFontScale(setting_fontSize);
         ImGui::PushItemWidth(200);
 
         ImGui::SliderFloat("outterRadius", &atmosRadius, 0.0f, 100000.0f);

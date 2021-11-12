@@ -12,8 +12,7 @@ Renderer::Renderer() {
 }
 
 Renderer::Renderer(unsigned int scrWidth, unsigned int scrHeight, Camera *camera, const char* skyboxPath) {
-    this->scrWidth = scrWidth;
-    this->scrHeight = scrHeight;
+    std::cout<<"Resolution: "<<scrWidth<<"x"<<scrHeight<<std::endl;
     this->camera = camera;
     sunDir = glm::vec3(-1);
     spotLight =  Light("spotLight",glm::vec3(0.0f, 0.0f, 0.0f),glm::vec3(1.0f, 1.0f, 1.0f),
@@ -54,7 +53,7 @@ void Renderer::renderScene(vector<Entity*> worldEnts,std::vector<std::pair<std::
     view = this->camera->GetViewMatrix();
     //projection
     glm::mat4 projection;
-    projection = glm::perspective(glm::radians(this->camera->Zoom), (float)scrWidth/scrHeight, 0.1f, 10000000.0f);
+    projection = glm::perspective(glm::radians(this->camera->Zoom), (float)setting_scrWidth/setting_scrHeight, setting_near, setting_far);
 
     glEnable(GL_DEPTH_TEST); // enable depth testing (is disabled for rendering screen-space quad)
     renderShadowMap(worldEnts,ents);
@@ -62,7 +61,7 @@ void Renderer::renderScene(vector<Entity*> worldEnts,std::vector<std::pair<std::
     //glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
 
 
-    glViewport(0, 0, scrWidth, scrHeight);
+    glViewport(0, 0, setting_scrWidth, setting_scrHeight);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
@@ -173,7 +172,7 @@ void Renderer::setupFrameBuffer() {
     // create a color attachment texture
     glGenTextures(1, &textColorBuffer);
     glBindTexture(GL_TEXTURE_2D, textColorBuffer);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, scrWidth, scrHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, setting_scrWidth, setting_scrHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textColorBuffer, 0);
@@ -181,7 +180,7 @@ void Renderer::setupFrameBuffer() {
     // create a renderbuffer object for depth and stencil attachment (we won't be sampling these)
     glGenRenderbuffers(1, &rbo);
     glBindRenderbuffer(GL_RENDERBUFFER, rbo);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, scrWidth, scrHeight); // use a single renderbuffer object for both a depth AND stencil buffer.
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, setting_scrWidth, setting_scrHeight); // use a single renderbuffer object for both a depth AND stencil buffer.
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo); // now actually attach it
     // now that we actually created the frameBuffer and added all attachments we want to check if it is actually complete now
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
@@ -352,7 +351,7 @@ void Renderer::renderShadowMap(vector<Entity*> worldEnts,std::vector<std::pair<s
     for (int i = 0; i < ents.size();i++)
         renderInstanced(ents[i],shaders[7]);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glViewport(0, 0, scrWidth, scrHeight);
+    glViewport(0, 0, setting_scrWidth, setting_scrHeight);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     glEnable(GL_CULL_FACE);
 }
@@ -367,7 +366,7 @@ void Renderer::renderReflexionTexture(vector<Entity*> worldEnts,std::vector<std:
     shaders[0].use();
     shaders[0].setMat4("lightSpaceMatrix", lightSpaceMatrix);
 
-    glViewport(0, 0, scrWidth, scrHeight);
+    glViewport(0, 0, setting_scrWidth, setting_scrHeight);
     glBindFramebuffer(GL_FRAMEBUFFER, reflexionFBO);
     glClear(GL_DEPTH_BUFFER_BIT);
 
@@ -381,7 +380,7 @@ void Renderer::renderReflexionTexture(vector<Entity*> worldEnts,std::vector<std:
     for (int i = 0; i < ents.size();i++)
         renderInstanced(ents[i],shaders[7]);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glViewport(0, 0, scrWidth, scrHeight);
+    glViewport(0, 0, setting_scrWidth, setting_scrHeight);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 }

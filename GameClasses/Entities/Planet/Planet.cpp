@@ -47,8 +47,8 @@ Planet::Planet(float radius, int nSeg, bool hasAtmos, float maxHeight, float noi
 void Planet::draw(Shader &shader, bool outlined, int depthMap) {
 
     shader.use();
-    shader.setFloat("near",0.1f);
-    shader.setFloat("far",1000000.0f);
+    shader.setFloat("near",setting_near);
+    shader.setFloat("far",setting_far);
     shader.setInt("isTerrain",1);
     shader.setFloat("hPoint",highestPoint + hPointOffset);
     shader.setFloat("lPoint",lowestPoint - lPointOffset);
@@ -112,7 +112,7 @@ void Planet::renderGui() {
     // 2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
     {
         ImGui::Begin("Planet Settings" + this->id,NULL,ImGuiWindowFlags_MenuBar);                          // Create a window called "Hello, world!" and append into it.
-        ImGui::SetWindowFontScale(1);
+        ImGui::SetWindowFontScale(setting_fontSize);
         ImGui::PushItemWidth(200);
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
         test = test + ImGui::SliderFloat("minValue", &minValue,-1.0f, 1.0f);

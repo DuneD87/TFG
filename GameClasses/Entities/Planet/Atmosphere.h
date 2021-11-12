@@ -8,7 +8,7 @@
 #include "../Entity.h"
 #include "../../Basic/Camera.h"
 #include "../../Util/Cubesphere.h"
-
+#include "../../Base/EngineSettings.h"
 class Atmosphere : public Entity {
 public:
     Atmosphere(float planetRadius, float atmosRadius, Camera *cam,glm::vec3 position);

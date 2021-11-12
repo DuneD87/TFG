@@ -27,7 +27,7 @@ void World::renderWorld() {
 
     renderer->renderScene(worldEntities,worldDeco);
     ImGui::Begin("World Settings",NULL,ImGuiWindowFlags_MenuBar);
-    ImGui::SetWindowFontScale(1);
+    ImGui::SetWindowFontScale(setting_fontSize);
     float xzLen = cos(glm::radians(sunPitch));
     float x = xzLen * cos(glm::radians(sunYaw));
     float y = sin(glm::radians(sunPitch));

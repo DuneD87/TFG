@@ -15,6 +15,7 @@
 #include "../Basic/Shader.h"
 #include "../Util/XmlParser.h"
 #include "../Util/BasicShapeBuilder.h"
+#include "EngineSettings.h"
 
 class Renderer {
 public:
@@ -48,7 +49,7 @@ private:
     glm::mat4 lightSpaceMatrix;
     PhysicsObject *water;
     Light spotLight = Light("", glm::vec3(), glm::vec3(), glm::vec3(), 0, 0, 0,-1,-1);
-    unsigned int scrWidth,scrHeight,frameBuffer,textColorBuffer,rbo,quadVAO,quadVBO,skyboxVAO,skyboxVBO,cubemapTexture,
+    unsigned int frameBuffer,textColorBuffer,rbo,quadVAO,quadVBO,skyboxVAO,skyboxVBO,cubemapTexture,
             depthMapFBO,depthMap,reflexionFBO,reflexion,refractionFBO,refraction;
     std::string postProcessPath[6] = {
             "../Shaders/PostProcess/blurShader.fs",

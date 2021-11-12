@@ -8,7 +8,7 @@
 #include "Renderer.h"
 #include "../Util/Math.h"
 #include "../../OldStuff/BasicTerrain.h"
-
+#include "../Base/EngineSettings.h"
 class World {
 public:
     Camera camera;

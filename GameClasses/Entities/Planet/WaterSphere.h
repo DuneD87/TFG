@@ -8,6 +8,7 @@
 #include "../../Util/Cubesphere.h"
 #include "../Entity.h"
 #include "../../Basic/Camera.h"
+#include "../../Base/EngineSettings.h"
 
 class WaterSphere : public Entity {
 public:

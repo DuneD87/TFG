@@ -9,7 +9,7 @@
 #include "../../../OldStuff/BasicTerrain.h"
 #include "Atmosphere.h"
 #include "WaterSphere.h"
-
+#include "../../Base/EngineSettings.h"
 class Planet : public Entity {
 public:
 
