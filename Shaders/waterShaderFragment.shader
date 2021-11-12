@@ -2,9 +2,29 @@
 out vec4 FragColor;
 in vec2 TexCoord;
 in vec4 worldPos;
+in vec3 Normal;
+in vec3 FragPos;
 // texture samplers
 uniform sampler2D texture_diffuse[1];
+struct Material {
+    sampler2D diffuse;
+    sampler2D specular;
+    float shininess;
+    int hasTexture;
+    vec3 mAmbient;
+    vec3 mDiffuse;
+    vec3 mSpecular;
+};
+struct DirLight {
+    vec3 direction;
 
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
+};
+uniform Material material;
+uniform DirLight dirLight;
+uniform vec3 viewPos;
 vec4 hash4( vec2 p )
 {
     return fract(sin(vec4( 1.0+dot(p,vec2(37.0,17.0)),
@@ -48,11 +68,32 @@ vec4 textureNoTile( sampler2D samp, in vec2 uv )
     textureGrad( samp, uvd, ddxd, ddyd ), b.x), b.y );
 }
 
+vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir, vec4 text)
+{
+    vec3 lightDir = normalize(-light.direction);
+    // diffuse shading
+    float diff = max(dot(normal, lightDir), 0.0);
+    // specular shading
+    vec3 reflectDir = reflect(-lightDir, normal);
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
+    // combine results
+    vec3 mDiffuse;
+    vec3 mSpecular;
+    mDiffuse = vec3(text);
+    mSpecular = vec3(text);
+    vec3 ambient  = light.ambient  * mDiffuse;
+    vec3 diffuse  = light.diffuse  * diff * mDiffuse;
+    vec3 specular = light.specular * spec * mSpecular;
+
+    float shadow = 0;
+    return (ambient + (1-shadow)*(diffuse + specular));
+}
+
 void main()
 {
-    const float C = 1.0;
-    const float far = 1000000.0;
-    const float offset = 1.0;
-    //gl_FragDepth = (log(C * worldPos.z + offset) / log(C * far + offset));
-    FragColor = textureNoTile(texture_diffuse[0],TexCoord);
+    vec3 viewDir = normalize(viewPos - FragPos);
+    vec4 waterText = textureNoTile(texture_diffuse[0],TexCoord);
+    vec3 result = vec3(0);
+    result += CalcDirLight(dirLight, Normal, viewDir,waterText);
+    FragColor = vec4(result,1.0);
 }

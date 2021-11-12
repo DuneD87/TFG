@@ -22,6 +22,7 @@ public:
     glm::vec3 getAmbient();
     glm::vec3 getDiffuse();
     glm::vec3 getSpecular();
+    glm::vec3 getDirVector();
     float getConstant();
     float getLinear();
     float getQuadratic();

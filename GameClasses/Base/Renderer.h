@@ -26,6 +26,8 @@ public:
     Renderer();
     ~Renderer();
     Renderer(unsigned int scrWidth, unsigned int scrHeight, Camera *camera, const char* skyboxPath);
+    void addSun(Light* sunLight);
+    void preRender(vector<Entity*> worldEnts);
     void renderScene(vector<Entity*> worldEnts,std::vector<std::pair<std::vector<glm::mat4>,PhysicsObject*>>ents);
     void setSunDir(glm::vec3 sunDirection);
     void setPostProcess(unsigned int index);
@@ -49,6 +51,7 @@ private:
     glm::mat4 lightSpaceMatrix;
     PhysicsObject *water;
     Light spotLight = Light("", glm::vec3(), glm::vec3(), glm::vec3(), 0, 0, 0,-1,-1);
+    Light* sun;
     unsigned int frameBuffer,textColorBuffer,rbo,quadVAO,quadVBO,skyboxVAO,skyboxVBO,cubemapTexture,
             depthMapFBO,depthMap,reflexionFBO,reflexion,refractionFBO,refraction;
     std::string postProcessPath[6] = {

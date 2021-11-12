@@ -257,10 +257,10 @@ void Planet::addCamera(Camera *cam) {
 void Planet::setupAtmosphere(float atmosRadius, float kr, float km, float e, float h, float l, float gm, float numOutScatter,
                         float numInScatter, float scale, glm::vec3 color) {
     float colorAux[3];
-    if (this->cam == NULL) std::cout<<"wtff \n";
     for (int i = 0; i < 3; i++)
         colorAux[i] = color[i];
     skyDome = new Atmosphere(atmosRadius-lowestPoint,atmosRadius+highestPoint,cam,kr,km,e,h,l,colorAux,gm,numOutScatter,numInScatter,scale,_position);
+
     if (hasWater)
         water = new WaterSphere(radius,radius,cam,_position);
 }
@@ -269,9 +269,14 @@ void Planet::addBiome(Biome bio) {
     biomes.push_back(bio);
 }
 
-void Planet::setSunDir(glm::vec3 sunDir) {
+void Planet::setSun(Light* sun) {
     if (this->hasAtmos)
-        skyDome->setSunDir(sunDir);
+    {
+        skyDome->setSun(sun);
+        if (this->hasWater)
+            water->setSun(sun);
+    }
+
 }
 
 std::string Planet::toString() {
@@ -299,9 +304,4 @@ bool Planet::hasAtmosphere() const {
 
 std::string Planet::getAtmosSettings() const {
     return skyDome->toString();
-}
-
-void Planet::setupUniformBuffers()
-{
-
 }

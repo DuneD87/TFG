@@ -117,5 +117,14 @@ std::string Light::toString() {
                                 + std::to_string(orientation[1]));
 }
 
+glm::vec3 Light::getDirVector() {
+    float xzLen = cos(glm::radians(orientation[0]));
+    float x = xzLen * cos(glm::radians(orientation[1]));
+    float y = sin(glm::radians(orientation[0]));
+    float z = xzLen * sin(glm::radians(-orientation[1]));
+    glm::vec3 direction(x,y,z);
+    return direction;
+}
+
 
 

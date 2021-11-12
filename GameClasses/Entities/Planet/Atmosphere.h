@@ -9,6 +9,8 @@
 #include "../../Basic/Camera.h"
 #include "../../Util/Cubesphere.h"
 #include "../../Base/EngineSettings.h"
+#include "../Light.h"
+
 class Atmosphere : public Entity {
 public:
     Atmosphere(float planetRadius, float atmosRadius, Camera *cam,glm::vec3 position);
@@ -16,7 +18,7 @@ public:
                float atmosColor[3], float gM, float numOutScatter, float numInScatter, float scale,glm::vec3 position);
     ~Atmosphere();
     void draw(Shader &shader, bool outlined = false, int depthMap = -1);
-    void setSunDir(glm::vec3 sunDir);
+    void setSun(Light* sun);
     std::string toString();
 private:
     void renderGui();
@@ -38,6 +40,7 @@ private:
     float numOutScatter = 10.0f;
     float numInScatter = 10.0f;
     float scale = 1;
+    Light* sun;
 };
 
 

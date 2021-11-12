@@ -43,7 +43,7 @@ void Atmosphere::draw(Shader &shader, bool outlined, int depthMap) {
     atmosShader.setVec3("planetPosition",_position);
     atmosShader.setFloat("planetRadius",planetRadius);
     atmosShader.setFloat("atmosRadius",atmosRadius);
-    atmosShader.setVec3("sunDir",sunDir);
+    atmosShader.setVec3("sunDir",sun->getDirVector());
     atmosShader.setFloat("H",H);
     atmosShader.setFloat("L",L);
     atmosShader.setFloat("K_R",k_r);
@@ -120,8 +120,8 @@ Atmosphere::Atmosphere(float planetRadius, float atmosRadius, Camera *cam, float
     atmosShader = Shader("../Shaders/skydomeVertex.shader", "../Shaders/skydomeFragment.shader");
 }
 
-void Atmosphere::setSunDir(glm::vec3 sunDir) {
-    this->sunDir = sunDir;
+void Atmosphere::setSun(Light* sun) {
+    this->sun = sun;
 }
 
 std::string Atmosphere::toString() {

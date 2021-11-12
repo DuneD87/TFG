@@ -10,6 +10,8 @@
 #include "Atmosphere.h"
 #include "WaterSphere.h"
 #include "../../Base/EngineSettings.h"
+#include "../Light.h"
+
 class Planet : public Entity {
 public:
 
@@ -24,11 +26,10 @@ public:
     void renderGui();
     void addCamera(Camera * cam);
     void addBiome(Biome bio);
-    void setupUniformBuffers();
     void setupAtmosphere(float atmosRadius, float kr, float km, float e, float h, float l,
                          float gm, float numOutScatter, float numInScatter, float scale,
                          glm::vec3 color);
-    void setSunDir(glm::vec3 sunDir);
+    void setSun(Light* sun);
     float getHighestPoint() const;
     float getLowestPoint() const;
     float getRadius() const;

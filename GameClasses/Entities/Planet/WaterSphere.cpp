@@ -27,12 +27,11 @@ void WaterSphere::draw(Shader &shader, bool outlined, int depthMap) {
     waterShader.setMat4("view",view);
     waterShader.setMat4("projection",projection);
     waterShader.setMat4("model", cameraModel);
+    waterShader.setVec3("viewPos",cam->Position);
+    waterShader.setFloat("material.shininess",12.80f);
     waterMesh->Draw(waterShader,outlined,depthMap,false,false);
+    sun->draw(waterShader,outlined,depthMap);
     //glEnable(GL_DEPTH_TEST);
-}
-
-void WaterSphere::setSunDir(glm::vec3 sunDir) {
-
 }
 
 WaterSphere::~WaterSphere() {
@@ -41,4 +40,8 @@ WaterSphere::~WaterSphere() {
 
 std::string WaterSphere::toString() {
     return std::string();
+}
+
+void WaterSphere::setSun(Light *sun) {
+    this->sun = sun;
 }
