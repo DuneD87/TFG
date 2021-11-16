@@ -17,8 +17,10 @@ public:
     ~WaterSphere();
     void draw(Shader &shader, bool outlined = false, int depthMap = -1);
     void setSun(Light * sun);
+    void setWaterTexture(unsigned int waterText);
     std::string toString();
 private:
+    bool isset = false;
     int oldClock;
     Shader waterShader;
     float planetRadius,waterRadius;

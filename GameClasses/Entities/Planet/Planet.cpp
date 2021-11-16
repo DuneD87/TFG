@@ -305,3 +305,8 @@ bool Planet::hasAtmosphere() const {
 std::string Planet::getAtmosSettings() const {
     return skyDome->toString();
 }
+
+void Planet::setWaterTexture(unsigned int waterid) {
+    if (water != NULL)
+        water->setWaterTexture(waterid);
+}

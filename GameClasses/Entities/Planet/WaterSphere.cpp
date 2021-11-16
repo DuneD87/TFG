@@ -18,7 +18,9 @@ WaterSphere::WaterSphere(float planetRadius, float waterRadius, Camera *cam, glm
 }
 
 void WaterSphere::draw(Shader &shader, bool outlined, int depthMap) {
-    //glDisable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    //glDisable(GL_CULL_FACE);
+    glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
     waterShader.use();
     glm::mat4 view = this->cam->GetViewMatrix();
     glm::mat4 projection;
@@ -35,7 +37,7 @@ void WaterSphere::draw(Shader &shader, bool outlined, int depthMap) {
     waterMesh->Draw(waterShader,outlined,depthMap,false,false);
     sun->draw(waterShader,outlined,depthMap);
     oldClock = clock();
-    //glEnable(GL_DEPTH_TEST);
+    glDisable(GL_BLEND);
 }
 
 WaterSphere::~WaterSphere() {
@@ -48,4 +50,17 @@ std::string WaterSphere::toString() {
 
 void WaterSphere::setSun(Light *sun) {
     this->sun = sun;
+}
+
+void WaterSphere::setWaterTexture(unsigned int waterText) {
+    if (!isset)
+    {
+        Texture text;
+        text.path ="";
+        text.type ="texture_diffuse";
+        text.id = waterText;
+        waterMesh->textures.push_back(text);
+        isset = true;
+    }
+
 }

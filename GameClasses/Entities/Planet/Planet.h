@@ -37,6 +37,7 @@ public:
     float getLPointOffset() const;
     float getMaxHeight() const;
     int getNSeg() const;
+    void setWaterTexture(unsigned int idText);
     bool hasAtmosphere() const;
     std::string getAtmosSettings() const;
     std::string toString();

@@ -28,7 +28,10 @@ public:
     Renderer(unsigned int scrWidth, unsigned int scrHeight, Camera *camera, const char* skyboxPath);
     void addSun(Light* sunLight);
     void preRender(vector<Entity*> worldEnts);
-    void renderScene(vector<Entity*> worldEnts,std::vector<std::pair<std::vector<glm::mat4>,PhysicsObject*>>ents,bool wireframe);
+    void render(vector<Entity*> worldEnts,std::vector<std::pair<std::vector<glm::mat4>,PhysicsObject*>>ents,bool wireframe);
+    void renderScene(vector<Entity*> worldEnts,std::vector<std::pair<std::vector<glm::mat4>,PhysicsObject*>>ents,bool wireframe,
+                     glm::mat4 &view, glm::mat4 &projection,float width, float height);
+    void renderSkybox(glm::mat4 view, glm::mat4 projection);
     void setSunDir(glm::vec3 sunDirection);
     void setPostProcess(unsigned int index);
     void addShader(Shader &shader);

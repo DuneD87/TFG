@@ -28,7 +28,7 @@ World::World(const char *scenePath, const char *skyBoxPath, unsigned int scrWidt
 
 void World::renderWorld(bool wireframe) {
 
-    renderer->renderScene(worldEntities,worldDeco,wireframe);
+    renderer->render(worldEntities,worldDeco,wireframe);
     ImGui::Begin("World Settings",NULL,ImGuiWindowFlags_MenuBar);
     ImGui::SetWindowFontScale(setting_fontSize);
 

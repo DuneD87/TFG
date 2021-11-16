@@ -5,7 +5,8 @@ in vec4 worldPos;
 in vec3 Normal;
 in vec3 FragPos;
 // texture samplers
-uniform sampler2D texture_diffuse[1];
+uniform sampler2D texture_diffuse[2];
+uniform sampler2D waterText;
 struct Material {
     sampler2D diffuse;
     sampler2D specular;
@@ -92,8 +93,8 @@ vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir, vec4 text)
 void main()
 {
     vec3 viewDir = normalize(viewPos - FragPos);
-    vec4 waterText = textureNoTile(texture_diffuse[0],TexCoord);
+    vec4 waterText = texture2D(texture_diffuse[1],TexCoord);
     vec3 result = vec3(0);
     result += CalcDirLight(dirLight, Normal, viewDir,waterText);
-    FragColor = vec4(result,1.0);
+    FragColor = vec4(result,0.7);
 }
