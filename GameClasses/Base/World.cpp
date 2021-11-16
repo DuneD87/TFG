@@ -26,9 +26,9 @@ World::World(const char *scenePath, const char *skyBoxPath, unsigned int scrWidt
     //camera->Position = glm::vec3(29562.6,-20292.2,58728);
 }
 
-void World::renderWorld() {
+void World::renderWorld(bool wireframe) {
 
-    renderer->renderScene(worldEntities,worldDeco);
+    renderer->renderScene(worldEntities,worldDeco,wireframe);
     ImGui::Begin("World Settings",NULL,ImGuiWindowFlags_MenuBar);
     ImGui::SetWindowFontScale(setting_fontSize);
 
