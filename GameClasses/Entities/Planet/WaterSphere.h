@@ -19,6 +19,7 @@ public:
     void setSun(Light * sun);
     std::string toString();
 private:
+    int oldClock;
     Shader waterShader;
     float planetRadius,waterRadius;
     Mesh* waterMesh;

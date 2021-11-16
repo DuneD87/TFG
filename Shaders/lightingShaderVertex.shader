@@ -42,6 +42,5 @@ void main()
     tbn = TBN;*/
     TexCoords = aTexCoords;
     gl_Position = worldPos;
-    gl_Position.z = 2.0f * log(gl_Position.w/near)/log(far/near) - 1;
-    gl_Position.z *= gl_Position.w;
+
 }

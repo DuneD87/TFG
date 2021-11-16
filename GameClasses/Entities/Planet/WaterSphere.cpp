@@ -29,8 +29,12 @@ void WaterSphere::draw(Shader &shader, bool outlined, int depthMap) {
     waterShader.setMat4("model", cameraModel);
     waterShader.setVec3("viewPos",cam->Position);
     waterShader.setFloat("material.shininess",12.80f);
+    waterShader.setVec3("planetOrigin",position);
+    float delta = clock() - oldClock;
+    waterShader.setFloat("a_time",delta);
     waterMesh->Draw(waterShader,outlined,depthMap,false,false);
     sun->draw(waterShader,outlined,depthMap);
+    oldClock = clock();
     //glEnable(GL_DEPTH_TEST);
 }
 
