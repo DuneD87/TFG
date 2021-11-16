@@ -28,7 +28,8 @@ void main()
     Normal = aNormal;
     FragPosLightSpace = lightSpaceMatrix * vec4(FragPos, 1.0);
     TexCoord = aTexCoords;
-    gl_Position = projection * view * vec4(FragPos, 1.0);
+    worldPos = projection * view * vec4(FragPos, 1.0);
+    gl_Position = worldPos;
     float near = 10.0;
     float far = 10000000.0;
     gl_Position.z = 2.0f * log(gl_Position.w/near)/log(far/near) - 1;

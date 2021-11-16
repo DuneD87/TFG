@@ -60,7 +60,7 @@ void Renderer::renderSkybox(glm::mat4 view, glm::mat4 projection) {
     glDepthFunc(GL_LESS); // set depth function back to default*/
 }
 
-void Renderer::drawEntities(std::vector<Entity*> worldEnts, glm::mat4 view, glm::mat4 projection,Shader &shader) {
+void Renderer::drawEntities(std::vector<Entity*> worldEnts, glm::mat4 view, glm::mat4 projection,Shader &shader, bool drawEffects) {
     shader.use();
     renderLoopCamera(shader,view,projection);
     shader.setFloat("material.shininess", 64.0f);
@@ -78,6 +78,7 @@ void Renderer::drawEntities(std::vector<Entity*> worldEnts, glm::mat4 view, glm:
                 Planet * planet = dynamic_cast<Planet *>(worldEnts[i]);
                 planet->renderGui();
                 planet->setWaterTexture(reflexion);
+                planet->setNoDrawEffects(drawEffects);
             }
         }
         else
@@ -103,16 +104,16 @@ void Renderer::render(vector<Entity *> worldEnts, std::vector<std::pair<std::vec
     view = this->camera->GetViewMatrix();
     //projection
     glm::mat4 projection;
-    projection = glm::perspective(glm::radians(this->camera->Zoom), (float)1024/720, setting_near, setting_far);
+    projection = glm::perspective(glm::radians(this->camera->Zoom), (float)1920/1080, setting_near, setting_far);
     glBindFramebuffer(GL_FRAMEBUFFER,reflexionFBO);
-    renderScene(worldEnts,ents,wireframe,view,projection,1024,720);
+    renderScene(worldEnts,ents,wireframe,view,projection,1920,1080,false);
     ImGui::Begin("Game Window");
     ImGui::SetWindowFontScale(setting_fontSize);
     ImVec2 pos = ImGui::GetCursorScreenPos();
     ImDrawList* drawList = ImGui::GetWindowDrawList();
     drawList->AddImage((void*)reflexion,
                        pos,
-                       ImVec2(pos.x + 1024, pos.y + 720),
+                       ImVec2(pos.x + 1920, pos.y + 1080),
                        ImVec2(0, 1),
                        ImVec2(1, 0));
     ImGui::End();
@@ -135,7 +136,7 @@ void Renderer::render(vector<Entity *> worldEnts, std::vector<std::pair<std::vec
     if (!wireframe)
         glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
     projection = glm::perspective(glm::radians(this->camera->Zoom), (float)setting_scrWidth/setting_scrHeight, setting_near, setting_far);
-    renderScene(worldEnts,ents,wireframe,view,projection,setting_scrWidth,setting_scrHeight);
+    renderScene(worldEnts,ents,wireframe,view,projection,setting_scrWidth,setting_scrHeight,true);
     if (!wireframe)
     {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -152,13 +153,13 @@ void Renderer::render(vector<Entity *> worldEnts, std::vector<std::pair<std::vec
 
 
 void Renderer::renderScene(vector<Entity*> worldEnts,std::vector<std::pair<std::vector<glm::mat4>,PhysicsObject*>> ents,
-                           bool wireframe,glm::mat4 &view, glm::mat4 &projection, float width, float height) {
+                           bool wireframe,glm::mat4 &view, glm::mat4 &projection, float width, float height, bool drawEffects) {
 
 
     glViewport(0, 0, width, height);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     renderSkybox(view,projection);
-    drawEntities(worldEnts,view,projection,shaders[0]);
+    drawEntities(worldEnts,view,projection,shaders[0],!drawEffects);
     // now bind back to default framebuffer and draw a quad plane with the attached framebuffer color texture
 
 }
@@ -255,7 +256,7 @@ void Renderer::setupFrameBuffer() {
 
     glGenTextures(1, &reflexion);
     glBindTexture(GL_TEXTURE_2D, reflexion);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1024, 720, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1920, 1080, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
     glGenerateMipmap(GL_TEXTURE_2D);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);

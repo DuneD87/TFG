@@ -37,6 +37,7 @@ public:
     float getLPointOffset() const;
     float getMaxHeight() const;
     int getNSeg() const;
+    void setNoDrawEffects(bool drawEffects);
     void setWaterTexture(unsigned int idText);
     bool hasAtmosphere() const;
     std::string getAtmosSettings() const;
@@ -94,32 +95,19 @@ private:
                                                            FastNoiseLite::DomainWarpType_OpenSimplex2,
                                                            FastNoiseLite::DomainWarpType_OpenSimplex2Reduced};
 
-    float highestPoint, lowestPoint;
     float hPointOffset = 0;
     float lPointOffset = 17.452;
     int seed = 1337;
-
-    float radius;
-    int nSeg;
-    bool hasAtmos, hasWater;
-    float maxHeight;
-    float noiseFreq;
-
-    int octaves;
-    float lacunarity;
-    float fGain;
-    float fWeStr;
-    float fPinPonStr;
-    float cellJitter;
-    float domWarpAmp;
-    float minValue;
-    int noiseTypeSel,fractalTypeSel,cellDistTypeSel, cellReturnTypeSel, domWarpTypeSel;
     bool biomeSet = false;
+    float radius;
+    int noiseTypeSel,fractalTypeSel,cellDistTypeSel, cellReturnTypeSel, domWarpTypeSel,nSeg, octaves;
+    bool hasAtmos, hasWater, drawEffects;
+    float maxHeight, noiseFreq, lacunarity, fGain, fWeStr, fPinPonStr,
+     cellJitter, domWarpAmp, minValue,highestPoint, lowestPoint;
     float blendFactor = 0.5;
     float depthBlend = 0.5;
     unsigned int noiseMap;
-    std::vector<std::string> path;
-    std::vector<std::string> pathNormal;
+    std::vector<std::string> path, pathNormal;
     Mesh* planet = NULL;
     Atmosphere * skyDome;
     Camera * cam;

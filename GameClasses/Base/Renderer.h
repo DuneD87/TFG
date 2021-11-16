@@ -30,7 +30,7 @@ public:
     void preRender(vector<Entity*> worldEnts);
     void render(vector<Entity*> worldEnts,std::vector<std::pair<std::vector<glm::mat4>,PhysicsObject*>>ents,bool wireframe);
     void renderScene(vector<Entity*> worldEnts,std::vector<std::pair<std::vector<glm::mat4>,PhysicsObject*>>ents,bool wireframe,
-                     glm::mat4 &view, glm::mat4 &projection,float width, float height);
+                     glm::mat4 &view, glm::mat4 &projection,float width, float height, bool drawEffects);
     void renderSkybox(glm::mat4 view, glm::mat4 projection);
     void setSunDir(glm::vec3 sunDirection);
     void setPostProcess(unsigned int index);
@@ -38,7 +38,7 @@ public:
     void removeShader(int shaderId);
 
 private:
-    void drawEntities(std::vector<Entity*> worldEnts, glm::mat4 view, glm::mat4 projection, Shader &shader);
+    void drawEntities(std::vector<Entity*> worldEnts, glm::mat4 view, glm::mat4 projection, Shader &shader, bool drawEffects);
     void renderInstanced(std::pair<std::vector<glm::mat4>,PhysicsObject*>ent, Shader &shader);
     void renderShadowMap(vector<Entity*> worldEnts,std::vector<std::pair<std::vector<glm::mat4>,PhysicsObject*>>ents);
     void renderLoopCamera(Shader shader,glm::mat4 view, glm::mat4 projection,bool skybox = false);

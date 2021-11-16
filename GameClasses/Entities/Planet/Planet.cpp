@@ -18,6 +18,7 @@ Planet::Planet(float radius, int nSeg, glm::vec3 position, Camera *cam, std::vec
     this->path = path;
     bindPlanetTextures();
     setupMesh();
+    drawEffects = true;
     //addVegetation();
 }
 Planet::Planet(float radius, int nSeg, bool hasAtmos, float maxHeight, float noiseFreq, int octaves, float lacunarity,
@@ -36,7 +37,7 @@ Planet::Planet(float radius, int nSeg, bool hasAtmos, float maxHeight, float noi
 {
     _position = position;
     this->type = 3;
-
+    drawEffects = true;
     bindPlanetTextures();
     setupMesh();
 }
@@ -93,11 +94,13 @@ void Planet::draw(Shader &shader, bool outlined, int depthMap) {
     shader.setInt("nTextures",path.size());
     planet->Draw(shader,outlined,depthMap,true,true);
     shader.setInt("isTerrain",0);
-    if (hasWater)
-        water->draw(shader,outlined,depthMap);
-    if (hasAtmos)
-        skyDome->draw(shader,outlined,-1);
-
+    if (drawEffects)
+    {
+        if (hasWater)
+            water->draw(shader,outlined,depthMap);
+        if (hasAtmos)
+            skyDome->draw(shader,outlined,-1);
+    }
 }
 
 Planet::~Planet() {
@@ -309,4 +312,8 @@ std::string Planet::getAtmosSettings() const {
 void Planet::setWaterTexture(unsigned int waterid) {
     if (water != NULL)
         water->setWaterTexture(waterid);
+}
+
+void Planet::setNoDrawEffects(bool drawEffects) {
+    this->drawEffects = drawEffects;
 }

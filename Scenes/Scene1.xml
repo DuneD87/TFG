@@ -1,7 +1,7 @@
 <Scene>
 	<Camera type="cam">
-		<Orientation pitch="-14.658025" yaw="56.322689" roll="-76.317711"/>
-		<Position x="30105.533203" y="56436.656250" z="41682.054688"/>
+		<Orientation pitch="62.868496" yaw="137.798874" roll="-157.138763"/>
+		<Position x="9559.958008" y="11280.728516" z="15557.730469"/>
 	</Camera>
 	<Entities>
 		<Entity type="Light">

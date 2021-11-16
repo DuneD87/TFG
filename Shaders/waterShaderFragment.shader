@@ -93,7 +93,14 @@ vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir, vec4 text)
 void main()
 {
     vec3 viewDir = normalize(viewPos - FragPos);
-    vec4 waterText = texture2D(texture_diffuse[1],TexCoord);
+    float dist = distance(FragPos,viewPos);
+    vec4 waterText = vec4(0,0.2,0.8,0.7);
+    if (dist < 5000)
+    {
+        vec2 ndc = (worldPos.xy/worldPos.w);
+        waterText = texture2D(texture_diffuse[1],vec2(ndc.x,-ndc.y));
+    }
+
     vec3 result = vec3(0);
     result += CalcDirLight(dirLight, Normal, viewDir,waterText);
     FragColor = vec4(result,0.7);
