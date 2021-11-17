@@ -21,6 +21,8 @@ public:
     std::string toString();
 private:
     bool isset = false;
+    float waveSpeed = 0.01;
+    float moveFactor = 0.0;
     int oldClock;
     Shader waterShader;
     float planetRadius,waterRadius;

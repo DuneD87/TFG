@@ -215,6 +215,7 @@ int main()
         // -------------------------------------------------------------------------------
         float currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
+        cam->deltaTime = deltaTime;
         lastFrame = currentFrame;
         glfwSwapBuffers(window);
         glfwPollEvents();

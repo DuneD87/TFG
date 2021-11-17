@@ -101,23 +101,29 @@ void Renderer::render(vector<Entity *> worldEnts, std::vector<std::pair<std::vec
     ImGui::NewFrame();
     //Reflexion framebuffer pass and render to window
     glm::mat4 view;
+    camera->invertCameraPitch();
+    glm::vec3 oldCamPos = this->camera->Position;
+    this->camera->Position = this->camera->Position + (this->camera->Up * -100.f);
     view = this->camera->GetViewMatrix();
     //projection
     glm::mat4 projection;
-    projection = glm::perspective(glm::radians(this->camera->Zoom), (float)1920/1080, setting_near, setting_far);
+    projection = glm::perspective(glm::radians(this->camera->Zoom), (float)800/600, setting_near, setting_far);
     glBindFramebuffer(GL_FRAMEBUFFER,reflexionFBO);
-    renderScene(worldEnts,ents,wireframe,view,projection,1920,1080,false);
+    renderScene(worldEnts,ents,wireframe,view,projection,800,600,false);
     ImGui::Begin("Game Window");
     ImGui::SetWindowFontScale(setting_fontSize);
     ImVec2 pos = ImGui::GetCursorScreenPos();
     ImDrawList* drawList = ImGui::GetWindowDrawList();
     drawList->AddImage((void*)reflexion,
                        pos,
-                       ImVec2(pos.x + 1920, pos.y + 1080),
+                       ImVec2(pos.x + 800, pos.y + 600),
                        ImVec2(0, 1),
                        ImVec2(1, 0));
     ImGui::End();
     glBindFramebuffer(GL_FRAMEBUFFER,0);
+    camera->invertCameraPitch();
+    this->camera->Position = oldCamPos;
+    view = this->camera->GetViewMatrix();
     //Shadowmap framebuffer pass and render to window
     glEnable(GL_DEPTH_TEST); // enable depth testing (is disabled for rendering screen-space quad)
     renderShadowMap(worldEnts,ents);
@@ -132,6 +138,7 @@ void Renderer::render(vector<Entity *> worldEnts, std::vector<std::pair<std::vec
                        ImVec2(1, 0));
     ImGui::End();
     glBindFramebuffer(GL_FRAMEBUFFER,0);
+
     //render to main screen
     if (!wireframe)
         glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
@@ -256,7 +263,7 @@ void Renderer::setupFrameBuffer() {
 
     glGenTextures(1, &reflexion);
     glBindTexture(GL_TEXTURE_2D, reflexion);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1920, 1080, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 800, 600, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
     glGenerateMipmap(GL_TEXTURE_2D);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);

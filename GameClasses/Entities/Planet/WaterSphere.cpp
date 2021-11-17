@@ -13,7 +13,7 @@ WaterSphere::WaterSphere(float planetRadius, float waterRadius, Camera *cam, glm
     this->position = position;
     Cubesphere cubesphere(waterRadius,6,true);
     cubesphere.setupNoise(0,NULL);
-    waterMesh = new Mesh(cubesphere.vertexList,cubesphere.getIndices(),"/Planet/reflection.jpg","");
+    waterMesh = new Mesh(cubesphere.vertexList,cubesphere.getIndices(),"/Planet/dudv.png","");
     waterMesh->position = position;
 }
 
@@ -32,8 +32,13 @@ void WaterSphere::draw(Shader &shader, bool outlined, int depthMap) {
     waterShader.setVec3("viewPos",cam->Position);
     waterShader.setFloat("material.shininess",12.80f);
     waterShader.setVec3("planetOrigin",position);
-    float delta = clock() - oldClock;
-    waterShader.setFloat("a_time",delta);
+
+    if (moveFactor < 1.0)
+        moveFactor += waveSpeed * cam->deltaTime;
+    else
+        moveFactor = 0.0;
+    std::cout<<moveFactor<<std::endl;
+    waterShader.setFloat("waveSpeed",moveFactor);
     waterMesh->Draw(waterShader,outlined,depthMap,false,false);
     sun->draw(waterShader,outlined,depthMap);
     oldClock = clock();

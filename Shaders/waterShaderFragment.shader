@@ -5,8 +5,7 @@ in vec4 worldPos;
 in vec3 Normal;
 in vec3 FragPos;
 // texture samplers
-uniform sampler2D texture_diffuse[2];
-uniform sampler2D waterText;
+uniform sampler2D texture_diffuse[3];
 struct Material {
     sampler2D diffuse;
     sampler2D specular;
@@ -26,6 +25,7 @@ struct DirLight {
 uniform Material material;
 uniform DirLight dirLight;
 uniform vec3 viewPos;
+uniform float waveSpeed;
 vec4 hash4( vec2 p )
 {
     return fract(sin(vec4( 1.0+dot(p,vec2(37.0,17.0)),
@@ -89,19 +89,20 @@ vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir, vec4 text)
     float shadow = 0;
     return (ambient + (1-shadow)*(diffuse + specular));
 }
-
+const float waveStrength = 0.2;
 void main()
 {
     vec3 viewDir = normalize(viewPos - FragPos);
     float dist = distance(FragPos,viewPos);
     vec4 waterText = vec4(0,0.2,0.8,0.7);
-    if (dist < 5000)
-    {
-        vec2 ndc = (worldPos.xy/worldPos.w);
-        waterText = texture2D(texture_diffuse[1],vec2(ndc.x,-ndc.y));
-    }
+    vec2 ndc = ((worldPos.xy/worldPos.w)/2.0)+0.5;
+    vec2 distorsion = (texture2D(texture_diffuse[0],vec2(TexCoord.x + waveSpeed,TexCoord.y)*5).rg * 2.0 - 1.0)*waveStrength;
 
+    vec2 reflectCoord = vec2(ndc.x, 1.0 - ndc.y);
+    reflectCoord += distorsion;
+    waterText = texture2D(texture_diffuse[1], reflectCoord);
     vec3 result = vec3(0);
     result += CalcDirLight(dirLight, Normal, viewDir,waterText);
-    FragColor = vec4(result,0.7);
+
+    FragColor = vec4(result,0.9);
 }
