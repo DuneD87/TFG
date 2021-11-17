@@ -94,15 +94,27 @@ void main()
 {
     vec3 viewDir = normalize(viewPos - FragPos);
     float dist = distance(FragPos,viewPos);
-    vec4 waterText = vec4(0,0.2,0.8,0.7);
+
     vec2 ndc = ((worldPos.xy/worldPos.w)/2.0)+0.5;
     vec2 distorsion = (texture2D(texture_diffuse[0],vec2(TexCoord.x + waveSpeed,TexCoord.y)*5).rg * 2.0 - 1.0)*waveStrength;
-
     vec2 reflectCoord = vec2(ndc.x, 1.0 - ndc.y);
+    vec2 diffCoord = TexCoord/2;
+
     reflectCoord += distorsion;
-    waterText = texture2D(texture_diffuse[1], reflectCoord);
+    diffCoord += distorsion;
+
+    vec4 waterTextDiff = textureNoTile(texture_diffuse[1], diffCoord);
+    vec4 waterTextRefl = texture2D(texture_diffuse[2], reflectCoord);
+    float mixAmount = dist/5000;
+    if (mixAmount > 1) mixAmount = 1;
+    vec4 waterText = mix(waterTextDiff,waterTextRefl,1-mixAmount);
+    //if (dist>6000) waterText = waterTextDiff;
     vec3 result = vec3(0);
     result += CalcDirLight(dirLight, Normal, viewDir,waterText);
-
-    FragColor = vec4(result,0.9);
+    float alphaAmount = dist/2000;
+    const float C = 10.0;
+    const float far = 10000000.0;
+    const float offset = 1.0;
+    gl_FragDepth = (log(C * worldPos.z + offset) / log(C * far + offset));
+    FragColor = vec4(result,clamp(1.0,0.8,alphaAmount));
 }

@@ -13,7 +13,18 @@ WaterSphere::WaterSphere(float planetRadius, float waterRadius, Camera *cam, glm
     this->position = position;
     Cubesphere cubesphere(waterRadius,6,true);
     cubesphere.setupNoise(0,NULL);
-    waterMesh = new Mesh(cubesphere.vertexList,cubesphere.getIndices(),"/Planet/dudv.png","");
+    std::vector<Texture> textv;
+    Texture text1;
+    text1.type = "texture_diffuse";
+    text1.id = TextureFromFile("/Planet/dudv.png","../Textures/",false,true);
+    text1.path = "/Planet/dudv.png";
+    Texture text2;
+    text2.type = "texture_diffuse";
+    text2.id = TextureFromFile("/Planet/waterTile2.jpg","../Textures/",false,true);
+    text2.path = "/planet/reflexion1.jpg";
+    textv.push_back(text1);
+    textv.push_back(text2);
+    waterMesh = new Mesh(cubesphere.vertexList,cubesphere.getIndices(),textv);
     waterMesh->position = position;
 }
 
@@ -37,7 +48,6 @@ void WaterSphere::draw(Shader &shader, bool outlined, int depthMap) {
         moveFactor += waveSpeed * cam->deltaTime;
     else
         moveFactor = 0.0;
-    std::cout<<moveFactor<<std::endl;
     waterShader.setFloat("waveSpeed",moveFactor);
     waterMesh->Draw(waterShader,outlined,depthMap,false,false);
     sun->draw(waterShader,outlined,depthMap);

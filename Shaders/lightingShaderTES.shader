@@ -84,9 +84,10 @@ void main()
     //tbn = interpolateMat3D(tbn_ES_in[0],tbn_ES_in[1],tbn_ES_in[2]);
 
     // Displace the vertex along the normal
-    float near = 10.0;
+    worldPos =  vec3((projection * view * vec4(FragPos, 1.0)).xyz);
+    gl_Position = projection * view * vec4(FragPos, 1.0);
+    /*float near = 10.0;
     float far = 10000000.0;
-    gl_Position =  projection * view * vec4(FragPos, 1.0);
     gl_Position.z = 2.0f * log(gl_Position.w/near)/log(far/near) - 1;
-    gl_Position.z *= gl_Position.w;
+    gl_Position.z *= gl_Position.w;*/
 }

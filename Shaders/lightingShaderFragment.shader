@@ -377,7 +377,10 @@ void main()
     vec3 result = vec3(0.0);
     //for(int i = 0; i < nPointLights; i++)
         //result += CalcPointLight(pointLights[i], norm, FragPos, viewDir);
-
+    const float C = 10.0;
+    const float far = 10000000.0;
+    const float offset = 1.0;
+    gl_FragDepth = (log(C * worldPos.z + offset) / log(C * far + offset));
     result += CalcDirLight(dirLight, norm, viewDir, FragPosLightSpace,TangentLightPos,text);
     result += CalcSpotLight(spotLight, norm, TangentFragPos, viewDir);
     FragColor = vec4(_ACESFilmicToneMapping(result), 1.0);
