@@ -107,6 +107,8 @@ Planet::~Planet() {
     delete planet;
     if (hasAtmos)
         delete skyDome;
+    if (hasWater)
+        delete water;
 }
 
 void Planet::renderGui() {
@@ -196,22 +198,6 @@ float Planet::getRadius() const {
     return radius;
 }
 
-float Planet::getHPointOffset() const {
-    return hPointOffset;
-}
-
-float Planet::getLPointOffset() const {
-    return lPointOffset;
-}
-
-float Planet::getMaxHeight() const {
-    return maxHeight;
-}
-
-int Planet::getNSeg() const {
-    return nSeg;
-}
-
 float Planet::getHighestPoint() const {
     return highestPoint;
 }
@@ -220,17 +206,6 @@ float Planet::getLowestPoint() const {
     return lowestPoint;
 }
 
-void Planet::addVegetation() {
-    srand(time(NULL));
-    for (int i = 0; i < planet->vertices.size();i++)
-    {
-        int r = rand()%14;
-        glm::vec3 position = planet->vertices[i].Position;
-        PhysicsObject *ent = new PhysicsObject(-1,0,decoPaths[r]);
-        ent->setPosition(position);
-        planetDeco.push_back(ent);
-    }
-}
 
 void Planet::bindPlanetTextures() {
     int nTextures = path.size();
@@ -310,7 +285,7 @@ std::string Planet::getAtmosSettings() const {
 }
 
 void Planet::setWaterTexture(unsigned int waterid) {
-    if (water != NULL)
+    if (water != NULL && hasWater)
         water->setWaterTexture(waterid);
 }
 

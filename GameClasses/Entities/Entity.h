@@ -32,6 +32,7 @@ protected:
     glm::vec4 _rotation;
     glm::vec3 _scale;
     Model *entityModel;
+    Shader entityShader;
     /*
    * Types:
     * 0-> LIGHT

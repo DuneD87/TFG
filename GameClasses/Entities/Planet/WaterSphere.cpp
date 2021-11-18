@@ -7,7 +7,6 @@
 
 WaterSphere::WaterSphere(float planetRadius, float waterRadius, Camera *cam, glm::vec3 position) {
     this->planetRadius = planetRadius;
-    this->waterRadius = waterRadius;
     this->cam = cam;
     waterShader = Shader("../Shaders/waterShaderVertex.shader","../Shaders/waterShaderFragment.shader");
     this->position = position;
@@ -51,7 +50,6 @@ void WaterSphere::draw(Shader &shader, bool outlined, int depthMap) {
     waterShader.setFloat("waveSpeed",moveFactor);
     waterMesh->Draw(waterShader,outlined,depthMap,false,false);
     sun->draw(waterShader,outlined,depthMap);
-    oldClock = clock();
     glDisable(GL_BLEND);
 }
 
