@@ -9,20 +9,27 @@
 #include "../Entity.h"
 #include "../../Basic/Camera.h"
 #include "../../Base/EngineSettings.h"
+#include "../Light.h"
 
 class WaterSphere : public Entity {
 public:
     WaterSphere(float planetRadius, float waterRadius, Camera *cam, glm::vec3 position);
     ~WaterSphere();
+    void draw();
     void draw(Shader &shader, bool outlined = false, int depthMap = -1);
-    void setSunDir(glm::vec3 sunDir);
+    void setSun(Light * sun);
+    void setWaterTexture(unsigned int waterText);
     std::string toString();
 private:
+    bool isset = false;
+    float waveSpeed = 0.01;
+    float moveFactor = 0.0;
     Shader waterShader;
-    float planetRadius,waterRadius;
+    float planetRadius;
     Mesh* waterMesh;
     Camera* cam;
     glm::vec3 position;
+    Light* sun;
 };
 
 

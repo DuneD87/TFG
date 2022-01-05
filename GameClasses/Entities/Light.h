@@ -22,6 +22,7 @@ public:
     glm::vec3 getAmbient();
     glm::vec3 getDiffuse();
     glm::vec3 getSpecular();
+    glm::vec3 getDirVector();
     float getConstant();
     float getLinear();
     float getQuadratic();
@@ -31,6 +32,7 @@ public:
     void setDirection(glm::vec2 orientation);
     void setCutOff(float cutOff);
     void setOuterCutOff(float outerCutOff);
+    void draw();
     void draw(Shader &shader,bool outlined, int depthMap);
     std::string toString();
 private:

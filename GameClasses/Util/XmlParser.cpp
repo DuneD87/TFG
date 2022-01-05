@@ -19,6 +19,30 @@ XmlParser::XmlParser(std::string path, Camera *cam) {
     entIndex = 0;
     nPointLights = 0;
     nPlanets = 0;
+    xml_node<> * shadersNode = _rootNode->first_node("Shaders");
+    for (xml_node<> * shaderNode = shadersNode->first_node("Shader"); shaderNode; shaderNode = shaderNode->next_sibling("Shader"))
+    {
+        xml_node<> * shaderPath = shaderNode->first_node("Path");
+        std::vector<std::string> paths;
+
+        for (xml_node<> * p = shaderPath->first_node("p"); p; p = p->next_sibling("p"))
+        {
+            paths.push_back(std::string(p->value()));
+        }
+        if (paths.size() == 2)
+        {
+            //2 shaders, vertex and fragment
+            Shader shader(paths[0].c_str(),paths[1].c_str());
+            shader.setParserId(std::stoi(shaderNode->first_attribute("id")->value()));
+            shaders.push_back(shader);
+        } else if (paths.size() == 4)
+        {
+            Shader shader(paths[0].c_str(),paths[1].c_str(),paths[2].c_str(),paths[3].c_str());
+            shader.setParserId(std::stoi(shaderNode->first_attribute("id")->value()));
+            shaders.push_back(shader);
+        }
+    }
+    std::cout<<"Shader count: "<<shaders.size()<<std::endl;
     xml_node<> * cameraNode = _rootNode->first_node("Camera");
     xml_node<> * camPosNode = cameraNode->first_node("Position");
     xml_node<> * camOrient = cameraNode->first_node("Orientation");
@@ -59,6 +83,7 @@ void XmlParser::readData() {
 
 Planet *XmlParser::getPlanet(xml_node<> *planet) {
     int id = stoi(planet->first_attribute("id")->value());
+    int shaderId = stoi(planet->first_attribute("shaderId")->value());
     bool hasAtmos = stoi(planet->first_attribute("hasAtmos")->value());
     bool hasWater = stoi(planet->first_attribute("hasWater")->value());
     float radius = stof(planet->first_attribute("radius")->value());
@@ -115,6 +140,7 @@ Planet *XmlParser::getPlanet(xml_node<> *planet) {
     float scale = stof(atmosSettings->first_attribute("scale")->value());
     glm::vec3 color = getValues3(atmosSettings->first_node("Color"));
     newPlanet->addCamera(cam);
+    newPlanet->entityShader = shaders[shaderId];
     if (hasAtmos)
         newPlanet->setupAtmosphere(atmosRadius,kr,km,e,h,l,gm,numOutScatter,numInScatter,
                                     scale,color);

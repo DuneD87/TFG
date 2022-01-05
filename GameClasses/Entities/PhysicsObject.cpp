@@ -36,3 +36,7 @@ PhysicsObject::~PhysicsObject() {
 std::string PhysicsObject::toString() {
     return std::string();
 }
+
+void PhysicsObject::draw() {
+    this->entityModel->Draw(entityShader);
+}

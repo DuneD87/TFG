@@ -35,3 +35,7 @@ std::string BasicWater::toString() {
     return std::string();
 }
 
+void BasicWater::draw() {
+    waterMesh->Draw(entityShader,false,-1,false,false);
+}
+

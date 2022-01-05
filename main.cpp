@@ -173,9 +173,9 @@ GLFWwindow * createWindow()
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);*/
 
-    glEnable(GL_CULL_FACE);
+    //glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
-    glFrontFace(GL_CW);
+    glFrontFace(GL_CCW);
 
     return window;
 }
@@ -209,12 +209,13 @@ int main()
             glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
         else
             glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-        world->renderWorld();
+        world->renderWorld(wireframe);
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
         float currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
+        cam->deltaTime = deltaTime;
         lastFrame = currentFrame;
         glfwSwapBuffers(window);
         glfwPollEvents();

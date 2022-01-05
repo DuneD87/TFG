@@ -9,14 +9,16 @@
 #include "../../Basic/Camera.h"
 #include "../../Util/Cubesphere.h"
 #include "../../Base/EngineSettings.h"
+#include "../Light.h"
+
 class Atmosphere : public Entity {
 public:
-    Atmosphere(float planetRadius, float atmosRadius, Camera *cam,glm::vec3 position);
     Atmosphere(float planetRadius, float atmosRadius, Camera *cam, float kR, float kM, float e, float h, float l,
                float atmosColor[3], float gM, float numOutScatter, float numInScatter, float scale,glm::vec3 position);
     ~Atmosphere();
+    void draw();
     void draw(Shader &shader, bool outlined = false, int depthMap = -1);
-    void setSunDir(glm::vec3 sunDir);
+    void setSun(Light* sun);
     std::string toString();
 private:
     void renderGui();
@@ -25,7 +27,6 @@ private:
     Camera *cam;
 private:
     Shader atmosShader;
-    Shader atmosShaderIN;
     float viewDistance = 1000000.0f;
     float k_r = 0.166;
     float k_m = 0.0025;
@@ -38,6 +39,7 @@ private:
     float numOutScatter = 10.0f;
     float numInScatter = 10.0f;
     float scale = 1;
+    Light* sun;
 };
 
 

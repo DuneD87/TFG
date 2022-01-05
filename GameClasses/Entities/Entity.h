@@ -12,7 +12,7 @@
 class Entity {
 public:
     int id;
-
+    Shader entityShader;
 
     Model* getModel();
     virtual ~Entity();
@@ -21,7 +21,7 @@ public:
     virtual glm::vec4 getRotation();
     virtual glm::vec3 getScale();
     int getType();
-
+    virtual void draw() = 0;
     virtual void draw(Shader &shader, bool outlined = false, int depthMap = -1) = 0;
     virtual std::string toString() = 0;
     virtual void setPosition(glm::vec3 position);
@@ -32,6 +32,7 @@ protected:
     glm::vec4 _rotation;
     glm::vec3 _scale;
     Model *entityModel;
+
     /*
    * Types:
     * 0-> LIGHT

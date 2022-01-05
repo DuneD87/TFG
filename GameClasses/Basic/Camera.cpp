@@ -14,6 +14,7 @@ Camera::Camera(glm::vec3 position, glm::vec3 up, float yaw, float pitch) : Front
     Yaw = yaw;
     Pitch = pitch;
     Roll = 90;
+    invertPitch = false;
     updateCameraVectors();
 }
 
@@ -23,14 +24,20 @@ Camera::Camera(float posX, float posY, float posZ, float upX, float upY, float u
     WorldUp = glm::vec3(upX, upY, upZ);
     Yaw = yaw;
     Pitch = pitch;
+    invertPitch = false;
     updateCameraVectors();
 }
 
 glm::mat4 Camera::GetViewMatrix()
 {
-
-    glm::mat4 rotate = glm::mat4_cast(orientation);
-
+    glm::mat4 rotate;
+    if (invertPitch)
+    {
+        rotate = glm::mat4_cast(orientation);
+        //rotate = glm::rotate(rotate,glm::radians(-180.0f + Roll),Front);
+    }
+    else
+        rotate = glm::mat4_cast(orientation);
     glm::mat4 translate = glm::mat4(1.0f);
     translate = glm::translate(translate, -Position);
 
@@ -91,7 +98,6 @@ void Camera::ProcessMouseScroll(float yoffset) {
 
 void Camera::updateCameraVectors() {
     glm::quat q = glm::quat(glm::vec3(-Pitch, Yaw, -Roll));
-
     // reset values
     Pitch = Yaw = Roll = 0;
 
@@ -106,4 +112,8 @@ void Camera::updateCameraVectors() {
     // also re-calculate the Right and Up vector
     Right = glm::conjugate(orientation) * glm::vec3(1.0f, 0.0f, 0.0f);
     Up = glm::conjugate(orientation) * glm::vec3(0.0f, 1.0f, 0.0f);
+}
+
+void Camera::invertCameraPitch() {
+    invertPitch = !invertPitch;
 }

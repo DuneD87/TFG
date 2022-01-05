@@ -18,6 +18,7 @@ Planet::Planet(float radius, int nSeg, glm::vec3 position, Camera *cam, std::vec
     this->path = path;
     bindPlanetTextures();
     setupMesh();
+    drawEffects = true;
     //addVegetation();
 }
 Planet::Planet(float radius, int nSeg, bool hasAtmos, float maxHeight, float noiseFreq, int octaves, float lacunarity,
@@ -36,7 +37,7 @@ Planet::Planet(float radius, int nSeg, bool hasAtmos, float maxHeight, float noi
 {
     _position = position;
     this->type = 3;
-
+    drawEffects = true;
     bindPlanetTextures();
     setupMesh();
 }
@@ -93,17 +94,21 @@ void Planet::draw(Shader &shader, bool outlined, int depthMap) {
     shader.setInt("nTextures",path.size());
     planet->Draw(shader,outlined,depthMap,true,true);
     shader.setInt("isTerrain",0);
-    if (hasWater)
-        water->draw(shader,outlined,depthMap);
-    if (hasAtmos)
-        skyDome->draw(shader,outlined,-1);
-
+    if (drawEffects)
+    {
+        if (hasWater)
+            water->draw(shader,outlined,depthMap);
+        if (hasAtmos)
+            skyDome->draw(shader,outlined,-1);
+    }
 }
 
 Planet::~Planet() {
     delete planet;
     if (hasAtmos)
         delete skyDome;
+    if (hasWater)
+        delete water;
 }
 
 void Planet::renderGui() {
@@ -193,22 +198,6 @@ float Planet::getRadius() const {
     return radius;
 }
 
-float Planet::getHPointOffset() const {
-    return hPointOffset;
-}
-
-float Planet::getLPointOffset() const {
-    return lPointOffset;
-}
-
-float Planet::getMaxHeight() const {
-    return maxHeight;
-}
-
-int Planet::getNSeg() const {
-    return nSeg;
-}
-
 float Planet::getHighestPoint() const {
     return highestPoint;
 }
@@ -217,17 +206,6 @@ float Planet::getLowestPoint() const {
     return lowestPoint;
 }
 
-void Planet::addVegetation() {
-    srand(time(NULL));
-    for (int i = 0; i < planet->vertices.size();i++)
-    {
-        int r = rand()%14;
-        glm::vec3 position = planet->vertices[i].Position;
-        PhysicsObject *ent = new PhysicsObject(-1,0,decoPaths[r]);
-        ent->setPosition(position);
-        planetDeco.push_back(ent);
-    }
-}
 
 void Planet::bindPlanetTextures() {
     int nTextures = path.size();
@@ -257,10 +235,10 @@ void Planet::addCamera(Camera *cam) {
 void Planet::setupAtmosphere(float atmosRadius, float kr, float km, float e, float h, float l, float gm, float numOutScatter,
                         float numInScatter, float scale, glm::vec3 color) {
     float colorAux[3];
-    if (this->cam == NULL) std::cout<<"wtff \n";
     for (int i = 0; i < 3; i++)
         colorAux[i] = color[i];
     skyDome = new Atmosphere(atmosRadius-lowestPoint,atmosRadius+highestPoint,cam,kr,km,e,h,l,colorAux,gm,numOutScatter,numInScatter,scale,_position);
+
     if (hasWater)
         water = new WaterSphere(radius,radius,cam,_position);
 }
@@ -269,9 +247,14 @@ void Planet::addBiome(Biome bio) {
     biomes.push_back(bio);
 }
 
-void Planet::setSunDir(glm::vec3 sunDir) {
+void Planet::setSun(Light* sun) {
     if (this->hasAtmos)
-        skyDome->setSunDir(sunDir);
+    {
+        skyDome->setSun(sun);
+        if (this->hasWater)
+            water->setSun(sun);
+    }
+
 }
 
 std::string Planet::toString() {
@@ -301,7 +284,50 @@ std::string Planet::getAtmosSettings() const {
     return skyDome->toString();
 }
 
-void Planet::setupUniformBuffers()
-{
+void Planet::setWaterTexture(unsigned int waterid) {
+    if (water != NULL && hasWater)
+        water->setWaterTexture(waterid);
+}
 
+void Planet::setNoDrawEffects(bool drawEffects) {
+    this->drawEffects = drawEffects;
+}
+
+void Planet::draw() {
+    entityShader.use();
+    entityShader.setFloat("near",setting_near);
+    entityShader.setFloat("far",setting_far);
+    entityShader.setInt("isTerrain",1);
+    entityShader.setFloat("hPoint",highestPoint + hPointOffset);
+    entityShader.setFloat("lPoint",lowestPoint - lPointOffset);
+    entityShader.setFloat("pRadius",radius);
+    entityShader.setFloat("blendFactor",blendFactor);
+    entityShader.setFloat("depthBlend",depthBlend);
+    entityShader.setVec3("pPosition",_position);
+    entityShader.setInt("nBiomes",biomes.size());
+    entityShader.setInt("nTextures",path.size());
+
+    for (int i = 0; i < biomes.size();i++)
+    {
+        entityShader.setFloat("biomes["+std::to_string(i)+"].latStart",biomes[i].latStart);
+        entityShader.setFloat("biomes["+std::to_string(i)+"].latEnd",biomes[i].latEnd);
+        entityShader.setInt("biomes["+std::to_string(i)+"].nTextBiome",biomes[i].textHeight.size());
+        for (int j = 0; j < biomes[i].textHeight.size();j++)
+        {
+            entityShader.setInt("biomes["+std::to_string(i)+"].textIndex["+std::to_string(j)+"].index",biomes[i].textHeight[j].index);
+            entityShader.setFloat("biomes["+std::to_string(i)+"].textIndex["+std::to_string(j)+"].hStart",biomes[i].textHeight[j].hStart);
+            entityShader.setFloat("biomes["+std::to_string(i)+"].textIndex["+std::to_string(j)+"].hEnd",biomes[i].textHeight[j].hEnd);
+        }
+    }
+
+    entityShader.setInt("nTextures",path.size());
+    planet->Draw(entityShader,false,-1,true,true);
+    entityShader.setInt("isTerrain",0);
+    if (drawEffects)
+    {
+        if (hasWater)
+            water->draw();
+        if (hasAtmos)
+            skyDome->draw();
+    }
 }

@@ -10,6 +10,8 @@
 #include "Atmosphere.h"
 #include "WaterSphere.h"
 #include "../../Base/EngineSettings.h"
+#include "../Light.h"
+
 class Planet : public Entity {
 public:
 
@@ -21,45 +23,26 @@ public:
 
     ~Planet();
     void draw(Shader &shader, bool outlined = false, int depthMap = -1);
+    void draw();
     void renderGui();
     void addCamera(Camera * cam);
     void addBiome(Biome bio);
-    void setupUniformBuffers();
     void setupAtmosphere(float atmosRadius, float kr, float km, float e, float h, float l,
                          float gm, float numOutScatter, float numInScatter, float scale,
                          glm::vec3 color);
-    void setSunDir(glm::vec3 sunDir);
+    void setSun(Light* sun);
     float getHighestPoint() const;
     float getLowestPoint() const;
     float getRadius() const;
-    float getHPointOffset() const;
-    float getLPointOffset() const;
-    float getMaxHeight() const;
-    int getNSeg() const;
+    void setNoDrawEffects(bool drawEffects);
+    void setWaterTexture(unsigned int idText);
     bool hasAtmosphere() const;
     std::string getAtmosSettings() const;
     std::string toString();
 private:
     void setupMesh();
     void bindPlanetTextures();
-    void addVegetation();
-    std::vector<Entity*> planetDeco;
-    const char *decoPaths[14] = {
-            "../Models/treeLP1.obj",
-            "../Models/treeLP2.obj",
-            "../Models/grass1.obj",
-            "../Models/grass2.obj",
-            "../Models/rock1.obj",
-            "../Models/rock2.obj",
-            "../Models/rock3.obj",
-            "../Models/rock4.obj",
-            "../Models/bark1.obj",
-            "../Models/bark2.obj",
-            "../Models/shroom1.obj",
-            "../Models/shroom2.obj",
-            "../Models/bush1.obj",
-            "../Models/bush2.obj"
-    };
+
     const char * noiseTypes[6] = {"Value","OpenSimplex2" ,"Cellular", "OpenSimplex2S", "Perlin", "ValueCubic"};
     const char * fractalTypes[6] = {"None","DomainWarpProg","FBm" ,"DomainWarpInd", "PingPong", "Ridged"};
     const char * cellDistFunc[4] = {"Hybrid","Euclidean","Euclidean Squared","Manhattan"};
@@ -92,32 +75,19 @@ private:
                                                            FastNoiseLite::DomainWarpType_OpenSimplex2,
                                                            FastNoiseLite::DomainWarpType_OpenSimplex2Reduced};
 
-    float highestPoint, lowestPoint;
     float hPointOffset = 0;
     float lPointOffset = 17.452;
     int seed = 1337;
-
-    float radius;
-    int nSeg;
-    bool hasAtmos, hasWater;
-    float maxHeight;
-    float noiseFreq;
-
-    int octaves;
-    float lacunarity;
-    float fGain;
-    float fWeStr;
-    float fPinPonStr;
-    float cellJitter;
-    float domWarpAmp;
-    float minValue;
-    int noiseTypeSel,fractalTypeSel,cellDistTypeSel, cellReturnTypeSel, domWarpTypeSel;
     bool biomeSet = false;
+    float radius;
+    int noiseTypeSel,fractalTypeSel,cellDistTypeSel, cellReturnTypeSel, domWarpTypeSel,nSeg, octaves;
+    bool hasAtmos, hasWater, drawEffects;
+    float maxHeight, noiseFreq, lacunarity, fGain, fWeStr, fPinPonStr,
+     cellJitter, domWarpAmp, minValue,highestPoint, lowestPoint;
     float blendFactor = 0.5;
     float depthBlend = 0.5;
     unsigned int noiseMap;
-    std::vector<std::string> path;
-    std::vector<std::string> pathNormal;
+    std::vector<std::string> path, pathNormal;
     Mesh* planet = NULL;
     Atmosphere * skyDome;
     Camera * cam;

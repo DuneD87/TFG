@@ -2,9 +2,30 @@
 out vec4 FragColor;
 in vec2 TexCoord;
 in vec4 worldPos;
+in vec3 Normal;
+in vec3 FragPos;
 // texture samplers
-uniform sampler2D texture_diffuse[1];
+uniform sampler2D texture_diffuse[3];
+struct Material {
+    sampler2D diffuse;
+    sampler2D specular;
+    float shininess;
+    int hasTexture;
+    vec3 mAmbient;
+    vec3 mDiffuse;
+    vec3 mSpecular;
+};
+struct DirLight {
+    vec3 direction;
 
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
+};
+uniform Material material;
+uniform DirLight dirLight;
+uniform vec3 viewPos;
+uniform float waveSpeed;
 vec4 hash4( vec2 p )
 {
     return fract(sin(vec4( 1.0+dot(p,vec2(37.0,17.0)),
@@ -48,11 +69,52 @@ vec4 textureNoTile( sampler2D samp, in vec2 uv )
     textureGrad( samp, uvd, ddxd, ddyd ), b.x), b.y );
 }
 
+vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir, vec4 text)
+{
+    vec3 lightDir = normalize(-light.direction);
+    // diffuse shading
+    float diff = max(dot(normal, lightDir), 0.0);
+    // specular shading
+    vec3 reflectDir = reflect(-lightDir, normal);
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
+    // combine results
+    vec3 mDiffuse;
+    vec3 mSpecular;
+    mDiffuse = vec3(text);
+    mSpecular = vec3(text);
+    vec3 ambient  = light.ambient  * mDiffuse;
+    vec3 diffuse  = light.diffuse  * diff * mDiffuse;
+    vec3 specular = light.specular * spec * mSpecular;
+
+    float shadow = 0;
+    return (ambient + (1-shadow)*(diffuse + specular));
+}
+const float waveStrength = 0.2;
 void main()
 {
-    const float C = 1.0;
-    const float far = 1000000.0;
+    vec3 viewDir = normalize(viewPos - FragPos);
+    float dist = distance(FragPos,viewPos);
+
+    vec2 ndc = ((worldPos.xy/worldPos.w)/2.0)+0.5;
+    vec2 distorsion = (texture2D(texture_diffuse[0],vec2(TexCoord.x + waveSpeed,TexCoord.y)*5).rg * 2.0 - 1.0)*waveStrength;
+    vec2 reflectCoord = vec2(ndc.x, 1.0 - ndc.y);
+    vec2 diffCoord = TexCoord/2;
+
+    reflectCoord += distorsion;
+    diffCoord += distorsion;
+
+    vec4 waterTextDiff = textureNoTile(texture_diffuse[1], diffCoord);
+    vec4 waterTextRefl = texture2D(texture_diffuse[2], reflectCoord);
+    float mixAmount = dist/5000;
+    if (mixAmount > 1) mixAmount = 1;
+    vec4 waterText = mix(waterTextDiff,waterTextRefl,1-mixAmount);
+    //if (dist>6000) waterText = waterTextDiff;
+    vec3 result = vec3(0);
+    result += CalcDirLight(dirLight, Normal, viewDir,waterText);
+    float alphaAmount = dist/2000;
+    const float C = 10.0;
+    const float far = 10000000.0;
     const float offset = 1.0;
-    //gl_FragDepth = (log(C * worldPos.z + offset) / log(C * far + offset));
-    FragColor = textureNoTile(texture_diffuse[0],TexCoord);
+    gl_FragDepth = (log(C * worldPos.z + offset) / log(C * far + offset));
+    FragColor = vec4(result,clamp(1.0,0.8,alphaAmount));
 }

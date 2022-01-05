@@ -19,8 +19,8 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std:
 }
 
 Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, const char *path, std::string directory) {
-    this->vertices = vertices;
-    this->indices = indices;
+    this->vertices = std::move(vertices);
+    this->indices = std::move(indices);
     this->position = glm::vec3(0);
     this->scale = glm::vec3(1);
     this->axis = glm::vec3(1);

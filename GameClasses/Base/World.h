@@ -20,7 +20,7 @@ public:
 
 
     Renderer* getRenderer();
-    void renderWorld();
+    void renderWorld(bool wireframe);
 private:
     void setupInstanceObjects(int wSeg, int divider);
     void makeWaterLevel();

@@ -24,6 +24,7 @@ class XmlParser {
 public:
 
     vector<Entity*> _ents;
+    vector<Shader> shaders;
     Light *sun;
     int nPointLights;
     int entIndex;

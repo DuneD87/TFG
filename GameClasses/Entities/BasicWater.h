@@ -11,6 +11,7 @@
 class BasicWater : public Entity{
 public:
     BasicWater(float width,float height,float wSeg, float hSeg,int waterLevel);
+    void draw();
     void draw(Shader &shader, bool outlined = false, int depthMap = -1);
     std::string toString();
 private:

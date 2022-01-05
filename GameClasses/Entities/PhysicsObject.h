@@ -12,7 +12,7 @@ public:
     PhysicsObject(int entId,int type,Model *model);
 
     ~PhysicsObject();
-
+    void draw();
     void draw(Shader &shader, bool outlined, int depthMap);
     std::string toString();
 };

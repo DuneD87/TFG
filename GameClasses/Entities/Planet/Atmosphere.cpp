@@ -7,21 +7,7 @@
 #include "../../Util/libs/imgui_impl_opengl3.h"
 #include "../../Util/libs/imgui_impl_glfw.h"
 
-Atmosphere::Atmosphere(float planetRadius, float atmosRadius, Camera *cam,glm::vec3 position) {
-    this->planetRadius = planetRadius;
-    this->atmosRadius = atmosRadius;
-    this->cam = cam;
-    Cubesphere cubesphere(atmosRadius,4,true);
-    cubesphere.setupNoise(0,NULL);
 
-    Mesh *modelMesh = new Mesh(cubesphere.vertexList,cubesphere.getIndices(),"","");
-    skyDome = new Model();
-    skyDome->meshes.push_back(modelMesh);
-    skyDome->setPosition(position);
-    _position = position;
-    atmosShader = Shader("../Shaders/skydomeVertex.shader", "../Shaders/skydomeFragment.shader");
-    atmosShaderIN = Shader("../Shaders/lightingShaderVertex.shader", "../Shaders/backup/alternativeScatteringFragment.shader");
-}
 
 void Atmosphere::draw(Shader &shader, bool outlined, int depthMap) {
     renderGui();
@@ -43,7 +29,7 @@ void Atmosphere::draw(Shader &shader, bool outlined, int depthMap) {
     atmosShader.setVec3("planetPosition",_position);
     atmosShader.setFloat("planetRadius",planetRadius);
     atmosShader.setFloat("atmosRadius",atmosRadius);
-    atmosShader.setVec3("sunDir",sunDir);
+    atmosShader.setVec3("sunDir",sun->getDirVector());
     atmosShader.setFloat("H",H);
     atmosShader.setFloat("L",L);
     atmosShader.setFloat("K_R",k_r);
@@ -57,9 +43,7 @@ void Atmosphere::draw(Shader &shader, bool outlined, int depthMap) {
     glFrontFace(GL_CW);
     skyDome->Draw(atmosShader,outlined,depthMap);
     glFrontFace(GL_CCW);
-    //skyDome->Draw(atmosShader,outlined,depthMap);
     glDisable(GL_BLEND);
-    //glEnable(GL_CULL_FACE);
     shader.use();
 }
 
@@ -118,10 +102,11 @@ Atmosphere::Atmosphere(float planetRadius, float atmosRadius, Camera *cam, float
     skyDome->setPosition(position);
     _position = position;
     atmosShader = Shader("../Shaders/skydomeVertex.shader", "../Shaders/skydomeFragment.shader");
+    entityShader = atmosShader;
 }
 
-void Atmosphere::setSunDir(glm::vec3 sunDir) {
-    this->sunDir = sunDir;
+void Atmosphere::setSun(Light* sun) {
+    this->sun = sun;
 }
 
 std::string Atmosphere::toString() {
@@ -137,4 +122,42 @@ std::string Atmosphere::toString() {
         << "scale:"<<scale<<"\n"
         << "color:"<<atmosColor[0]<<","<<atmosColor[1]<<","<<atmosColor[2];
    return ststr.str();
+}
+
+void Atmosphere::draw() {
+    renderGui();
+    glEnable(GL_BLEND);
+    //glDisable(GL_CULL_FACE);
+    glBlendFunc(GL_SRC_ALPHA,GL_SRC_ALPHA);
+    glm::mat4 view = this->cam->GetViewMatrix();
+    glm::mat4 projection;
+    projection = glm::perspective(glm::radians(this->cam->Zoom), (float)setting_scrWidth/setting_scrHeight, setting_near, setting_far);
+    glm::mat4 cameraModel(1.0f);
+    //std::cout<<"xPos: "<<cam->Position.x<<" yPos: "<<cam->Position.y<<" zPos: "<<cam->Position.z<<std::endl;
+    //std::cout<<"xDir: "<<cam->orientation.x<<" yDir: "<<cam->orientation.y<<" zDir: "<<cam->orientation.z<<std::endl;
+    entityShader.use();
+    entityShader.setMat4("view",view);
+    entityShader.setMat4("projection",projection);
+    entityShader.setMat4("model", cameraModel);
+    entityShader.setVec3("cameraPosition",cam->Position);
+    entityShader.setVec3("cameraForward",cam->Front);
+    entityShader.setVec3("planetPosition",_position);
+    entityShader.setFloat("planetRadius",planetRadius);
+    entityShader.setFloat("atmosRadius",atmosRadius);
+    entityShader.setVec3("sunDir",sun->getDirVector());
+    entityShader.setFloat("H",H);
+    entityShader.setFloat("L",L);
+    entityShader.setFloat("K_R",k_r);
+    entityShader.setFloat("K_M",k_m);
+    entityShader.setFloat("E",e);
+    entityShader.setVec3("C_R",glm::normalize(glm::vec3(atmosColor[0],atmosColor[1],atmosColor[2])));
+    entityShader.setFloat("G_M",g_m);
+    entityShader.setFloat("MAX",viewDistance);
+    entityShader.setFloat("fNumOutScatter",numOutScatter);
+    entityShader.setFloat("fNumInScatter",numInScatter);
+    glFrontFace(GL_CW);
+    skyDome->Draw(entityShader,false,-1);
+    glFrontFace(GL_CCW);
+    glDisable(GL_BLEND);
+    entityShader.use();
 }

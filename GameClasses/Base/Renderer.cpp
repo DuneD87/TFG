@@ -48,24 +48,7 @@ Renderer::Renderer(unsigned int scrWidth, unsigned int scrHeight, Camera *camera
     setupSkyBox(skyboxPath);
 }
 
-void Renderer::renderScene(vector<Entity*> worldEnts,std::vector<std::pair<std::vector<glm::mat4>,PhysicsObject*>> ents) {
-    glm::mat4 view;
-    view = this->camera->GetViewMatrix();
-    //projection
-    glm::mat4 projection;
-    projection = glm::perspective(glm::radians(this->camera->Zoom), (float)setting_scrWidth/setting_scrHeight, setting_near, setting_far);
-
-    glEnable(GL_DEPTH_TEST); // enable depth testing (is disabled for rendering screen-space quad)
-    renderShadowMap(worldEnts,ents);
-
-    //glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
-
-
-    glViewport(0, 0, setting_scrWidth, setting_scrHeight);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-    ImGui_ImplOpenGL3_NewFrame();
-    ImGui_ImplGlfw_NewFrame();
-    ImGui::NewFrame();
+void Renderer::renderSkybox(glm::mat4 view, glm::mat4 projection) {
     glDepthFunc(GL_LEQUAL);
     shaders[4].use();
     renderLoopCamera(shaders[4],view,projection,true);
@@ -75,47 +58,118 @@ void Renderer::renderScene(vector<Entity*> worldEnts,std::vector<std::pair<std::
     glDrawArrays(GL_TRIANGLES, 0, 36);
     glBindVertexArray(0);
     glDepthFunc(GL_LESS); // set depth function back to default*/
-    drawEntities(worldEnts,view,projection,shaders[0]);
-    shaders[6].use();
-    renderLoopCamera(shaders[6],view,projection);
-    shaders[6].setFloat("material.shininess", 64.0f);
-    shaders[6].setVec3("viewPos",camera->Position);
-    shaders[6].setVec3("lightPos", sunPos);
-    shaders[6].setMat4("lightSpaceMatrix", lightSpaceMatrix);
-    shaders[6].setInt("nPointLights",nPointLights);
+}
+
+void Renderer::drawEntities(std::vector<Entity*> worldEnts, glm::mat4 view, glm::mat4 projection,Shader &shader, bool drawEffects) {
 
     for (int i = 0; i < worldEnts.size();i++)
     {
-        if (worldEnts[i]->getType() == 2)
+        if (worldEnts[i]->getType() != 4)
         {
-            worldEnts[i]->draw(shaders[6]);
+            worldEnts[i]->entityShader.use();
+            renderLoopCamera(worldEnts[i]->entityShader,view,projection);
+            worldEnts[i]->entityShader.setFloat("material.shininess", 64.0f);
+            worldEnts[i]->entityShader.setVec3("viewPos",camera->Position);
+            worldEnts[i]->entityShader.setVec3("lightPos", sunPos);
+            worldEnts[i]->entityShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
+            worldEnts[i]->entityShader.setInt("nPointLights",nPointLights);
+            worldEnts[i]->draw();
+            if (worldEnts[i]->getType() == 3)
+            {
+
+                Planet * planet = dynamic_cast<Planet *>(worldEnts[i]);
+                planet->renderGui();
+                planet->setWaterTexture(reflexion);
+                planet->setNoDrawEffects(drawEffects);
+            }
         }
+        else
+        {
+            shaders[8].use();
+            renderLoopCamera(shaders[8],view,projection);
+            worldEnts[i]->draw(shaders[8],false,-1);
+            shader.use();
+            renderLoopCamera(shader,view,projection);
+
+        }
+
     }
-    for (int i = 0; i < ents.size();i++)
-        renderInstanced(ents[i],shaders[6]);
+}
 
+void Renderer::render(vector<Entity *> worldEnts, std::vector<std::pair<std::vector<glm::mat4>, PhysicsObject *>> ents,
+                      bool wireframe) {
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplGlfw_NewFrame();
+    ImGui::NewFrame();
+    //Reflexion framebuffer pass and render to window
+    glm::mat4 view;
+    camera->invertCameraPitch();
+    glm::vec3 oldCamPos = this->camera->Position;
+    this->camera->Position = this->camera->Position + (this->camera->Up * -100.f);
+    view = this->camera->GetViewMatrix();
+    //projection
+    glm::mat4 projection;
+    projection = glm::perspective(glm::radians(this->camera->Zoom), (float)800/600, setting_near, setting_far);
+    glBindFramebuffer(GL_FRAMEBUFFER,reflexionFBO);
+    renderScene(worldEnts,ents,wireframe,view,projection,800,600,false);
+    ImGui::Begin("Game Window");
+    ImGui::SetWindowFontScale(setting_fontSize);
+    ImVec2 pos = ImGui::GetCursorScreenPos();
+    ImDrawList* drawList = ImGui::GetWindowDrawList();
+    drawList->AddImage((void*)reflexion,
+                       pos,
+                       ImVec2(pos.x + 800, pos.y + 600),
+                       ImVec2(0, 1),
+                       ImVec2(1, 0));
+    ImGui::End();
+    glBindFramebuffer(GL_FRAMEBUFFER,0);
+    camera->invertCameraPitch();
+    this->camera->Position = oldCamPos;
+    view = this->camera->GetViewMatrix();
+    //Shadowmap framebuffer pass and render to window
+    glEnable(GL_DEPTH_TEST); // enable depth testing (is disabled for rendering screen-space quad)
+    renderShadowMap(worldEnts,ents);
+    ImGui::Begin("Game Window 2");
+    ImGui::SetWindowFontScale(setting_fontSize);
+    pos = ImGui::GetCursorScreenPos();
+    ImDrawList* drawList2 = ImGui::GetWindowDrawList();
+    drawList2->AddImage((void*)depthMap,
+                       pos,
+                       ImVec2(pos.x + 1024, pos.y + 720),
+                       ImVec2(0, 1),
+                       ImVec2(1, 0));
+    ImGui::End();
+    glBindFramebuffer(GL_FRAMEBUFFER,0);
 
-
-   // shaders[1].use();
-    /*for (int i = 0; i < effects.size();i++)
+    //render to main screen
+    if (!wireframe)
+        glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
+    projection = glm::perspective(glm::radians(this->camera->Zoom), (float)setting_scrWidth/setting_scrHeight, setting_near, setting_far);
+    renderScene(worldEnts,ents,wireframe,view,projection,setting_scrWidth,setting_scrHeight,true);
+    if (!wireframe)
     {
-        //Render should be a function, handle semi-transparent objects sorting them to draw in order ( pre-render function? )
-        effects[i].Draw(shaders[1],false,-1);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glDisable(GL_DEPTH_TEST); // disable depth test so screen-space quad isn't discarded due to depth test.
+        // clear all relevant buffers
+        glClearColor(1.0f, 1.0f, 1.0f, 1.0f); // set clear color to white (not really necessary actually, since we won't be able to see behind the quad anyways)
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+        shaders[3].use();
+        glBindVertexArray(quadVAO);
+        glBindTexture(GL_TEXTURE_2D, textColorBuffer);	// use the color attachment texture as the texture of the quad plane
+        glDrawArrays(GL_TRIANGLES, 0, 6);
     }
-     */
-    // now bind back to default framebuffer and draw a quad plane with the attached framebuffer color texture
-    //glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
 
-    //glDisable(GL_DEPTH_TEST); // disable depth test so screen-space quad isn't discarded due to depth test.
-    // clear all relevant buffers
-    /*glClearColor(1.0f, 1.0f, 1.0f, 1.0f); // set clear color to white (not really necessary actually, since we won't be able to see behind the quad anyways)
+
+void Renderer::renderScene(vector<Entity*> worldEnts,std::vector<std::pair<std::vector<glm::mat4>,PhysicsObject*>> ents,
+                           bool wireframe,glm::mat4 &view, glm::mat4 &projection, float width, float height, bool drawEffects) {
+
+
+    glViewport(0, 0, width, height);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
-    shaders[3].use();
-    glBindVertexArray(quadVAO);
-    glBindTexture(GL_TEXTURE_2D, textColorBuffer);	// use the color attachment texture as the texture of the quad plane
-    glDrawArrays(GL_TRIANGLES, 0, 6);*/
-
+    renderSkybox(view,projection);
+    drawEntities(worldEnts,view,projection,shaders[0],!drawEffects);
+    // now bind back to default framebuffer and draw a quad plane with the attached framebuffer color texture
 
 }
 
@@ -207,13 +261,17 @@ void Renderer::setupFrameBuffer() {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     glGenFramebuffers(1, &reflexionFBO);
-    // create depth texture
+    glBindFramebuffer(GL_FRAMEBUFFER, reflexionFBO);
+
     glGenTextures(1, &reflexion);
     glBindTexture(GL_TEXTURE_2D, reflexion);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 800, 600, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 800, 600, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    glGenerateMipmap(GL_TEXTURE_2D);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, reflexion, 0);
 
 }
 
@@ -356,36 +414,6 @@ void Renderer::renderShadowMap(vector<Entity*> worldEnts,std::vector<std::pair<s
     glEnable(GL_CULL_FACE);
 }
 
-void Renderer::renderReflexionTexture(vector<Entity*> worldEnts,std::vector<std::pair<std::vector<glm::mat4>,PhysicsObject*>>ents) {
-    // render
-    // ------
-    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    // 1. render depth of scene to texture (from light's perspective)
-    // --------------------------------------------------------------
-    shaders[0].use();
-    shaders[0].setMat4("lightSpaceMatrix", lightSpaceMatrix);
-
-    glViewport(0, 0, setting_scrWidth, setting_scrHeight);
-    glBindFramebuffer(GL_FRAMEBUFFER, reflexionFBO);
-    glClear(GL_DEPTH_BUFFER_BIT);
-
-    for (int i = 0; i < worldEnts.size();i++)
-    {
-        if (worldEnts[i]->getType() == 1)
-            worldEnts[i]->draw(shaders[5],false);
-    }
-    shaders[7].use();
-    shaders[7].setMat4("lightSpaceMatrix", lightSpaceMatrix);
-    for (int i = 0; i < ents.size();i++)
-        renderInstanced(ents[i],shaders[7]);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glViewport(0, 0, setting_scrWidth, setting_scrHeight);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
-}
-
-
 void Renderer::addShader(Shader &shader) {
     shaders.push_back(shader);
 }
@@ -410,46 +438,23 @@ Renderer::~Renderer() {
         glDeleteShader(shader.ID);
 }
 
-void Renderer::drawEntities(std::vector<Entity*> worldEnts, glm::mat4 view, glm::mat4 projection,Shader &shader) {
-    shader.use();
-    renderLoopCamera(shader,view,projection);
-    shader.setFloat("material.shininess", 64.0f);
-    shader.setVec3("viewPos",camera->Position);
-    shader.setVec3("lightPos", sunPos);
-    shader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
-    shader.setInt("nPointLights",nPointLights);
-    for (int i = 0; i < worldEnts.size();i++)
-    {
-        if (worldEnts[i]->getType() != 4)
-        {
-            worldEnts[i]->draw(shader,false,depthMap);
-            if (worldEnts[i]->getType() == 3)
-            {
-                dynamic_cast<Planet *>(worldEnts[i])->renderGui();
-            }
-        }
-        else
-        {
-            shaders[8].use();
-            renderLoopCamera(shaders[8],view,projection);
-            worldEnts[i]->draw(shaders[8],false,-1);
-            shader.use();
-            renderLoopCamera(shader,view,projection);
 
-        }
-        if (worldEnts[i]->getType() == 3)
+
+void Renderer::preRender(vector<Entity *> worldEnts) {
+    for (auto ent: worldEnts)
+    {
+        if (ent->getType() == 3)
         {
-            sunPos = camera->Position
-                     //+ glm::vec3(0.0f,dynamic_cast<BasicTerrain*>(worldEnts[i])->getHighestPoint(),0.0f)
-                     + camera->Front * 100.0f;
-            dynamic_cast<Planet*>(worldEnts[i])->setSunDir(sunDir);
+            dynamic_cast<Planet*>(ent)->setSun(sun);
         }
     }
 }
 
-void Renderer::setSunDir(glm::vec3 sunDirection) {
-    this->sunDir = sunDirection;
+void Renderer::addSun(Light *sunLight) {
+    this->sun = sunLight;
 }
+
+
 
 
 

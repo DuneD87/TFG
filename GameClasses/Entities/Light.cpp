@@ -117,5 +117,37 @@ std::string Light::toString() {
                                 + std::to_string(orientation[1]));
 }
 
+glm::vec3 Light::getDirVector() {
+    float xzLen = cos(glm::radians(orientation[0]));
+    float x = xzLen * cos(glm::radians(orientation[1]));
+    float y = sin(glm::radians(orientation[0]));
+    float z = xzLen * sin(glm::radians(-orientation[1]));
+    glm::vec3 direction(x,y,z);
+    return direction;
+}
+
+void Light::draw() {
+    if (this->getSubType() == "pointLight") {
+        entityShader.setVec3("pointLights["+std::to_string(this->lightIndex)+"].position", this->getPosition());
+        entityShader.setVec3("pointLights["+std::to_string(this->lightIndex)+"].ambient",this->getAmbient());
+        entityShader.setVec3("pointLights["+std::to_string(this->lightIndex)+"].diffuse", this->getDiffuse());
+        entityShader.setVec3("pointLights["+std::to_string(this->lightIndex)+"].specular",this->getSpecular());
+        entityShader.setFloat("pointLights["+std::to_string(this->lightIndex)+"].constant", this->getConstant());
+        entityShader.setFloat("pointLights["+std::to_string(this->lightIndex)+"].linear", this->getLinear());
+        entityShader.setFloat("pointLights["+std::to_string(this->lightIndex)+"].quadratic", this->getQuadratic());
+    }
+    else if (this->getSubType() == "dirLight") {
+        float xzLen = cos(glm::radians(orientation[0]));
+        float x = xzLen * cos(glm::radians(orientation[1]));
+        float y = sin(glm::radians(orientation[0]));
+        float z = xzLen * sin(glm::radians(-orientation[1]));
+        glm::vec3 dir(x,y,z);
+        entityShader.setVec3("dirLight.direction", dir);
+        entityShader.setVec3("dirLight.ambient",this->getAmbient());
+        entityShader.setVec3("dirLight.diffuse", this->getDiffuse());
+        entityShader.setVec3("dirLight.specular",this->getSpecular());
+    }
+}
+
 
 
