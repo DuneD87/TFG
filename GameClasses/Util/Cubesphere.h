@@ -51,6 +51,7 @@ public:
     unsigned int getIndexCount() const      { return (unsigned int)indices.size(); }
     unsigned int getTriangleCount() const   { return getIndexCount() / 3; }
     std::vector<unsigned int> getIndices() const  { return indices; }
+    std::vector<Vertex> getVertexList() const {return vertexList; }
 
     float getLPoint() const;
     float getHPoint() const;

@@ -35,8 +35,6 @@ Cubesphere::Cubesphere(float radius, int sub, bool smooth, float minValue) : rad
     lPoint = 0;
     hPoint = 0;
     this->minValue = minValue;
-    //this->noise = noise;
-    //buildVerticesSmooth();
 }
 
 

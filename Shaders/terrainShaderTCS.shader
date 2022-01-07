@@ -2,24 +2,18 @@
 
 // define the number of CPs in the output patch
 layout (vertices = 3) out;
+uniform vec3 viewPos;
 
 // attributes of the input CPs
 in vec2 TexCoords[];
-in vec3 _viewPos[];
 in vec3 FragPos[];
 in vec3 LocalPos[];
 in vec3 Normal[];
-in mat3 tbn[];
-
-
-
 // attributes of the output CPs
 out vec2 TexCoord_ES_in[];
 out vec3 WorldPos_ES_in[];
 out vec3 LocalPos_ES_in[];
 out vec3 Normal_ES_in[];
-out vec3 viewPos_ES_in[];
-out mat3 tbn_ES_in[];
 
 
 struct OutputPatch
@@ -110,15 +104,10 @@ void main()
     oPatch.Normal[gl_InvocationID] = Normal[gl_InvocationID];
     oPatch.TexCoord[gl_InvocationID] = TexCoords[gl_InvocationID];
 
-    tbn_ES_in[gl_InvocationID] = tbn[gl_InvocationID];
-    viewPos_ES_in[gl_InvocationID] = _viewPos[gl_InvocationID];
-
-    // Calculate the distance from the camera to the three control points
-
     CalcPositions();
-    float EyeToVertexDistance0 = distance(_viewPos[0], FragPos[0]);
-    float EyeToVertexDistance1 = distance(_viewPos[1], FragPos[1]);
-    float EyeToVertexDistance2 = distance(_viewPos[2], FragPos[2]);
+    float EyeToVertexDistance0 = distance(viewPos, FragPos[0]);
+    float EyeToVertexDistance1 = distance(viewPos, FragPos[1]);
+    float EyeToVertexDistance2 = distance(viewPos, FragPos[2]);
     // Calculate the tessellation levels
     gl_TessLevelOuter[0] = GetTessLevel(EyeToVertexDistance1, EyeToVertexDistance2);
     gl_TessLevelOuter[1] = GetTessLevel(EyeToVertexDistance2, EyeToVertexDistance0);

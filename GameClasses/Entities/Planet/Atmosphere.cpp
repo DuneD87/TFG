@@ -5,44 +5,39 @@
 #include "Atmosphere.h"
 
 #include "../../Util/libs/imgui_impl_opengl3.h"
-#include "../../Util/libs/imgui_impl_glfw.h"
-
-
 
 void Atmosphere::draw(Shader &shader, bool outlined, int depthMap) {
     renderGui();
     glEnable(GL_BLEND);
-    //glDisable(GL_CULL_FACE);
     glBlendFunc(GL_SRC_ALPHA,GL_SRC_ALPHA);
     glm::mat4 view = this->cam->GetViewMatrix();
     glm::mat4 projection;
     projection = glm::perspective(glm::radians(this->cam->Zoom), (float)setting_scrWidth/setting_scrHeight, setting_near, setting_far);
     glm::mat4 cameraModel(1.0f);
-    //std::cout<<"xPos: "<<cam->Position.x<<" yPos: "<<cam->Position.y<<" zPos: "<<cam->Position.z<<std::endl;
-    //std::cout<<"xDir: "<<cam->orientation.x<<" yDir: "<<cam->orientation.y<<" zDir: "<<cam->orientation.z<<std::endl;
-    atmosShader.use();
-    atmosShader.setMat4("view",view);
-    atmosShader.setMat4("projection",projection);
-    atmosShader.setMat4("model", cameraModel);
-    atmosShader.setVec3("cameraPosition",cam->Position);
-    atmosShader.setVec3("cameraForward",cam->Front);
-    atmosShader.setVec3("planetPosition",_position);
-    atmosShader.setFloat("planetRadius",planetRadius);
-    atmosShader.setFloat("atmosRadius",atmosRadius);
-    atmosShader.setVec3("sunDir",sun->getDirVector());
-    atmosShader.setFloat("H",H);
-    atmosShader.setFloat("L",L);
-    atmosShader.setFloat("K_R",k_r);
-    atmosShader.setFloat("K_M",k_m);
-    atmosShader.setFloat("E",e);
-    atmosShader.setVec3("C_R",glm::normalize(glm::vec3(atmosColor[0],atmosColor[1],atmosColor[2])));
-    atmosShader.setFloat("G_M",g_m);
-    atmosShader.setFloat("MAX",viewDistance);
-    atmosShader.setFloat("fNumOutScatter",numOutScatter);
-    atmosShader.setFloat("fNumInScatter",numInScatter);
+    entityShader.use();
+    entityShader.setMat4("view",view);
+    entityShader.setMat4("projection",projection);
+    entityShader.setMat4("model", cameraModel);
+    entityShader.setVec3("cameraPosition",cam->Position);
+    entityShader.setVec3("cameraForward",cam->Front);
+    entityShader.setVec3("planetPosition",_position);
+    entityShader.setFloat("planetRadius",planetRadius);
+    entityShader.setFloat("atmosRadius",atmosRadius);
+    entityShader.setVec3("sunDir",sun->getDirVector());
+    entityShader.setFloat("H",H);
+    entityShader.setFloat("L",L);
+    entityShader.setFloat("K_R",k_r);
+    entityShader.setFloat("K_M",k_m);
+    entityShader.setFloat("E",e);
+    entityShader.setVec3("C_R",glm::normalize(glm::vec3(atmosColor[0],atmosColor[1],atmosColor[2])));
+    entityShader.setFloat("G_M",g_m);
+    entityShader.setFloat("MAX",viewDistance);
+    entityShader.setFloat("fNumOutScatter",numOutScatter);
+    entityShader.setFloat("fNumInScatter",numInScatter);
     glFrontFace(GL_CW);
-    skyDome->Draw(atmosShader,outlined,depthMap);
+    entityMesh->Draw(atmosShader,outlined,depthMap,false,false);
     glFrontFace(GL_CCW);
+    entityMesh->Draw(atmosShader,outlined,depthMap,false,false);
     glDisable(GL_BLEND);
     shader.use();
 }
@@ -59,7 +54,7 @@ void Atmosphere::renderGui() {
         ImGui::SliderFloat("innerRadius", &planetRadius, 0.0f, 100000.0f);
         ImGui::SliderFloat("viewDistance", &viewDistance, 0.0f, 10000000.0f);
         ImGui::SliderFloat("Scale",&scale,1.0f,10.0f);
-        skyDome->setScale(glm::vec3(scale));
+        entityMesh->scale = glm::vec3(scale);
         ImGui::NewLine();
         ImGui::SliderFloat("L", &L, 0.0f, 50.0f);
         ImGui::SliderFloat("H", &H, 0.0f, 50.0f);
@@ -81,7 +76,7 @@ void Atmosphere::renderGui() {
 }
 
 Atmosphere::~Atmosphere() {
-    delete skyDome;
+    delete entityMesh;
 }
 
 Atmosphere::Atmosphere(float planetRadius, float atmosRadius, Camera *cam, float kR, float kM, float e, float h,
@@ -95,13 +90,9 @@ Atmosphere::Atmosphere(float planetRadius, float atmosRadius, Camera *cam, float
     this->cam = cam;
     Cubesphere cubesphere(atmosRadius,4,true);
     cubesphere.setupNoise(0,NULL);
-
-    Mesh *modelMesh = new Mesh(cubesphere.vertexList,cubesphere.getIndices(),"","");
-    skyDome = new Model();
-    skyDome->meshes.push_back(modelMesh);
-    skyDome->setPosition(position);
+    entityMesh = new Mesh(cubesphere.vertexList,cubesphere.getIndices(),"","");
+    entityShader = Shader("../Shaders/skydomeVertex.shader", "../Shaders/skydomeFragment.shader");
     _position = position;
-    atmosShader = Shader("../Shaders/skydomeVertex.shader", "../Shaders/skydomeFragment.shader");
 }
 
 void Atmosphere::setSun(Light* sun) {

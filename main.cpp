@@ -106,16 +106,12 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 
 GLFWwindow * createWindow()
 {
-    // glfw: initialize and configure
-    // ------------------------------
+
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4.5);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4.5);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-#ifdef __APPLE__
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-#endif
     GLFWwindow* window;
     if (fullScreen)
     {
@@ -134,8 +130,6 @@ GLFWwindow * createWindow()
     {
         window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", NULL, NULL);
     }
-    // glfw window creation
-    // --------------------
 
     if (window == NULL)
     {
@@ -151,31 +145,12 @@ GLFWwindow * createWindow()
     glfwSetScrollCallback(window, scroll_callback);
     if (!enableCursor)
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-    // glad: load all OpenGL function pointers
-    // ---------------------------------------
+
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
         std::cout << "Failed to initialize GLAD" << std::endl;
         return NULL;
     }
-    stbi_set_flip_vertically_on_load(true);
-    glPatchParameteri(GL_PATCH_VERTICES,3);
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LESS);
-    GLint MaxPatchVertices = 0;
-    glGetIntegerv(GL_MAX_PATCH_VERTICES, &MaxPatchVertices);
-    printf("Max supported patch vertices %d\n", MaxPatchVertices);
-
-
-    /*glEnable(GL_STENCIL_TEST);
-    glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);*/
-
-    //glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
-    glFrontFace(GL_CCW);
 
     return window;
 }
@@ -185,25 +160,28 @@ int main()
 {
 
     GLFWwindow *window = createWindow();
+
+    stbi_set_flip_vertically_on_load(true);
+    glPatchParameteri(GL_PATCH_VERTICES,3);
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
+    GLint MaxPatchVertices = 0;
+    glGetIntegerv(GL_MAX_PATCH_VERTICES, &MaxPatchVertices);
+    printf("Max supported patch vertices %d\n", MaxPatchVertices);
+    glCullFace(GL_BACK);
+    glFrontFace(GL_CCW);
+
     World *world = new World("../Scenes/Scene1.xml","../Textures/SkyBox/SpaceHres/",SCR_WIDTH,SCR_HEIGHT,cam);
-    // Setup Dear ImGui context
+
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
-    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
-
-    // Setup Dear ImGui style
     ImGui::StyleColorsDark();
-    //ImGui::StyleColorsClassic();
-
-    // Setup Platform/Renderer backends
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 150");
+
     while (!glfwWindowShouldClose(window))
     {
-        // input
-        // -----
         processInput(window, world);
         if (wireframe)
             glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
@@ -211,8 +189,6 @@ int main()
             glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
         world->renderWorld(wireframe);
 
-        // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
-        // -------------------------------------------------------------------------------
         float currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         cam->deltaTime = deltaTime;
@@ -224,11 +200,6 @@ int main()
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
     delete world;
-    // optional: de-allocate all resources once they've outlived their purpose:
-    // ------------------------------------------------------------------------
-
-    // glfw: terminate, clearing all previously allocated GLFW resources.
-    // ------------------------------------------------------------------
     glfwTerminate();
     return 0;
 }

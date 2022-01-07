@@ -20,15 +20,17 @@ public:
            float fGain, float fWeStr, float fPinPonStr, float cellJitter, float domWarpAmp, float minValue,
            int noiseTypeSel, int fractalTypeSel, int cellDistTypeSel, int cellReturnTypeSel, int domWarpTypeSel,
            const std::vector<std::string> &path, const std::vector<std::string> &pathNorm, glm::vec3 position,bool hasWater);
+    Planet(float radius, int nSeg, bool hasAtmos, float maxHeight,const std::vector<std::string> &path,glm::vec3 position,
+           bool hasWater, FastNoiseLite Noise);
 
     ~Planet();
     void draw(Shader &shader, bool outlined = false, int depthMap = -1);
     void renderGui();
     void addCamera(Camera * cam);
     void addBiome(Biome bio);
-    void setupAtmosphere(float atmosRadius, float kr, float km, float e, float h, float l,
-                         float gm, float numOutScatter, float numInScatter, float scale,
-                         glm::vec3 color);
+    void setupEffects(float atmosRadius, float kr, float km, float e, float h, float l,
+                      float gm, float numOutScatter, float numInScatter, float scale,
+                      glm::vec3 color);
     void setSun(Light* sun);
     float getHighestPoint() const;
     float getLowestPoint() const;
@@ -75,6 +77,7 @@ private:
                                                            FastNoiseLite::DomainWarpType_OpenSimplex2Reduced};
 
     float hPointOffset = 0;
+    FastNoiseLite noise;
     float lPointOffset = 17.452;
     int seed = 1337;
     bool biomeSet = false;

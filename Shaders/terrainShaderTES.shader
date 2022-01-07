@@ -10,9 +10,6 @@ in vec2 TexCoord_ES_in[];
 in vec3 WorldPos_ES_in[];
 in vec3 LocalPos_ES_in[];
 in vec3 Normal_ES_in[];
-in vec3 viewPos_ES_in[];
-in mat3 tbn_ES_in[];
-
 
 struct OutputPatch
 {
@@ -35,9 +32,7 @@ out vec2 TexCoords;
 out vec3 FragPos;
 out vec3 LocalPos;
 out vec3 Normal;
-out vec3 _viewPos;
 out vec3 worldPos;
-out mat3 tbn;
 
 vec2 interpolate2D(vec2 v0, vec2 v1, vec2 v2)
 {
@@ -80,14 +75,6 @@ void main()
                 oPatch.WorldPos_B012 * 3.0 * u * vPow2 +
                 oPatch.WorldPos_B111 * 6.0 * w * u * v;
 
-    _viewPos = viewPos_ES_in[0];
-    //tbn = interpolateMat3D(tbn_ES_in[0],tbn_ES_in[1],tbn_ES_in[2]);
-
-    // Displace the vertex along the normal
     worldPos =  vec3((projection * view * vec4(FragPos, 1.0)).xyz);
     gl_Position = projection * view * vec4(FragPos, 1.0);
-    /*float near = 10.0;
-    float far = 10000000.0;
-    gl_Position.z = 2.0f * log(gl_Position.w/near)/log(far/near) - 1;
-    gl_Position.z *= gl_Position.w;*/
 }

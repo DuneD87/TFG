@@ -17,7 +17,7 @@ Planet::Planet(float radius, int nSeg, glm::vec3 position, Camera *cam, std::vec
     this->cam = cam;
     this->path = path;
     bindPlanetTextures();
-    setupMesh();
+    //setupMesh();
     drawEffects = true;
     //addVegetation();
 }
@@ -39,22 +39,31 @@ Planet::Planet(float radius, int nSeg, bool hasAtmos, float maxHeight, float noi
     this->type = 3;
     drawEffects = true;
     bindPlanetTextures();
-    setupMesh();
+    //setupMesh();
 }
 
-
-
+Planet::Planet(float radius, int nSeg, bool hasAtmos, float maxHeight,const std::vector<std::string> &path,
+               glm::vec3 position, bool hasWater, FastNoiseLite Noise):
+               radius(radius), nSeg(nSeg), hasAtmos(hasAtmos),
+               maxHeight(maxHeight), path(path),hasWater(hasWater)
+{
+    _position = position;
+    this->type = 3;
+    drawEffects = true;
+    bindPlanetTextures();
+    this->noise = Noise;
+    this->noise.SetSeed(seed);
+    setupMesh();
+}
 
 void Planet::draw(Shader &shader, bool outlined, int depthMap) {
 
     shader.use();
-    shader.setFloat("near",setting_near);
-    shader.setFloat("far",setting_far);
     shader.setInt("isTerrain",1);
     shader.setFloat("hPoint",highestPoint + hPointOffset);
     shader.setFloat("lPoint",lowestPoint - lPointOffset);
     shader.setFloat("pRadius",radius);
-    shader.setFloat("blendFactor",blendFactor);
+
     shader.setFloat("depthBlend",depthBlend);
     shader.setVec3("pPosition",_position);
     shader.setInt("nBiomes",biomes.size());
@@ -73,26 +82,8 @@ void Planet::draw(Shader &shader, bool outlined, int depthMap) {
         }
     }
 
-    /*if (!biomeSet)
-    {
-        for (int i = 0; i < biomes.size();i++)
-        {
-            std::cout<<"Biome: "<<i<<" LAT START: " << biomes[i].latStart<<" ----- LAT END: " << biomes[i].latEnd<<std::endl;
-            std::cout<<"nTextures: "<<biomes[i].textHeight.size()<<std::endl;
-            for (int j = 0; j < biomes[i].textHeight.size();j++)
-            {
-                std::cout<<"Texture index: "<<biomes[i].textHeight[j].index<<std::endl;
-                std::cout<<"hStart: "<<biomes[i].textHeight[j].hStart<<std::endl;
-                std::cout<<"hEnd: "<<biomes[i].textHeight[j].hEnd<<std::endl;
-                std::cout<<"------------------------------------------------"<<std::endl;
-            }
-            std::cout<<"****************************************************"<<std::endl;
-        }
-        biomeSet = true;
-    }*/
-
     shader.setInt("nTextures",path.size());
-    planet->Draw(shader,outlined,depthMap,true,true);
+    entityMesh->Draw(shader,outlined,depthMap,true,false);
     shader.setInt("isTerrain",0);
     if (drawEffects)
     {
@@ -104,7 +95,7 @@ void Planet::draw(Shader &shader, bool outlined, int depthMap) {
 }
 
 Planet::~Planet() {
-    delete planet;
+    delete entityMesh;
     if (hasAtmos)
         delete skyDome;
     if (hasWater)
@@ -149,49 +140,20 @@ void Planet::renderGui() {
         test =test +  ImGui::Combo("Domain Warp Type",&domWarpTypeSel,domainWarpType, IM_ARRAYSIZE(domainWarpType));
         test =test +  ImGui::SliderFloat("Domain Warp Amplitude",&domWarpAmp,0.0f,50.0f);
         if (ImGui::Button("Rebuild")) setupMesh();
-        ImGui::End();
-
-        //if (test) setupMesh();
+        ImGui::End();;
     }
 
 }
 
 void Planet::setupMesh() {
 
-    FastNoiseLite noise;
-
-    noise.SetSeed(seed);
-    noise.SetNoiseType(_noiseTypes[noiseTypeSel]);
-    noise.SetFrequency(noiseFreq);
-
-    noise.SetCellularDistanceFunction(_cellDistFunc[cellDistTypeSel]);
-    noise.SetCellularReturnType(_cellReturnType[cellReturnTypeSel]);
-    noise.SetCellularJitter(cellJitter);
-    noise.SetDomainWarpType(_domWarpType[domWarpTypeSel]);
-    noise.SetDomainWarpAmp(domWarpAmp);
-
-    noise.SetFractalType(_fractalTypes[fractalTypeSel]);
-    noise.SetFractalOctaves(octaves);
-    noise.SetFractalLacunarity(lacunarity);
-    noise.SetFractalGain(fGain);
-    noise.SetFractalWeightedStrength(fWeStr);
-    noise.SetFractalPingPongStrength(fPinPonStr);
-
-
-
-    auto *cubeSphere = new Cubesphere(radius,nSeg,true,minValue);
+    auto *cubeSphere = new Cubesphere(radius,nSeg,true);
     cubeSphere->setupNoise(maxHeight,noise,minValue);
-    //std::cout<<"Vertex count: "<<cubeSphere->vertexList.size()<<std::endl;
-    std::vector<unsigned int> indices = cubeSphere->getIndices();
     highestPoint = cubeSphere->getHPoint();
     lowestPoint = cubeSphere->getLPoint();
-    std::cout<<"hPoint: "<<highestPoint<<" lPoint: "<<lowestPoint<<std::endl;
-
-    planet = new Mesh(cubeSphere->vertexList,indices,textures);
-
-    planet->position = _position;
+    entityMesh = new Mesh(cubeSphere->getVertexList(),cubeSphere->getIndices(),textures);
+    entityMesh->position = _position;
     delete cubeSphere;
-
 }
 
 float Planet::getRadius() const {
@@ -217,23 +179,14 @@ void Planet::bindPlanetTextures() {
         text.id = TextureFromFile( path[i].c_str(),"../Textures/",false,true);
         textures.push_back(text);
     }
-    //Normal
-    for (auto i = 0; i < nTextures ; i++)
-    {
-        Texture text;
-        text.path = "../Textures/" + pathNormal[i];
-        text.type = "texture_normal";
-        text.id = TextureFromFile( pathNormal[i].c_str(),"../Textures/",false,true);
-        textures.push_back(text);
-    }
 }
 
 void Planet::addCamera(Camera *cam) {
     this->cam = cam;
 }
 
-void Planet::setupAtmosphere(float atmosRadius, float kr, float km, float e, float h, float l, float gm, float numOutScatter,
-                        float numInScatter, float scale, glm::vec3 color) {
+void Planet::setupEffects(float atmosRadius, float kr, float km, float e, float h, float l, float gm, float numOutScatter,
+                          float numInScatter, float scale, glm::vec3 color) {
     float colorAux[3];
     for (int i = 0; i < 3; i++)
         colorAux[i] = color[i];

@@ -81,6 +81,21 @@ Planet *XmlParser::getPlanet(xml_node<> *planet) {
     int cellDistTypeSel = stoi(noiseSettings->first_attribute("cellDistTypeSel")->value());
     int cellReturnTypeSel = stoi(noiseSettings->first_attribute("cellReturnTypeSel")->value());
     int domWarpTypeSel = stoi(noiseSettings->first_attribute("domWarpTypeSel")->value());
+    FastNoiseLite noise;
+
+    noise.SetNoiseType(_noiseTypes[noiseTypeSel]);
+    noise.SetFrequency(noiseFreq);
+    noise.SetCellularDistanceFunction(_cellDistFunc[cellDistTypeSel]);
+    noise.SetCellularReturnType(_cellReturnType[cellReturnTypeSel]);
+    noise.SetCellularJitter(cellJitter);
+    noise.SetDomainWarpType(_domWarpType[domWarpTypeSel]);
+    noise.SetDomainWarpAmp(domWarpAmp);
+    noise.SetFractalType(_fractalTypes[fractalTypeSel]);
+    noise.SetFractalOctaves(octaves);
+    noise.SetFractalLacunarity(lacunarity);
+    noise.SetFractalGain(fGain);
+    noise.SetFractalWeightedStrength(fWeStr);
+    noise.SetFractalPingPongStrength(fPinPonStr);
     //-----TEXTURES-------
     std::vector<string> pathDiffuse;
     std::vector<string> pathNormal;
@@ -95,11 +110,8 @@ Planet *XmlParser::getPlanet(xml_node<> *planet) {
     {
         pathNormal.push_back(n->value());
     }
-    Planet * newPlanet = new Planet(radius,nSeg,hasAtmos,maxHeight,noiseFreq,octaves,
-                                    lacunarity,fGain,fWeStr,fPinPonStr,cellJitter,
-                                    domWarpAmp,minValue,noiseTypeSel,fractalTypeSel,
-                                    cellDistTypeSel,cellReturnTypeSel,domWarpTypeSel,
-                                    pathDiffuse,pathNormal,position,hasWater);
+    Planet * newPlanet = new Planet(radius,nSeg,hasAtmos,maxHeight,
+                                    pathDiffuse,position,hasWater,noise);
     newPlanet->id = id;
     //-------ATMOS SETTINGS-------
     xml_node<> * atmosSettings = planet->first_node("AtmosSettings");
@@ -116,8 +128,8 @@ Planet *XmlParser::getPlanet(xml_node<> *planet) {
     glm::vec3 color = getValues3(atmosSettings->first_node("Color"));
     newPlanet->addCamera(cam);
     if (hasAtmos)
-        newPlanet->setupAtmosphere(atmosRadius,kr,km,e,h,l,gm,numOutScatter,numInScatter,
-                                    scale,color);
+        newPlanet->setupEffects(atmosRadius, kr, km, e, h, l, gm, numOutScatter, numInScatter,
+                                scale, color);
     xml_node<> * biomeRoot = planet->first_node("Biomes");
     for (xml_node<> * bio = biomeRoot->first_node("Biome");bio;bio = bio->next_sibling())
     {
@@ -137,7 +149,6 @@ Planet *XmlParser::getPlanet(xml_node<> *planet) {
         newPlanet->addBiome(bioAux);
 
     }
-    //newPlanet->computeBiomes();
     return newPlanet;
 }
 

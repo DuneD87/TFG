@@ -12,8 +12,6 @@
 class Entity {
 public:
     int id;
-
-
     Model* getModel();
     virtual ~Entity();
     void setModel(const char * path);
@@ -32,6 +30,7 @@ protected:
     glm::vec4 _rotation;
     glm::vec3 _scale;
     Model *entityModel;
+    Mesh *entityMesh;
     Shader entityShader;
     /*
    * Types:

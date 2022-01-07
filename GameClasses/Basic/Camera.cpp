@@ -98,18 +98,12 @@ void Camera::ProcessMouseScroll(float yoffset) {
 
 void Camera::updateCameraVectors() {
     glm::quat q = glm::quat(glm::vec3(-Pitch, Yaw, -Roll));
-    // reset values
     Pitch = Yaw = Roll = 0;
 
-    // update qCamera
     orientation = q * orientation;
-
     orientation = glm::normalize(orientation);
-    oldYaw = glm::degrees(atan2(2.0*(orientation.y*orientation.z + orientation.w*orientation.x), orientation.w*orientation.w - orientation.x*orientation.x - orientation.y*orientation.y + orientation.z*orientation.z));
-    oldPitch = -glm::degrees(asin(-2.0*(orientation.x*orientation.z - orientation.w*orientation.y)));
-    oldRoll = -glm::degrees(atan2(2.0*(orientation.x*orientation.y + orientation.w*orientation.z), orientation.w*orientation.w + orientation.x*orientation.x - orientation.y*orientation.y - orientation.z*orientation.z));
+
     Front = glm::conjugate(orientation) * glm::vec3(0.0f, 0.0f, -1.0f);
-    // also re-calculate the Right and Up vector
     Right = glm::conjugate(orientation) * glm::vec3(1.0f, 0.0f, 0.0f);
     Up = glm::conjugate(orientation) * glm::vec3(0.0f, 1.0f, 0.0f);
 }

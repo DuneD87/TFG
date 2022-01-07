@@ -19,18 +19,18 @@ Renderer::Renderer(unsigned int scrWidth, unsigned int scrHeight, Camera *camera
                                  glm::vec3(1.0f, 1.0f, 1.0f),1.0,0.09,0.032,-1,-1);
     // build and compile our shader zprogram
     // ------------------------------------
-    Shader lightShader("../Shaders/lightingShaderVertex.shader",
-                       "../Shaders/lightingShaderFragment.shader",
-                       "../Shaders/lightingShaderTCS.shader",
-                       "../Shaders/lightingShaderTES.shader");
-    /*Shader lightShader("../Shaders/lightingShaderVertex.shader",
-                       "../Shaders/lightingShaderFragment.shader");*/
-    Shader spriteShader("../Shaders/lightingShaderVertex.shader","../Shaders/alphaTextureTest.fs");
-    Shader outlineShader = Shader("../Shaders/lightingShaderVertex.shader", "../Shaders/singleColorShader.fs");
+    /*Shader lightShader("../Shaders/terrainShaderVertex.shader",
+                       "../Shaders/terrainShaderFragment.shader",
+                       "../Shaders/terrainShaderTCS.shader",
+                       "../Shaders/terrainShaderTES.shader");*/
+    Shader lightShader("../Shaders/terrainShaderVertex.shader",
+                       "../Shaders/terrainShaderFragment.shader");
+    Shader spriteShader("../Shaders/terrainShaderVertex.shader","../Shaders/alphaTextureTest.fs");
+    Shader outlineShader = Shader("../Shaders/terrainShaderVertex.shader", "../Shaders/singleColorShader.fs");
     Shader screenShader = Shader("../Shaders/PostProcess/screenShader.vs","../Shaders/PostProcess/screenShader.fs");
-    Shader skyboxShader = Shader("../Shaders/skyboxShader.vs","../Shaders/skyboxShader.fs");
+    Shader skyboxShader = Shader("../Shaders/skyboxVertexShader.shader","../Shaders/skyboxFragmentShader.shader");
     Shader depthSMapShader = Shader("../Shaders/depthShadowMappingVertex.shader","../Shaders/depthShadowMappingFragment.shader");
-    Shader lightInstancedShader("../Shaders/lightingShaderInstancedVertex.shader", "../Shaders/lightingShaderFragment.shader");
+    Shader lightInstancedShader("../Shaders/lightingShaderInstancedVertex.shader", "../Shaders/terrainShaderFragment.shader");
     Shader depthSMapInstancedShader("../Shaders/depthShadowMappingInstancedVertex.shader", "../Shaders/depthShadowMappingFragment.shader");
     Shader waterShader("../Shaders/waterShaderVertex.shader", "../Shaders/waterShaderFragment.shader");
     shaders.push_back(lightShader);//0
@@ -90,7 +90,6 @@ void Renderer::drawEntities(std::vector<Entity*> worldEnts, glm::mat4 view, glm:
             renderLoopCamera(shader,view,projection);
 
         }
-
     }
 }
 

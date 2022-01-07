@@ -132,15 +132,7 @@ void Mesh::bindTextures(Shader &shader,unsigned int depthMap) {
 
 
 void Mesh::Draw(Shader &shader, bool outlined,unsigned int depthMap,bool wireframe, bool patches) {
-    if (outlined)
-    {
-        glStencilFunc(GL_ALWAYS, 1, 0xFF);
-        glStencilMask(0xFF);
-    }
-    else
-    {
-        glStencilMask(0x00);
-    }
+
     bindTextures(shader,depthMap);
     glBindVertexArray(VAO);
 
@@ -150,19 +142,11 @@ void Mesh::Draw(Shader &shader, bool outlined,unsigned int depthMap,bool wirefra
     meshModel = glm::scale(meshModel,scale);
     shader.setMat4("model", meshModel);
 
-    if (patches)
-    {
-
-        glDrawElements(GL_PATCHES, indices.size(), GL_UNSIGNED_INT, 0);
-    }
-
-    else
-        glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 
     // always good practice to set everything back to defaults once configured.
     glActiveTexture(GL_TEXTURE0);
-
 }
 
 void Mesh::setupMesh() {
