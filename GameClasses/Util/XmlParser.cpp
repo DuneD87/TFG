@@ -106,10 +106,10 @@ Planet *XmlParser::getPlanet(xml_node<> *planet) {
     {
         pathDiffuse.push_back(d->value());
     }
-    for (xml_node<> * n = normPath->first_node("n");n;n = n->next_sibling())
+    /*for (xml_node<> * n = normPath->first_node("n");n;n = n->next_sibling())
     {
         pathNormal.push_back(n->value());
-    }
+    }*/
     Planet * newPlanet = new Planet(radius,nSeg,hasAtmos,maxHeight,
                                     pathDiffuse,position,hasWater,noise);
     newPlanet->id = id;

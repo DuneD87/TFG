@@ -102,14 +102,15 @@ vec3 inScatter(vec3 o, vec3 dir, vec2 e, vec3 l) {
 
 void main (void)
 {
+    vec3 eye = cameraPosition - planetPosition;
     vec3 dir = normalize(cameraPosition - (FragPos.xyz));
     vec3 l = normalize(sunDir);
-    vec2 e = rayIntersection(cameraPosition, dir, atmosRadius);
-    vec2 f = rayIntersection(cameraPosition, dir, planetRadius);
+    vec2 e = rayIntersection(eye, dir, atmosRadius);
+    vec2 f = rayIntersection(eye, dir, planetRadius);
 
     e.y = min(e.y, f.x);
 
-    vec3 I = inScatter(cameraPosition, dir, e, -l);
+    vec3 I = inScatter(eye, dir, e, -l);
 
     const float C = 10.0;
     const float far = 10000000.0;

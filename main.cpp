@@ -171,7 +171,7 @@ int main()
     glCullFace(GL_BACK);
     glFrontFace(GL_CCW);
 
-    World *world = new World("../Scenes/Scene1.xml","../Textures/SkyBox/SpaceHres/",SCR_WIDTH,SCR_HEIGHT,cam);
+    World *world = new World("../Scenes/Scene4.xml","../Textures/SkyBox/SpaceHres/",SCR_WIDTH,SCR_HEIGHT,cam);
 
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
