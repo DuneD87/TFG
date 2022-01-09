@@ -9,7 +9,8 @@
 #include "GameClasses/Util/libs/imgui.h"
 #include "GameClasses/Util/libs/imgui_impl_glfw.h"
 #include "GameClasses/Util/libs/imgui_impl_opengl3.h"
-
+#include <filesystem>
+namespace fs = std::filesystem;
 // settings
  unsigned int SCR_WIDTH = 1920;
  unsigned int SCR_HEIGHT = 1080;
@@ -74,7 +75,6 @@ void processInput(GLFWwindow *window,World *world)
         world->getRenderer()->setPostProcess(3);
     if (glfwGetKey(window,GLFW_KEY_5) == GLFW_PRESS)
         world->getRenderer()->setPostProcess(4);
-
 }
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos)
@@ -158,20 +158,41 @@ GLFWwindow * createWindow()
 // ---------------------------------------------------
 int main()
 {
+    std::string path = "../Scenes";
+    int nScenes = 0;
+    std::cout<<"Selecciona una escena:"<<std::endl;
+    std::vector<std::string> files;
+    for (const auto & entry : fs::directory_iterator(path))
+        if (entry.is_regular_file())
+        {
+            std::cout <<"["<<nScenes<<"]"<< entry.path() << std::endl;
+            files.push_back(entry.path());
+            nScenes++;
+        }
+    int sel = -1;
+    while(sel < 0)
+    {
+        std::cin>>sel;
+        if (sel > nScenes)
+        {
+            std::cout<<"Seleccio incorrecte"<<std::endl;
+            for (int i = 0; i < files.size();i++)
+                std::cout<<"["<<i<<"]"<<files[i]<<std::endl;
+            sel = -1;
+        }
+    }
 
     GLFWwindow *window = createWindow();
-
     stbi_set_flip_vertically_on_load(true);
     glPatchParameteri(GL_PATCH_VERTICES,3);
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
     GLint MaxPatchVertices = 0;
     glGetIntegerv(GL_MAX_PATCH_VERTICES, &MaxPatchVertices);
-    printf("Max supported patch vertices %d\n", MaxPatchVertices);
     glCullFace(GL_BACK);
     glFrontFace(GL_CCW);
 
-    World *world = new World("../Scenes/Scene4.xml","../Textures/SkyBox/SpaceHres/",SCR_WIDTH,SCR_HEIGHT,cam);
+    World *world = new World(files[sel].c_str(),"../Textures/SkyBox/SpaceHres/",SCR_WIDTH,SCR_HEIGHT,cam);
 
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();

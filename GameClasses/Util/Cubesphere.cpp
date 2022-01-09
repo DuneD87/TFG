@@ -31,7 +31,6 @@ Cubesphere::Cubesphere(float radius, int sub, bool smooth, float minValue) : rad
 {
     vertexCountPerRow = (unsigned int)pow(2, sub) + 1;
     vertexCountPerFace = vertexCountPerRow * vertexCountPerRow;
-    std::cout<<vertexCountPerRow<<std::endl;
     lPoint = 0;
     hPoint = 0;
     this->minValue = minValue;
@@ -108,7 +107,6 @@ void Cubesphere::buildVerticesSmooth()
 {
     // generate unit-length verties in +X face
     std::vector<float> unitVertices = Cubesphere::getUnitPositiveX(vertexCountPerRow);
-    std::cout<<"Vertex count per row: "<<vertexCountPerRow<<std::endl;
     // clear memory of prev arrays
     clearArrays();
 

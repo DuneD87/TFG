@@ -32,12 +32,7 @@ XmlParser::XmlParser(std::string path, Camera *cam) {
     for (xml_node<> * ent = entities->first_node("Entity");ent;ent = ent->next_sibling("Entity"))
     {
         string entType = ent->first_attribute("type")->value();
-        if (entType == "PhysicsObject")
-        {
-            xml_node<> *model = ent->first_node("Model");
-            _ents.push_back(getObject(model));
-
-        } else if (entType == "Light")
+        if (entType == "Light")
         {
             xml_node<> *light = ent->first_node("Light");
             _ents.push_back(getLight(light));
@@ -51,12 +46,6 @@ XmlParser::XmlParser(std::string path, Camera *cam) {
     }
     theFile.close();
 }
-
-void XmlParser::readData() {
-
-}
-
-
 Planet *XmlParser::getPlanet(xml_node<> *planet) {
     int id = stoi(planet->first_attribute("id")->value());
     bool hasAtmos = stoi(planet->first_attribute("hasAtmos")->value());
@@ -66,6 +55,7 @@ Planet *XmlParser::getPlanet(xml_node<> *planet) {
     glm::vec3 position = getValues3(planet->first_node("Position"));
     xml_node<> * noiseSettings = planet->first_node("NoiseSettings");
     //-------NOISE SETTINGS-------
+    int seed = stoi(noiseSettings->first_attribute("seed")->value());
     float maxHeight = stof(noiseSettings->first_attribute("maxHeight")->value());
     float noiseFreq = stof(noiseSettings->first_attribute("noiseFreq")->value());
     int octaves = stoi(noiseSettings->first_attribute("octaves")->value());
@@ -111,7 +101,9 @@ Planet *XmlParser::getPlanet(xml_node<> *planet) {
         pathNormal.push_back(n->value());
     }*/
     Planet * newPlanet = new Planet(radius,nSeg,hasAtmos,maxHeight,
-                                    pathDiffuse,position,hasWater,noise);
+                                    pathDiffuse,position,hasWater,noise,seed);
+    newPlanet->setupNoiseVariables(noiseFreq,octaves,lacunarity,fGain,fWeStr,fPinPonStr,cellJitter,domWarpAmp,minValue,
+                                   noiseTypeSel,fractalTypeSel,cellDistTypeSel,cellReturnTypeSel,domWarpTypeSel);
     newPlanet->id = id;
     //-------ATMOS SETTINGS-------
     xml_node<> * atmosSettings = planet->first_node("AtmosSettings");
@@ -185,73 +177,6 @@ Light* XmlParser::getLight(xml_node<> *light) {
             this->sun = lightAux;
             return lightAux;
         }
-}
-
-PhysicsObject* XmlParser::getObject(xml_node<> * model) {
-    std::string typePre = model->first_attribute("type")->value();
-
-    xml_node<> * pos = model->first_node("Position");
-    xml_node<> * rot = model->first_node("Rotation");
-    xml_node<> * scale = model->first_node("Scale");
-
-
-    if (typePre == "Cube") {
-        const char * path = (const char * )model->first_attribute("path")->value();
-        std::string directory = model->first_attribute("directory")->value();
-        Cube cube;
-        Mesh *cubeMesh = procesMesh(cube.vertices, cube.indices,path,directory,192,36);
-        Model *modelRes = new Model();
-        modelRes->meshes.push_back(cubeMesh);
-        auto *obj = new PhysicsObject(entIndex,1,modelRes);
-        obj->setPosition(getValues3(pos));
-        glm::vec4 rotation = getValues4(rot);
-        obj->setRotation(rotation);
-        obj->setScale(getValues3(scale));
-        return obj;
-    }
-    else if (typePre == "AModel")
-    {
-        const char * path = (const char * )model->first_attribute("path")->value();
-        auto obj = new PhysicsObject(entIndex,1,path);
-        obj->setPosition(getValues3(pos));
-        glm::vec4 rotation = getValues4(rot);
-        obj->setRotation(rotation);
-        obj->setScale(getValues3(scale));
-        return obj;
-    }
-}
-
-vector<Mesh*> XmlParser::getSprites() {
-    std::vector<Mesh*> res;
-    xml_node<> * models = _rootNode->first_node("Effects");
-
-    //Renderer model parsing
-    int i = 0;
-    for (xml_node<> * effect = models->first_node("Effect"); effect; effect = effect->next_sibling() )
-    {
-        std::string typePre = effect->first_attribute("type")->value();
-
-        xml_node<> * pos = effect->first_node("Position");
-        xml_node<> * rot = effect->first_node("Rotation");
-        xml_node<> * scale = effect->first_node("Scale");
-
-        Mesh *cubeMesh;
-        if (typePre == "Sprite" || typePre == "Window") {
-            const char * path = (const char * )effect->first_attribute("path")->value();
-            std::string directory = effect->first_attribute("directory")->value();
-            Quad quad;
-            cubeMesh = procesMesh(quad.vertices, quad.indices,path,directory,32,6);
-        }
-
-        cubeMesh->position = getValues3(pos);
-        glm::vec4 rotation = getValues4(rot);
-        cubeMesh->axis= glm::vec3(rotation);
-        cubeMesh->angle = rotation.w;
-        cubeMesh->scale = getValues3(scale);
-
-        res.push_back(cubeMesh);
-    }
-    return res;
 }
 
 vector<string> XmlParser::split (string s, string delimiter) {

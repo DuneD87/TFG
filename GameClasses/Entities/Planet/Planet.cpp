@@ -5,54 +5,19 @@
 #include "../../Util/libs/imgui_impl_opengl3.h"
 #include "Planet.h"
 #include "../../Util/Cubesphere.h"
-#include "../PhysicsObject.h"
-
-Planet::Planet(float radius, int nSeg, glm::vec3 position, Camera *cam, std::vector<std::string> path) {
-    this->type = 3;
-    this->id = 34324;
-    this->radius = radius;
-    this->nSeg = nSeg;
-    this->seed = time(NULL);
-    _position = position;
-    this->cam = cam;
-    this->path = path;
-    bindPlanetTextures();
-    //setupMesh();
-    drawEffects = true;
-    //addVegetation();
-}
-Planet::Planet(float radius, int nSeg, bool hasAtmos, float maxHeight, float noiseFreq, int octaves, float lacunarity,
-               float fGain, float fWeStr, float fPinPonStr, float cellJitter, float domWarpAmp, float minValue,
-               int noiseTypeSel, int fractalTypeSel, int cellDistTypeSel, int cellReturnTypeSel, int domWarpTypeSel,
-               const std::vector<std::string> &path, const std::vector<std::string> &pathNorm,glm::vec3 position, bool hasWater):radius(radius), nSeg(nSeg), hasAtmos(hasAtmos),
-                                                       maxHeight(maxHeight), noiseFreq(noiseFreq), octaves(octaves),
-                                                       lacunarity(lacunarity), fGain(fGain), fWeStr(fWeStr),
-                                                       fPinPonStr(fPinPonStr), cellJitter(cellJitter),
-                                                       domWarpAmp(domWarpAmp), minValue(minValue),
-                                                       noiseTypeSel(noiseTypeSel), fractalTypeSel(fractalTypeSel),
-                                                       cellDistTypeSel(cellDistTypeSel),
-                                                       cellReturnTypeSel(cellReturnTypeSel),
-                                                       domWarpTypeSel(domWarpTypeSel), path(path),
-                                                       pathNormal(pathNorm), hasWater(hasWater)
-{
-    _position = position;
-    this->type = 3;
-    drawEffects = true;
-    bindPlanetTextures();
-    //setupMesh();
-}
 
 Planet::Planet(float radius, int nSeg, bool hasAtmos, float maxHeight,const std::vector<std::string> &path,
-               glm::vec3 position, bool hasWater, FastNoiseLite Noise):
+               glm::vec3 position, bool hasWater, FastNoiseLite Noise,int seed):
                radius(radius), nSeg(nSeg), hasAtmos(hasAtmos),
                maxHeight(maxHeight), path(path),hasWater(hasWater)
 {
     _position = position;
     this->type = 3;
     drawEffects = true;
+    this->seed = seed;
     bindPlanetTextures();
     this->noise = Noise;
-    this->noise.SetSeed(seed);
+    this->noise.SetSeed(this->seed);
     setupMesh();
 }
 
@@ -139,6 +104,19 @@ void Planet::renderGui() {
         test =test +  ImGui::SliderFloat("Cellular Jitter",&cellJitter,0.0f,10.0f);
         test =test +  ImGui::Combo("Domain Warp Type",&domWarpTypeSel,domainWarpType, IM_ARRAYSIZE(domainWarpType));
         test =test +  ImGui::SliderFloat("Domain Warp Amplitude",&domWarpAmp,0.0f,50.0f);
+        noise.SetNoiseType(_noiseTypes[noiseTypeSel]);
+        noise.SetFrequency(noiseFreq);
+        noise.SetCellularDistanceFunction(_cellDistFunc[cellDistTypeSel]);
+        noise.SetCellularReturnType(_cellReturnType[cellReturnTypeSel]);
+        noise.SetCellularJitter(cellJitter);
+        noise.SetDomainWarpType(_domWarpType[domWarpTypeSel]);
+        noise.SetDomainWarpAmp(domWarpAmp);
+        noise.SetFractalType(_fractalTypes[fractalTypeSel]);
+        noise.SetFractalOctaves(octaves);
+        noise.SetFractalLacunarity(lacunarity);
+        noise.SetFractalGain(fGain);
+        noise.SetFractalWeightedStrength(fWeStr);
+        noise.SetFractalPingPongStrength(fPinPonStr);
         if (ImGui::Button("Rebuild")) setupMesh();
         ImGui::End();;
     }
@@ -244,4 +222,23 @@ void Planet::setWaterTexture(unsigned int waterid) {
 
 void Planet::setNoDrawEffects(bool drawEffects) {
     this->drawEffects = drawEffects;
+}
+
+void
+Planet::setupNoiseVariables(float noiseFreq, int octaves, float lacunarity, float fGain, float fWeStr, float fPinPonStr,
+                            float cellJitter, float domWarpAmp, float minValue, int noiseTypeSel, int fractalTypeSel,
+                            int cellDistTypeSel, int cellReturnTypeSel, int domWarpTypeSel) {
+    this->noiseTypeSel = noiseTypeSel;
+    this->noiseFreq = noiseFreq;
+    this->cellDistTypeSel = cellDistTypeSel;
+    this->cellReturnTypeSel = cellReturnTypeSel;
+    this->cellJitter = cellJitter;
+    this->domWarpTypeSel = domWarpTypeSel;
+    this->domWarpAmp = domWarpAmp;
+    this->fractalTypeSel = fractalTypeSel;
+    this->octaves = octaves;
+    this->lacunarity = lacunarity;
+    this->fGain = fGain;
+    this->fWeStr = fWeStr;
+    this->fPinPonStr = fPinPonStr;
 }

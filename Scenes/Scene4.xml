@@ -1,7 +1,7 @@
 <Scene>
 	<Camera type="cam">
-		<Orientation pitch="38.995235" yaw="-35.091671" roll="-8.017399"/>
-		<Position x="4493.371094" y="15442.373047" z="13443.627930"/>
+		<Orientation pitch="0.000000" yaw="0.000000" roll="0.000000"/>
+		<Position x="-5212.056641" y="94228.210938" z="97022.265625"/>
 	</Camera>
 	<Entities>
 		<Entity type="Light">
@@ -15,7 +15,7 @@
 		<Entity type="Planet">
 			<Planet id="1" type="planet" hasAtmos="1" hasWater="1" radius="20000" nSeg="8">
 				<Position x="0" y="0" z="0"/>
-				<NoiseSettings maxHeight="1200" noiseFreq="0.0001" octaves="8" lacunarity="2.3" fGain="0.5" fWeStr="0.6" fPinPonStr="3" cellJitter="1" domWarpAmp="50" minValue="0" noiseTypeSel="4" fractalTypeSel="4" cellDistTypeSel="3" cellReturnTypeSel="2" domWarpTypeSel="2"/>
+				<NoiseSettings seed="1331" maxHeight="1290.32" noiseFreq="0.0001" octaves="8" lacunarity="2.3" fGain="0.5" fWeStr="0.6" fPinPonStr="3" cellJitter="1" domWarpAmp="50" minValue="0" noiseTypeSel="4" fractalTypeSel="4" cellDistTypeSel="3" cellReturnTypeSel="2" domWarpTypeSel="2"/>
 				<AtmosSettings radius="21000" k_r="0.166" k_m="0.0025" e="14.3" H="4" L="1" g_m="-0.85" numOutScatter="10" numInScatter="10" scale="1">
 					<Color x="0.1" y="0.2" z="0.8"/>
 				</AtmosSettings>
@@ -87,7 +87,7 @@
 		<Entity type="Planet">
 			<Planet id="2" type="planet" hasAtmos="1" hasWater="0" radius="20000" nSeg="8">
 				<Position x="55000" y="0" z="0"/>
-				<NoiseSettings maxHeight="1200" noiseFreq="0.0001" octaves="8" lacunarity="2.3" fGain="0.5" fWeStr="0.6" fPinPonStr="3" cellJitter="1" domWarpAmp="50" minValue="0" noiseTypeSel="4" fractalTypeSel="4" cellDistTypeSel="3" cellReturnTypeSel="2" domWarpTypeSel="2"/>
+				<NoiseSettings seed="1337" maxHeight="1827.96" noiseFreq="0.00011" octaves="8" lacunarity="2.3" fGain="0.5" fWeStr="0.6" fPinPonStr="3" cellJitter="1" domWarpAmp="50" minValue="0" noiseTypeSel="5" fractalTypeSel="4" cellDistTypeSel="3" cellReturnTypeSel="2" domWarpTypeSel="2"/>
 				<AtmosSettings radius="21000" k_r="0.166" k_m="0.0025" e="14.3" H="4" L="1" g_m="-0.85" numOutScatter="10" numInScatter="10" scale="1">
 					<Color x="0.1" y="0.8" z="0.1"/>
 				</AtmosSettings>
@@ -125,9 +125,9 @@
 			</Planet>
 		</Entity>
 		<Entity type="Planet">
-			<Planet id="2" type="planet" hasAtmos="1" hasWater="0" radius="20000" nSeg="8">
+			<Planet id="3" type="planet" hasAtmos="1" hasWater="0" radius="20000" nSeg="8">
 				<Position x="-55000" y="0" z="0"/>
-				<NoiseSettings maxHeight="1200" noiseFreq="0.0001" octaves="8" lacunarity="2.3" fGain="0.5" fWeStr="0.6" fPinPonStr="3" cellJitter="1" domWarpAmp="50" minValue="0" noiseTypeSel="4" fractalTypeSel="4" cellDistTypeSel="3" cellReturnTypeSel="2" domWarpTypeSel="2"/>
+				<NoiseSettings seed="1330" maxHeight="1200" noiseFreq="0.0002" octaves="8" lacunarity="2.3" fGain="0.5" fWeStr="0.6" fPinPonStr="3" cellJitter="1" domWarpAmp="50" minValue="0" noiseTypeSel="2" fractalTypeSel="2" cellDistTypeSel="3" cellReturnTypeSel="3" domWarpTypeSel="2"/>
 				<AtmosSettings radius="21000" k_r="0.166" k_m="0.0025" e="14.3" H="4" L="1" g_m="-0.85" numOutScatter="10" numInScatter="10" scale="1">
 					<Color x="0.8" y="0.2" z="0.1"/>
 				</AtmosSettings>

@@ -3,7 +3,6 @@
 //
 
 #include "World.h"
-#include "../Entities/BasicWater.h"
 #include "../Entities/Planet/Planet.h"
 #include "../Util/libs/imgui.h"
 #include "../Util/libs/imgui_impl_opengl3.h"
@@ -12,9 +11,7 @@ World::World(const char *scenePath, const char *skyBoxPath, unsigned int scrWidt
              Camera *camera) {
     renderer = new Renderer(scrWidth,scrHeight,camera,skyBoxPath);
     parser =  new XmlParser(scenePath,camera);
-    parser->readData();
     worldEntities = parser->_ents;
-
     nPointLights = parser->nPointLights;
     renderer->nPointLights = nPointLights;
     renderer->camera = camera;
@@ -23,12 +20,11 @@ World::World(const char *scenePath, const char *skyBoxPath, unsigned int scrWidt
     renderer->preRender(worldEntities);
     sunPitch = sun->getDirection().x;
     sunYaw = sun->getDirection().y;
-    //camera->Position = glm::vec3(29562.6,-20292.2,58728);
 }
 
 void World::renderWorld(bool wireframe) {
 
-    renderer->render(worldEntities,worldDeco,wireframe);
+    renderer->render(worldEntities,wireframe);
     ImGui::Begin("World Settings",NULL,ImGuiWindowFlags_MenuBar);
     ImGui::SetWindowFontScale(setting_fontSize);
 

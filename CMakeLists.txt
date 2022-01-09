@@ -28,20 +28,13 @@ add_executable(opengltest main.cpp GameClasses/Util/libs/glad.c
         GameClasses/Entities/Light.h
         GameClasses/Util/XmlParser.cpp
         GameClasses/Util/XmlParser.h
-        GameClasses/Util/BasicShapeBuilder.h
         GameClasses/Base/Renderer.cpp
         GameClasses/Base/Renderer.h
         GameClasses/Entities/Entity.cpp
         GameClasses/Entities/Entity.h
         GameClasses/Base/World.cpp
         GameClasses/Base/World.h
-        GameClasses/Entities/PhysicsObject.cpp
-        GameClasses/Entities/PhysicsObject.h
-        OldStuff/BasicTerrain.cpp
-        OldStuff/BasicTerrain.h
         GameClasses/Util/Math.h
-        GameClasses/Entities/BasicWater.cpp
-        GameClasses/Entities/BasicWater.h
         GameClasses/Entities/Planet/Planet.cpp
         GameClasses/Entities/Planet/Planet.h
         GameClasses/Util/Cubesphere.cpp
@@ -59,5 +52,7 @@ add_executable(opengltest main.cpp GameClasses/Util/libs/glad.c
         GameClasses/Util/libs/imgui_impl_opengl3.h
         GameClasses/Entities/Planet/Atmosphere.cpp
         GameClasses/Entities/Planet/Atmosphere.h
-        GameClasses/Entities/Planet/WaterSphere.cpp GameClasses/Entities/Planet/WaterSphere.h GameClasses/Base/EngineSettings.h)
+        GameClasses/Entities/Planet/WaterSphere.cpp
+        GameClasses/Entities/Planet/WaterSphere.h
+        GameClasses/Base/EngineSettings.h)
 target_link_libraries(opengltest glfw GL X11 pthread Xrandr Xi dl assimp ReactPhysics3D::ReactPhysics3D)

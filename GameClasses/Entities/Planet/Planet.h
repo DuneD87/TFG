@@ -6,7 +6,6 @@
 #define OPENGLTEST_PLANET_H
 
 #include "../Entity.h"
-#include "../../../OldStuff/BasicTerrain.h"
 #include "Atmosphere.h"
 #include "WaterSphere.h"
 #include "../../Base/EngineSettings.h"
@@ -15,13 +14,8 @@
 class Planet : public Entity {
 public:
 
-    Planet(float radius, int nSeg, glm::vec3 position, Camera *cam, std::vector<std::string> path);
-    Planet(float radius, int nSeg, bool hasAtmos, float maxHeight, float noiseFreq, int octaves, float lacunarity,
-           float fGain, float fWeStr, float fPinPonStr, float cellJitter, float domWarpAmp, float minValue,
-           int noiseTypeSel, int fractalTypeSel, int cellDistTypeSel, int cellReturnTypeSel, int domWarpTypeSel,
-           const std::vector<std::string> &path, const std::vector<std::string> &pathNorm, glm::vec3 position,bool hasWater);
     Planet(float radius, int nSeg, bool hasAtmos, float maxHeight,const std::vector<std::string> &path,glm::vec3 position,
-           bool hasWater, FastNoiseLite Noise);
+           bool hasWater, FastNoiseLite Noise, int seed);
 
     ~Planet();
     void draw(Shader &shader, bool outlined = false, int depthMap = -1);
@@ -32,6 +26,9 @@ public:
                       float gm, float numOutScatter, float numInScatter, float scale,
                       glm::vec3 color);
     void setSun(Light* sun);
+    void setupNoiseVariables(float noiseFreq, int octaves, float lacunarity,
+                             float fGain, float fWeStr, float fPinPonStr, float cellJitter, float domWarpAmp, float minValue,
+                             int noiseTypeSel, int fractalTypeSel, int cellDistTypeSel, int cellReturnTypeSel, int domWarpTypeSel);
     float getHighestPoint() const;
     float getLowestPoint() const;
     float getRadius() const;
@@ -79,7 +76,7 @@ private:
     float hPointOffset = 0;
     FastNoiseLite noise;
     float lPointOffset = 17.452;
-    int seed = 1337;
+    int seed;
     bool biomeSet = false;
     float radius;
     int noiseTypeSel,fractalTypeSel,cellDistTypeSel, cellReturnTypeSel, domWarpTypeSel,nSeg, octaves;

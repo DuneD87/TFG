@@ -12,12 +12,11 @@
 #include <vector>
 #include <map>
 #include "../Entities/Light.h"
-#include "../Entities/PhysicsObject.h"
 #include "../Entities/Planet/Planet.h"
 #include "../Basic/Model.h"
 #include "rapidxml/rapidxml.hpp"
 #include "rapidxml/rapidxml_print.hpp"
-#include "BasicShapeBuilder.h"
+
 using namespace rapidxml;
 using namespace std;
 class XmlParser {
@@ -40,7 +39,6 @@ private:
     Camera * cam;
     int nPlanets;
     Light* getLight(xml_node<> *light);
-    PhysicsObject* getObject(xml_node<> *model);
     Planet* getPlanet(xml_node<> *planet);
     vector<Mesh*> getSprites();
     glm::vec3 getValues3(xml_node<> *pos);

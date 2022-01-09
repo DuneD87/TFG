@@ -9,12 +9,10 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include "../Entities/Light.h"
-#include "../../OldStuff/BasicTerrain.h"
 #include "../Basic/Model.h"
 #include "../Basic/Camera.h"
 #include "../Basic/Shader.h"
 #include "../Util/XmlParser.h"
-#include "../Util/BasicShapeBuilder.h"
 #include "EngineSettings.h"
 
 class Renderer {
@@ -28,8 +26,8 @@ public:
     Renderer(unsigned int scrWidth, unsigned int scrHeight, Camera *camera, const char* skyboxPath);
     void addSun(Light* sunLight);
     void preRender(vector<Entity*> worldEnts);
-    void render(vector<Entity*> worldEnts,std::vector<std::pair<std::vector<glm::mat4>,PhysicsObject*>>ents,bool wireframe);
-    void renderScene(vector<Entity*> worldEnts,std::vector<std::pair<std::vector<glm::mat4>,PhysicsObject*>>ents,bool wireframe,
+    void render(vector<Entity*> worldEnts,bool wireframe);
+    void renderScene(vector<Entity*> worldEnts,bool wireframe,
                      glm::mat4 &view, glm::mat4 &projection,float width, float height, bool drawEffects);
     void renderSkybox(glm::mat4 view, glm::mat4 projection);
     void setSunDir(glm::vec3 sunDirection);
@@ -39,10 +37,7 @@ public:
 
 private:
     void drawEntities(std::vector<Entity*> worldEnts, glm::mat4 view, glm::mat4 projection, Shader &shader, bool drawEffects);
-    void renderInstanced(std::pair<std::vector<glm::mat4>,PhysicsObject*>ent, Shader &shader);
-    void renderShadowMap(vector<Entity*> worldEnts,std::vector<std::pair<std::vector<glm::mat4>,PhysicsObject*>>ents);
     void renderLoopCamera(Shader shader,glm::mat4 view, glm::mat4 projection,bool skybox = false);
-    void renderReflexionTexture(vector<Entity*> worldEnts,std::vector<std::pair<std::vector<glm::mat4>,PhysicsObject*>>ents);
     void setupFrameBuffer();
     void setupSkyBox(const char * path);
     unsigned int loadCubemap(vector<std::string> faces);
@@ -52,7 +47,6 @@ private:
     glm::vec3 sunPos = glm::vec3(0);
     glm::vec3 sunDir = glm::vec3(0);
     glm::mat4 lightSpaceMatrix;
-    PhysicsObject *water;
     Light spotLight = Light("", glm::vec3(), glm::vec3(), glm::vec3(), 0, 0, 0,-1,-1);
     Light* sun;
     unsigned int frameBuffer,textColorBuffer,rbo,quadVAO,quadVBO,skyboxVAO,skyboxVBO,cubemapTexture,

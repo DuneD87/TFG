@@ -32,17 +32,7 @@ protected:
     Model *entityModel;
     Mesh *entityMesh;
     Shader entityShader;
-    /*
-   * Types:
-    * 0-> LIGHT
-    * 1-> PHYSICSOBJECT
-    * 2-> EFFECTS
-    * 3-> TERRAIN
-   */
     int type;
-private:
-
-
 };
 
 

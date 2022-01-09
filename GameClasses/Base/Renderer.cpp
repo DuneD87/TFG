@@ -25,23 +25,13 @@ Renderer::Renderer(unsigned int scrWidth, unsigned int scrHeight, Camera *camera
                        "../Shaders/terrainShaderTES.shader");*/
     Shader lightShader("../Shaders/terrainShaderVertex.shader",
                        "../Shaders/terrainShaderFragment.shader");
-    Shader spriteShader("../Shaders/terrainShaderVertex.shader","../Shaders/alphaTextureTest.fs");
-    Shader outlineShader = Shader("../Shaders/terrainShaderVertex.shader", "../Shaders/singleColorShader.fs");
+
     Shader screenShader = Shader("../Shaders/PostProcess/screenShader.vs","../Shaders/PostProcess/screenShader.fs");
     Shader skyboxShader = Shader("../Shaders/skyboxVertexShader.shader","../Shaders/skyboxFragmentShader.shader");
-    Shader depthSMapShader = Shader("../Shaders/depthShadowMappingVertex.shader","../Shaders/depthShadowMappingFragment.shader");
-    Shader lightInstancedShader("../Shaders/lightingShaderInstancedVertex.shader", "../Shaders/terrainShaderFragment.shader");
-    Shader depthSMapInstancedShader("../Shaders/depthShadowMappingInstancedVertex.shader", "../Shaders/depthShadowMappingFragment.shader");
-    Shader waterShader("../Shaders/waterShaderVertex.shader", "../Shaders/waterShaderFragment.shader");
+
     shaders.push_back(lightShader);//0
-    shaders.push_back(spriteShader);//1
-    shaders.push_back(outlineShader);//2
-    shaders.push_back(screenShader);//3
-    shaders.push_back(skyboxShader);//4
-    shaders.push_back(depthSMapShader);//5
-    shaders.push_back(lightInstancedShader);//6
-    shaders.push_back(depthSMapInstancedShader);//7
-    shaders.push_back(waterShader);//8
+    shaders.push_back(screenShader);//1
+    shaders.push_back(skyboxShader);//2
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
     setupFrameBuffer();
@@ -50,8 +40,8 @@ Renderer::Renderer(unsigned int scrWidth, unsigned int scrHeight, Camera *camera
 
 void Renderer::renderSkybox(glm::mat4 view, glm::mat4 projection) {
     glDepthFunc(GL_LEQUAL);
-    shaders[4].use();
-    renderLoopCamera(shaders[4],view,projection,true);
+    shaders[2].use();
+    renderLoopCamera(shaders[2],view,projection,true);
     glBindVertexArray(skyboxVAO);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
@@ -81,20 +71,10 @@ void Renderer::drawEntities(std::vector<Entity*> worldEnts, glm::mat4 view, glm:
                 planet->setNoDrawEffects(drawEffects);
             }
         }
-        else
-        {
-            shaders[8].use();
-            renderLoopCamera(shaders[8],view,projection);
-            worldEnts[i]->draw(shaders[8],false,-1);
-            shader.use();
-            renderLoopCamera(shader,view,projection);
-
-        }
     }
 }
 
-void Renderer::render(vector<Entity *> worldEnts, std::vector<std::pair<std::vector<glm::mat4>, PhysicsObject *>> ents,
-                      bool wireframe) {
+void Renderer::render(vector<Entity *> worldEnts,bool wireframe) {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
@@ -108,7 +88,7 @@ void Renderer::render(vector<Entity *> worldEnts, std::vector<std::pair<std::vec
     glm::mat4 projection;
     projection = glm::perspective(glm::radians(this->camera->Zoom), (float)800/600, setting_near, setting_far);
     glBindFramebuffer(GL_FRAMEBUFFER,reflexionFBO);
-    renderScene(worldEnts,ents,wireframe,view,projection,800,600,false);
+    renderScene(worldEnts,wireframe,view,projection,800,600,false);
     ImGui::Begin("Game Window");
     ImGui::SetWindowFontScale(setting_fontSize);
     ImVec2 pos = ImGui::GetCursorScreenPos();
@@ -125,24 +105,12 @@ void Renderer::render(vector<Entity *> worldEnts, std::vector<std::pair<std::vec
     view = this->camera->GetViewMatrix();
     //Shadowmap framebuffer pass and render to window
     glEnable(GL_DEPTH_TEST); // enable depth testing (is disabled for rendering screen-space quad)
-    renderShadowMap(worldEnts,ents);
-    ImGui::Begin("Game Window 2");
-    ImGui::SetWindowFontScale(setting_fontSize);
-    pos = ImGui::GetCursorScreenPos();
-    ImDrawList* drawList2 = ImGui::GetWindowDrawList();
-    drawList2->AddImage((void*)depthMap,
-                       pos,
-                       ImVec2(pos.x + 1024, pos.y + 720),
-                       ImVec2(0, 1),
-                       ImVec2(1, 0));
-    ImGui::End();
-    glBindFramebuffer(GL_FRAMEBUFFER,0);
-
+    glEnable(GL_CULL_FACE);
     //render to main screen
     if (!wireframe)
         glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
     projection = glm::perspective(glm::radians(this->camera->Zoom), (float)setting_scrWidth/setting_scrHeight, setting_near, setting_far);
-    renderScene(worldEnts,ents,wireframe,view,projection,setting_scrWidth,setting_scrHeight,true);
+    renderScene(worldEnts,wireframe,view,projection,setting_scrWidth,setting_scrHeight,true);
     if (!wireframe)
     {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -150,7 +118,7 @@ void Renderer::render(vector<Entity *> worldEnts, std::vector<std::pair<std::vec
         // clear all relevant buffers
         glClearColor(1.0f, 1.0f, 1.0f, 1.0f); // set clear color to white (not really necessary actually, since we won't be able to see behind the quad anyways)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-        shaders[3].use();
+        shaders[1].use();
         glBindVertexArray(quadVAO);
         glBindTexture(GL_TEXTURE_2D, textColorBuffer);	// use the color attachment texture as the texture of the quad plane
         glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -158,8 +126,8 @@ void Renderer::render(vector<Entity *> worldEnts, std::vector<std::pair<std::vec
 }
 
 
-void Renderer::renderScene(vector<Entity*> worldEnts,std::vector<std::pair<std::vector<glm::mat4>,PhysicsObject*>> ents,
-                           bool wireframe,glm::mat4 &view, glm::mat4 &projection, float width, float height, bool drawEffects) {
+void Renderer::renderScene(vector<Entity*> worldEnts,bool wireframe,glm::mat4 &view, glm::mat4 &projection,
+                           float width, float height, bool drawEffects) {
 
 
     glViewport(0, 0, width, height);
@@ -168,16 +136,6 @@ void Renderer::renderScene(vector<Entity*> worldEnts,std::vector<std::pair<std::
     drawEntities(worldEnts,view,projection,shaders[0],!drawEffects);
     // now bind back to default framebuffer and draw a quad plane with the attached framebuffer color texture
 
-}
-
-void Renderer::renderInstanced(std::pair<std::vector<glm::mat4>,PhysicsObject*> ent,Shader &shader) {
-    for (int i = 0; i < ent.second->getModel()->meshes.size();i++)
-    {
-        ent.second->getModel()->meshes[i]->bindTextures(shader,depthMap);
-        glBindVertexArray(ent.second->getModel()->meshes[i]->VAO);
-        glDrawElementsInstanced(GL_TRIANGLES, ent.second->getModel()->meshes[i]->indices.size(), GL_UNSIGNED_INT, 0, ent.first.size());
-        glBindVertexArray(0);
-    }
 }
 
 void Renderer::renderLoopCamera(Shader shader,glm::mat4 view, glm::mat4 projection,bool skybox) {
@@ -212,8 +170,8 @@ void Renderer::setupFrameBuffer() {
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
 
-    shaders[3].use();
-    shaders[3].setInt("screenTexture",0);
+    shaders[1].use();
+    shaders[1].setInt("screenTexture",0);
 
     // frameBuffer configuration
     // -------------------------
@@ -238,25 +196,6 @@ void Renderer::setupFrameBuffer() {
         cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << endl;
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-    // configure depth map FBO
-    // -----------------------
-    glGenFramebuffers(1, &depthMapFBO);
-    // create depth texture
-    glGenTextures(1, &depthMap);
-    glBindTexture(GL_TEXTURE_2D, depthMap);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-    // attach depth texture as FBO's depth buffer
-    glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
-    glDrawBuffer(GL_NONE);
-    glReadBuffer(GL_NONE);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
     glGenFramebuffers(1, &reflexionFBO);
     glBindFramebuffer(GL_FRAMEBUFFER, reflexionFBO);
 
@@ -273,7 +212,7 @@ void Renderer::setupFrameBuffer() {
 }
 
 void Renderer::setPostProcess(unsigned int index) {
-    shaders[3] = Shader("../Shaders/PostProcess/screenShader.vs",postProcessPath[index].c_str());
+    shaders[1] = Shader("../Shaders/PostProcess/screenShader.vs",postProcessPath[index].c_str());
 }
 
 unsigned int Renderer::loadCubemap(vector<std::string> faces)
@@ -370,46 +309,10 @@ void Renderer::setupSkyBox(const char * path) {
         std::string(path)+"back"+format
     };
     cubemapTexture = loadCubemap(faces);
-    shaders[4].use();
-    shaders[4].setInt("skybox",0);
+    shaders[2].use();
+    shaders[2].setInt("skybox",0);
 }
 
-void Renderer::renderShadowMap(vector<Entity*> worldEnts,std::vector<std::pair<std::vector<glm::mat4>,PhysicsObject*>>ents) {
-    // render
-    // ------
-    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glDisable(GL_CULL_FACE);
-    // 1. render depth of scene to texture (from light's perspective)
-    // --------------------------------------------------------------
-    glm::mat4 lightProjection, lightView;
-    float near_plane = -100.0f, zFar = 500.0f,boxSize = 256.0f;
-    lightProjection = glm::ortho(-boxSize, boxSize, -boxSize, boxSize, near_plane, zFar);
-    //std::cout<<camera->Front.x<<" "<<camera->Front.y<<" " << camera->Front.z<<std::endl;
-    lightView = glm::lookAt(sunPos , sunPos + (sunDir * zFar/2.0f), glm::vec3(0,1,0));
-    lightSpaceMatrix = lightProjection * lightView;
-    // render scene from light's point of view
-    shaders[5].use();
-    shaders[5].setMat4("lightSpaceMatrix", lightSpaceMatrix);
-
-    glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
-    glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-    glClear(GL_DEPTH_BUFFER_BIT);
-
-    for (int i = 0; i < worldEnts.size();i++)
-    {
-        if (worldEnts[i]->getType() == 1)
-            worldEnts[i]->draw(shaders[5],false);
-    }
-    shaders[7].use();
-    shaders[7].setMat4("lightSpaceMatrix", lightSpaceMatrix);
-    for (int i = 0; i < ents.size();i++)
-        renderInstanced(ents[i],shaders[7]);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glViewport(0, 0, setting_scrWidth, setting_scrHeight);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-    glEnable(GL_CULL_FACE);
-}
 
 void Renderer::addShader(Shader &shader) {
     shaders.push_back(shader);
@@ -434,8 +337,6 @@ Renderer::~Renderer() {
     for (auto shader: shaders)
         glDeleteShader(shader.ID);
 }
-
-
 
 void Renderer::preRender(vector<Entity *> worldEnts) {
     for (auto ent: worldEnts)

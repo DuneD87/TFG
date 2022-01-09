@@ -18,7 +18,7 @@ Atmosphere::Atmosphere(float planetRadius, float atmosRadius, Camera *cam, float
     this->cam = cam;
     Cubesphere cubesphere(atmosRadius,4,true);
     cubesphere.setupNoise(0,NULL);
-    entityMesh = new Mesh(cubesphere.vertexList,cubesphere.getIndices(),"","");
+    entityMesh = new Mesh(cubesphere.vertexList,cubesphere.getIndices());
     entityMesh->position = position;
     entityShader = Shader("../Shaders/skydomeVertex.shader", "../Shaders/skydomeFragment.shader");
 
@@ -26,7 +26,6 @@ Atmosphere::Atmosphere(float planetRadius, float atmosRadius, Camera *cam, float
 
 void Atmosphere::draw(Shader &shader, bool outlined, int depthMap) {
     renderGui();
-    std::cout<<"atmos pos:"<<entityMesh->position.x<<", "<<entityMesh->position.y<<", "<<entityMesh->position.z<<std::endl;
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA,GL_SRC_ALPHA);
     glm::mat4 view = this->cam->GetViewMatrix();

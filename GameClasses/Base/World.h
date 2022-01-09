@@ -7,7 +7,6 @@
 
 #include "Renderer.h"
 #include "../Util/Math.h"
-#include "../../OldStuff/BasicTerrain.h"
 #include "../Base/EngineSettings.h"
 class World {
 public:
@@ -22,15 +21,10 @@ public:
     Renderer* getRenderer();
     void renderWorld(bool wireframe);
 private:
-    void setupInstanceObjects(int wSeg, int divider);
-    void makeWaterLevel();
-    BasicTerrain *terrain;
-    Mesh waterPlane;
-    PhysicsObject * water;
+
     vector<Entity*> worldEntities;
     Light *sun;
     float sunYaw,sunPitch;
-    vector<std::pair<std::vector<glm::mat4>,PhysicsObject*>> worldDeco;
     Renderer *renderer;
     XmlParser *parser;
 };
