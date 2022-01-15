@@ -13,10 +13,10 @@
 			</Light>
 		</Entity>
 		<Entity type="Planet">
-			<Planet seed = "1337" id="0" type="planet" hasAtmos="0" hasWater="0" radius="7000" nSeg="8">
+			<Planet id="0" type="planet" hasAtmos="0" hasWater="0" radius="7000" nSeg="8">
 				<Position x="-25000" y="0" z="40000"/>
-				<NoiseSettings maxHeight="570" noiseFreq="0.00055" octaves="8" lacunarity="2.3" fGain="0.5" fWeStr="0.6" fPinPonStr="3" cellJitter="1" domWarpAmp="50" minValue="0" noiseTypeSel="4" fractalTypeSel="2" cellDistTypeSel="3" cellReturnTypeSel="2" domWarpTypeSel="2"/>
-				<AtmosSettings radius="30000" k_r="0.166" k_m="0.0025" e="14.3" H="4.0" L="1.0" g_m="-0.85" numOutScatter="10.0" numInScatter="10.0" scale="1.0">
+				<NoiseSettings seed = "1337" maxHeight="570" noiseFreq="0.00055" octaves="8" lacunarity="2.3" fGain="0.5" fWeStr="0.6" fPinPonStr="3" cellJitter="1" domWarpAmp="50" minValue="0" noiseTypeSel="4" fractalTypeSel="2" cellDistTypeSel="3" cellReturnTypeSel="2" domWarpTypeSel="2"/>
+				<AtmosSettings  radius="30000" k_r="0.166" k_m="0.0025" e="14.3" H="4.0" L="1.0" g_m="-0.85" numOutScatter="10.0" numInScatter="10.0" scale="1.0">
 					<Color x="0.1" y="0.2" z="0.8"/>
 				</AtmosSettings>
 				<Textures>

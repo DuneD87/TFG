@@ -155,15 +155,19 @@ GLFWwindow * createWindow()
     return window;
 }
 
-// ---------------------------------------------------
-int main()
+std::string selectFromFolder(std::string path, std::string type, bool folders = false)
 {
-    std::string path = "../Scenes";
+
     int nScenes = 0;
-    std::cout<<"Selecciona una escena:"<<std::endl;
+    std::cout<<"Selecciona una "<<type<<":"<<std::endl;
     std::vector<std::string> files;
     for (const auto & entry : fs::directory_iterator(path))
-        if (entry.is_regular_file())
+        if (!folders && entry.is_regular_file())
+        {
+            std::cout <<"["<<nScenes<<"]"<< entry.path() << std::endl;
+            files.push_back(entry.path());
+            nScenes++;
+        } else if (folders)
         {
             std::cout <<"["<<nScenes<<"]"<< entry.path() << std::endl;
             files.push_back(entry.path());
@@ -181,7 +185,18 @@ int main()
             sel = -1;
         }
     }
+    if (folders)
+        return files[sel] + "/";
+    else
+        return files[sel];
+}
 
+// ---------------------------------------------------
+int main()
+{
+
+    std::string path = selectFromFolder("../Scenes","escena");
+    std::string skybox = selectFromFolder("../Textures/SkyBox","skybox", true);
     GLFWwindow *window = createWindow();
     stbi_set_flip_vertically_on_load(true);
     glPatchParameteri(GL_PATCH_VERTICES,3);
@@ -192,7 +207,7 @@ int main()
     glCullFace(GL_BACK);
     glFrontFace(GL_CCW);
 
-    World *world = new World(files[sel].c_str(),"../Textures/SkyBox/SpaceHres/",SCR_WIDTH,SCR_HEIGHT,cam);
+    World *world = new World(path.c_str(),skybox.c_str(),SCR_WIDTH,SCR_HEIGHT,cam);
 
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -200,7 +215,6 @@ int main()
     ImGui::StyleColorsDark();
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 150");
-
     while (!glfwWindowShouldClose(window))
     {
         processInput(window, world);

@@ -220,19 +220,33 @@ void Cubesphere::buildInterleavedVertices()
     std::size_t count = vertices.size();
     for(i = 0, j = 0; i < count; i += 3, j += 2)
     {
-        Vertex auxVert;
+        Vertex auxVertex;
         interleavedVertices.push_back(vertices[i]);
         interleavedVertices.push_back(vertices[i+1]);
         interleavedVertices.push_back(vertices[i+2]);
-        auxVert.Position = glm::vec3(vertices[i],vertices[i+1],vertices[i+2]);
+        float x = vertices[i];
+        float y = vertices[i+1];
+        float z = vertices[i+2];
+        glm::vec3 vertexPos = glm::vec3(x*radius,y*radius,z*radius);
+        float minNoise = noise.GetNoise(x*radius,y*radius,z*radius);
+        float noiseLevel = minNoise * height;
+        if (noiseLevel > hPoint)
+            hPoint = noiseLevel;
+        if (noiseLevel < lPoint)
+            lPoint = noiseLevel;
+        glm::vec3 dir = glm::normalize(glm::vec3(0) - vertexPos);
+        auxVertex.Position = vertexPos + dir*noiseLevel;
+
+
         interleavedVertices.push_back(normals[i]);
         interleavedVertices.push_back(normals[i+1]);
         interleavedVertices.push_back(normals[i+2]);
-        auxVert.Normal = glm::vec3(normals[i],normals[i+1],normals[i+2]);
+        auxVertex.Normal = glm::vec3(normals[i],normals[i+1],normals[i+2]);
+
         interleavedVertices.push_back(texCoords[j]);
         interleavedVertices.push_back(texCoords[j+1]);
-        auxVert.TexCoords = glm::vec2(texCoords[j],texCoords[j+1]);
-        vertexList.push_back(auxVert);
+        auxVertex.TexCoords = glm::vec2(texCoords[j],texCoords[j+1]);
+        vertexList.push_back(auxVertex);
     }
 }
 

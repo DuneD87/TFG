@@ -34,7 +34,7 @@ private:
     float L = 1.0f;
     float atmosColor[3] = {0.1,0.2,0.8};
     glm::vec3 sunDir = glm::vec3(-2,-4,-2);
-    float g_m = -0.85;
+    float g_m = -0.75;
     float numOutScatter = 10.0f;
     float numInScatter = 10.0f;
     float scale = 1;

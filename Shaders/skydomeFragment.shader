@@ -95,7 +95,7 @@ vec3 inScatter(vec3 o, vec3 dir, vec2 e, vec3 l) {
     }
 
     sum *= len * SCALE_L;
-    float c = dot(dir, -l);
+    float c = dot(dir, l);
     float cc = c * c;
     return sum * ( K_R * C_R * rayleighPhase( cc ) + K_M * miePhase( G_M, c, cc ) ) * E;
 }
