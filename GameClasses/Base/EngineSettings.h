@@ -4,7 +4,7 @@
 
 #ifndef OPENGLTEST_ENGINESETTINGS_H
 #define OPENGLTEST_ENGINESETTINGS_H
-const float setting_far = 1000000.0f;
+const float setting_far = 10000000.0f;
 const float setting_near = 10.0f;
 const int setting_scrHeight = 2160;
 const int setting_scrWidth = 3840;

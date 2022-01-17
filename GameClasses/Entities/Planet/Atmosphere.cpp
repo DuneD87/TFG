@@ -77,10 +77,10 @@ void Atmosphere::renderGui() {
         ImGui::SliderFloat("L", &L, 0.0f, 50.0f);
         ImGui::SliderFloat("H", &H, 0.0f, 50.0f);
         ImGui::SliderFloat("K_R", &k_r, -10.0f, 10.0f);
-        ImGui::SliderFloat("K_M", &k_m, -2.0f, 0.1);
+        ImGui::SliderFloat("K_M", &k_m, -2.0f, 2.0);
         ImGui::SliderFloat("E", &e, -100.0f, 100);
         ImGui::NewLine();
-        ImGui::SliderFloat("G_M",&g_m,-100.0f,100.0f);
+        ImGui::SliderFloat("G_M",&g_m,-5.0f,5.0f);
         ImGui::NewLine();
         ImGui::SliderFloat("numOutScatter",&numOutScatter,-10.0,500.0f);
         ImGui::SliderFloat("numInScatter",&numInScatter,-10.0f,500.0f);

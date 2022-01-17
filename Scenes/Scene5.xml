@@ -1,0 +1,49 @@
+<Scene>
+	<Camera type="cam">
+		<Orientation pitch="0.000000" yaw="0.000000" roll="0.000000"/>
+		<Position x="34332.910156" y="97636.500000" z="33598.765625"/>
+	</Camera>
+	<Entities>
+		<Entity type="Light">
+			<Light type="dirLight">
+				<Orientation pitch="0.968000" yaw="94.838997"/>
+				<Ambient x="0.1" y="0.1f" z="0.1f"/>
+				<Diffuse x="0.9" y="0.9f" z="0.9"/>
+				<Specular x="1.0" y="1.0" z="1.0"/>
+			</Light>
+		</Entity>
+		<Entity type="Planet">
+			<Planet id="1" type="planet" hasAtmos="1" hasWater="0" radius="20000" nSeg="8">
+				<Position x="180000" y="0" z="0"/>
+				<NoiseSettings seed="1334" maxHeight="1" noiseFreq="0.0001" octaves="8" lacunarity="2.3" fGain="0.5" fWeStr="0.6" fPinPonStr="3" cellJitter="1" domWarpAmp="50" minValue="0" noiseTypeSel="4" fractalTypeSel="4" cellDistTypeSel="3" cellReturnTypeSel="2" domWarpTypeSel="2"/>
+				<AtmosSettings radius="21000" k_r="0.166" k_m="0.0025" e="14.3" H="4" L="1" g_m="-0.85" numOutScatter="10" numInScatter="10" scale="1">
+					<Color x="0.1" y="0.2" z="0.8"/>
+				</AtmosSettings>
+				<Textures>
+					<Diffuse>
+						<d>Planet/rough-wet-cobble-albedo-1024.png</d>
+						<d>Planet/grass1-albedo3-1024.png</d>
+						<d>Planet/worn-bumpy-rock-albedo-1024.png</d>
+						<d>Planet/rock-snow-ice-albedo-1024.png</d>
+						<d>Planet/snow-packed-albedo-1024.png</d>
+					</Diffuse>
+				</Textures>
+				<Biomes>
+					<Biome latStart="1" latEnd="0.75">
+						<Textures>
+							<Texture index="0" hStart="0.0" hEnd="0.8"/>
+							<Texture index="2" hStart="0.8" hEnd="1.5"/>
+						</Textures>
+					</Biome>
+					<Biome latStart="0.75" latEnd="0.0">
+						<Textures>
+							<Texture index="1" hStart="0.0" hEnd="0.8"/>
+							<Texture index="3" hStart="0.8" hEnd="1.5"/>
+						</Textures>
+					</Biome>
+				</Biomes>
+			</Planet>
+		</Entity>
+	</Entities>
+</Scene>
+

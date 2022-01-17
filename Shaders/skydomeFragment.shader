@@ -84,7 +84,6 @@ vec3 inScatter(vec3 o, vec3 dir, vec2 e, vec3 l) {
     vec3 step = dir * len;
     vec3 p = o + dir * e.x;
     vec3 v = p + dir * (len * 0.5);
-
     vec3 sum = vec3(0.0);
     for(int i = 0; i < fNumInScatter; i++) {
         vec2 f = rayIntersection(v, l, atmosRadius);
@@ -93,7 +92,6 @@ vec3 inScatter(vec3 o, vec3 dir, vec2 e, vec3 l) {
         sum += density(v)* exp(-n * ( K_R * C_R + K_M ));
         v += step;
     }
-
     sum *= len * SCALE_L;
     float c = dot(dir, l);
     float cc = c * c;

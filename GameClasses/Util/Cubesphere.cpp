@@ -127,8 +127,9 @@ void Cubesphere::buildVerticesSmooth()
             z = unitVertices[k+2];
 
             s = ((float)j / (vertexCountPerRow - 1)) *vertexCountPerRow ;
-            Vertex auxVertex;
+
             glm::vec3 vertexPos = glm::vec3(x*radius,y*radius,z*radius);
+            Vertex auxVertex{};
             float minNoise = noise.GetNoise(x*radius,y*radius,z*radius);
             float noiseLevel = minNoise * height;
             if (noiseLevel > hPoint)
@@ -137,10 +138,10 @@ void Cubesphere::buildVerticesSmooth()
                 lPoint = noiseLevel;
             glm::vec3 dir = glm::normalize(glm::vec3(0) - vertexPos);
             auxVertex.Position = vertexPos + dir*noiseLevel;
-            auxVertex.Normal = glm::vec3(x,y,z);
             auxVertex.TexCoords = glm::vec2(s,t);
-
+            auxVertex.Normal = glm::vec3(0);
             vertexList.push_back(auxVertex);
+
             addVertex(x*radius, y*radius, z*radius);
             addNormal(x, y, z);
             addTexCoord(s, t);
@@ -161,18 +162,18 @@ void Cubesphere::buildVerticesSmooth()
     int indexSize = (int)indices.size();        // index array size of +X face
     int lineIndexSize = (int)lineIndices.size(); // line index size of +X face
 
-    // build -X face by negating x and z
-
+    //-X FACE
     std::vector<int> index1 = {0,1,2};
     std::vector<Vertex> vertices0;
     std::vector<unsigned int> indices0;
-    buildFace(glm::vec3(-1,1,-1), index1,vertexSize,indexSize,vertices0,indices0);;
+    buildFace(glm::vec3(-1,1,-1), index1,vertexSize,indexSize,vertices0,indices0);
     finishFaceComputation(vertices0);
-    // build +Y face by swapping x=>y, y=>-z, z=>-x
+    //+Y FACE
     std::vector<int> index2 = {2,0,1};
     std::vector<Vertex> vertices1;
     std::vector<unsigned int> indices1;
     buildFace(glm::vec3(-1,1,-1), index2,vertexSize,indexSize,vertices1,indices1);
+
     finishFaceComputation(vertices1);
     // build -Y face by swapping x=>-y, y=>z, z=>-x
     std::vector<int> index3 = {2,0,1};

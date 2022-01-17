@@ -1,7 +1,7 @@
 <Scene>
 	<Camera type="cam">
-		<Orientation pitch="38.995235" yaw="-35.091671" roll="-8.017399"/>
-		<Position x="4493.371094" y="15442.373047" z="13443.627930"/>
+		<Orientation pitch="0.000000" yaw="0.000000" roll="0.000000"/>
+		<Position x="97964.195312" y="46521.183594" z="13673.212891"/>
 	</Camera>
 	<Entities>
 		<Entity type="Light">
@@ -13,10 +13,19 @@
 			</Light>
 		</Entity>
 		<Entity type="Planet">
-			<Planet id="0" type="planet" hasAtmos="0" hasWater="0" radius="7000" nSeg="8">
+			<Planet id="0" type="planet" hasAtmos="0" hasWater="0" radius="7000" nSeg="10">
 				<Position x="-200000" y="0" z="40000"/>
-				<NoiseSettings seed = "1337" maxHeight="570" noiseFreq="0.00055" octaves="8" lacunarity="2.3" fGain="0.5" fWeStr="0.6" fPinPonStr="3" cellJitter="1" domWarpAmp="50" minValue="0" noiseTypeSel="4" fractalTypeSel="2" cellDistTypeSel="3" cellReturnTypeSel="2" domWarpTypeSel="2"/>
-				<AtmosSettings radius="30000" k_r="0.166" k_m="0.0025" e="14.3" H="4.0" L="1.0" g_m="-0.85" numOutScatter="10.0" numInScatter="10.0" scale="1.0">
+				<NoiseSettings seed="1337" maxHeight="570" noiseFreq="0.00055" octaves="8" lacunarity="2.3" fGain="0.5" fWeStr="0.6" fPinPonStr="3" cellJitter="1" domWarpAmp="50" minValue="0" noiseTypeSel="4" fractalTypeSel="2" cellDistTypeSel="3" cellReturnTypeSel="2" domWarpTypeSel="2"/>
+				<AtmosSettings radius="30000"
+							   k_r="0.215"
+							   k_m="0.045"
+							   e="14.3"
+							   H="4.0"
+							   L="1.0"
+							   g_m="-0.85"
+							   numOutScatter="10.0"
+							   numInScatter="10.0"
+							   scale="1.0">
 					<Color x="0.1" y="0.2" z="0.8"/>
 				</AtmosSettings>
 				<Textures>
@@ -54,10 +63,10 @@
 			</Planet>
 		</Entity>
 		<Entity type="Planet">
-			<Planet id="1" type="planet" hasAtmos="1" hasWater="1" radius="20000" nSeg="8">
+			<Planet id="1" type="planet" hasAtmos="1" hasWater="1" radius="20000" nSeg="10">
 				<Position x="0" y="0" z="0"/>
-				<NoiseSettings seed = "1334" maxHeight="1200" noiseFreq="0.0001" octaves="8" lacunarity="2.3" fGain="0.5" fWeStr="0.6" fPinPonStr="3" cellJitter="1" domWarpAmp="50" minValue="0" noiseTypeSel="4" fractalTypeSel="4" cellDistTypeSel="3" cellReturnTypeSel="2" domWarpTypeSel="2"/>
-				<AtmosSettings radius="21000" k_r="0.166" k_m="0.0025" e="14.3" H="4" L="1" g_m="-0.85" numOutScatter="10" numInScatter="10" scale="1">
+				<NoiseSettings seed="1334" maxHeight="1200" noiseFreq="0.0001" octaves="8" lacunarity="2.3" fGain="0.5" fWeStr="0.6" fPinPonStr="3" cellJitter="1" domWarpAmp="50" minValue="0" noiseTypeSel="4" fractalTypeSel="4" cellDistTypeSel="3" cellReturnTypeSel="2" domWarpTypeSel="2"/>
+				<AtmosSettings radius="21000" k_r="0.215" k_m="0.045" e="14.3" H="4" L="1" g_m="-0.85" numOutScatter="10" numInScatter="10" scale="1">
 					<Color x="0.1" y="0.2" z="0.8"/>
 				</AtmosSettings>
 				<Textures>

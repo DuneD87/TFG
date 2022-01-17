@@ -15,6 +15,7 @@ World::World(const char *scenePath, const char *skyBoxPath, unsigned int scrWidt
     nPointLights = parser->nPointLights;
     renderer->nPointLights = nPointLights;
     renderer->camera = camera;
+    this->camera = camera;
     this->sun = parser->sun;
     renderer->addSun(sun);
     renderer->preRender(worldEntities);
@@ -31,6 +32,7 @@ void World::renderWorld(bool wireframe) {
     sun->setDirection(glm::vec2(sunPitch,sunYaw));
     ImGui::SliderFloat("Sun yaw",&sunYaw,-180,180);
     ImGui::SliderFloat("Sun pitch",&sunPitch,-90,90);
+    ImGui::InputFloat("Camera Speed",&camera->MovementSpeed);
     bool saveWorld = ImGui::Button("Save");
     if (saveWorld) parser->saveWorld();
     ImGui::End();

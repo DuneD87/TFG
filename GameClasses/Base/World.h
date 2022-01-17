@@ -10,7 +10,7 @@
 #include "../Base/EngineSettings.h"
 class World {
 public:
-    Camera camera;
+    Camera* camera;
     int nPointLights;
     int waterLevel = -50;
     ~World();

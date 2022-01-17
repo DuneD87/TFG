@@ -132,7 +132,8 @@ void Renderer::renderScene(vector<Entity*> worldEnts,bool wireframe,glm::mat4 &v
 
     glViewport(0, 0, width, height);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-    renderSkybox(view,projection);
+    if (!wireframe)
+        renderSkybox(view,projection);
     drawEntities(worldEnts,view,projection,shaders[0],!drawEffects);
     // now bind back to default framebuffer and draw a quad plane with the attached framebuffer color texture
 

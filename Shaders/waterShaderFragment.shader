@@ -81,19 +81,21 @@ void main()
     vec3 viewDir = normalize(viewPos - FragPos);
     float dist = distance(FragPos,viewPos);
 
-    vec2 ndc = ((worldPos.xy/worldPos.w)/2.0)+0.5;
-    vec2 distorsion = (texture2D(texture_diffuse[0],vec2(TexCoord.x + waveSpeed,TexCoord.y)*5).rg * 2.0 - 1.0)*waveStrength;
-    vec2 reflectCoord = vec2(ndc.x, 1.0 - ndc.y);
+
+    vec2 distorsion = (texture2D(texture_diffuse[0],
+                        vec2(TexCoord.x + waveSpeed,TexCoord.y)*5).rg * 2.0 - 1.0)*waveStrength;
     vec2 diffCoord = TexCoord/2;
-
-    reflectCoord += distorsion;
     diffCoord += distorsion;
-
     vec4 waterTextDiff = textureNoTile(texture_diffuse[1], diffCoord);
+
+    vec2 ndc = ((worldPos.xy/worldPos.w)/2.0)+0.5;
+    vec2 reflectCoord = vec2(ndc.x, 1.0 - ndc.y);
+    reflectCoord += distorsion;
     vec4 waterTextRefl = texture2D(texture_diffuse[2], reflectCoord);
+
     float mixAmount = dist/5000;
     if (mixAmount > 1) mixAmount = 1;
-    vec4 waterText = mix(waterTextDiff,waterTextRefl,1-mixAmount);
+    vec4 waterText= mix(waterTextDiff,waterTextRefl,1-mixAmount);
     vec3 result = vec3(0);
     result += CalcDirLight(dirLight, Normal, viewDir,waterText);
     float alphaAmount = dist/2000;

@@ -127,9 +127,11 @@ vec4 createTerrainTextHeight(vec4 loadedTextures[maxText],Biome biome, float hei
         if (height >= biome.textIndex[i].hStart && height <  biome.textIndex[i].hEnd)
         {
             if (i == 0)
-                terrainColor += vec4(blend(loadedTextures[biome.textIndex[0].index],1-a,loadedTextures[biome.textIndex[0].index],a),0.0);
+                terrainColor += vec4(blend(loadedTextures[biome.textIndex[0].index],1-a,
+                loadedTextures[biome.textIndex[0].index],a),0.0);
             else
-                terrainColor += vec4(blend(loadedTextures[biome.textIndex[i - 1].index],1-a,loadedTextures[biome.textIndex[i].index],a),0.0);
+                terrainColor += vec4(blend(loadedTextures[biome.textIndex[i - 1].index],1-a,
+                loadedTextures[biome.textIndex[i].index],a),0.0);
         }
 
     }
@@ -145,7 +147,8 @@ vec4 biomeInterpolation(vec4 loadedTextures[maxText], int index, float lat, floa
         if (index == 0)
             result += createTerrainTextHeight(loadedTextures,biomes[0], height);
         else
-            result += vec4(blend(createTerrainTextHeight(loadedTextures,biomes[index - 1], height), 1-a, createTerrainTextHeight(loadedTextures,biomes[index], height), a), 0.0);
+            result += vec4(blend(createTerrainTextHeight(loadedTextures,biomes[index - 1], height), 1-a,
+            createTerrainTextHeight(loadedTextures,biomes[index], height), a), 0.0);
     }
     return result;
 }
