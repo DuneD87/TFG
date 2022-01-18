@@ -72,9 +72,11 @@ void Planet::renderGui() {
     bool test = false;
     // 2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
     {
-        ImGui::Begin("Planet Settings" + this->id,NULL,ImGuiWindowFlags_MenuBar);                          // Create a window called "Hello, world!" and append into it.
+        std::string windowId = "Planet Settings" + std::to_string(this->id);
+        ImGui::Begin(windowId.c_str(),NULL,ImGuiWindowFlags_MenuBar);// Create a window called "Hello, world!" and append into it.
         ImGui::SetWindowFontScale(setting_fontSize);
         ImGui::PushItemWidth(200);
+        ImGui::Text("Planet id: %d" , this->id);
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
         test = test + ImGui::SliderFloat("minValue", &minValue,-1.0f, 1.0f);
         ImGui::Text("Highest Point offset");
@@ -118,7 +120,10 @@ void Planet::renderGui() {
         noise.SetFractalWeightedStrength(fWeStr);
         noise.SetFractalPingPongStrength(fPinPonStr);
         if (ImGui::Button("Rebuild")) setupMesh();
-        ImGui::End();;
+        if (hasAtmos)
+            skyDome->renderGui();
+        else
+            ImGui::End();
     }
 
 }
@@ -169,7 +174,7 @@ void Planet::setupEffects(float atmosRadius, float kr, float km, float e, float 
     for (int i = 0; i < 3; i++)
         colorAux[i] = color[i];
     skyDome = new Atmosphere(atmosRadius-lowestPoint,atmosRadius+highestPoint,cam,kr,km,e,h,l,colorAux,gm,numOutScatter,numInScatter,scale,_position);
-
+    skyDome->id = this->id;
     if (hasWater)
         water = new WaterSphere(radius,radius,cam,_position);
 }

@@ -25,7 +25,7 @@ Atmosphere::Atmosphere(float planetRadius, float atmosRadius, Camera *cam, float
 }
 
 void Atmosphere::draw(Shader &shader, bool outlined, int depthMap) {
-    renderGui();
+    //renderGui();
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA,GL_SRC_ALPHA);
     glm::mat4 view = this->cam->GetViewMatrix();
@@ -64,10 +64,10 @@ void Atmosphere::renderGui() {
 
     // 2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
     {
-        ImGui::Begin("Atmospheric Settings",NULL,ImGuiWindowFlags_MenuBar);                          // Create a window called "Hello, world!" and append into it.
+                             // Create a window called "Hello, world!" and append into it.
         ImGui::SetWindowFontScale(setting_fontSize);
         ImGui::PushItemWidth(200);
-
+        ImGui::Text("Planet id: %d",this->id);
         ImGui::SliderFloat("outterRadius", &atmosRadius, 0.0f, 100000.0f);
         ImGui::SliderFloat("innerRadius", &planetRadius, 0.0f, 100000.0f);
         ImGui::SliderFloat("MAX", &viewDistance, 0.0f, 10000000.0f);

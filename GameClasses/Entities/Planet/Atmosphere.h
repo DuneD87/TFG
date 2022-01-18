@@ -19,12 +19,13 @@ public:
     void draw(Shader &shader, bool outlined = false, int depthMap = -1);
     void setSun(Light* sun);
     std::string toString();
-private:
     void renderGui();
+    int id;
+private:
+
     Model * skyDome;
     float planetRadius, atmosRadius;
     Camera *cam;
-private:
     Shader atmosShader;
     float viewDistance = 1000000.0f;
     float k_r = 0.166;
