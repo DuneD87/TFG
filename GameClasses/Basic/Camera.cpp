@@ -10,7 +10,6 @@
 Camera::Camera(glm::vec3 position, glm::vec3 up, float yaw, float pitch) : Front(glm::vec3(1.0f, 0.0f, 1.0f)), MovementSpeed(SPEED), MouseSensitivity(SENSITIVITY), Zoom(ZOOM)
 {
     Position = position;
-    WorldUp = up;
     Yaw = yaw;
     Pitch = pitch;
     Roll = 90;
@@ -21,7 +20,6 @@ Camera::Camera(glm::vec3 position, glm::vec3 up, float yaw, float pitch) : Front
 Camera::Camera(float posX, float posY, float posZ, float upX, float upY, float upZ, float yaw, float pitch) : Front(glm::vec3(0.0f, 0.0f, -1.0f)), MovementSpeed(SPEED), MouseSensitivity(SENSITIVITY), Zoom(ZOOM)
 {
     Position = glm::vec3(posX, posY, posZ);
-    WorldUp = glm::vec3(upX, upY, upZ);
     Yaw = yaw;
     Pitch = pitch;
     invertPitch = false;
@@ -30,16 +28,16 @@ Camera::Camera(float posX, float posY, float posZ, float upX, float upY, float u
 
 glm::mat4 Camera::GetViewMatrix()
 {
-    glm::mat4 rotate;
-    if (invertPitch)
-    {
-        rotate = glm::mat4_cast(orientation);
-        //rotate = glm::rotate(rotate,glm::radians(-180.0f + Roll),Front);
-    }
-    else
-        rotate = glm::mat4_cast(orientation);
+    glm::mat4 rotate = glm::mat4_cast(orientation);
     glm::mat4 translate = glm::mat4(1.0f);
     translate = glm::translate(translate, -Position);
+    /*if (invertPitch)
+    {
+        glm::vec3 eulerAngles = glm::eulerAngles(orientation);
+        //std::cout<<"Euler Angles:\nPitch: "<<eulerAngles.x<<"\nYaw: "<<eulerAngles.y<<"\nRoll: "<<eulerAngles.z<<std::endl;
+        rotate = glm::rotate(rotate,eulerAngles.x,Up);
+        translate = glm::translate(translate, Up * -100.0f);
+    }*/
 
     return rotate * translate;
 }
@@ -73,7 +71,6 @@ void Camera::ProcessMouseMovement(float xoffset, float yoffset, GLboolean constr
 
     Yaw   += xoffset;
     Pitch += yoffset;
-
     // make sure that when pitch is out of bounds, screen doesn't get flipped
     if (constrainPitch)
     {
@@ -97,7 +94,8 @@ void Camera::ProcessMouseScroll(float yoffset) {
 
 
 void Camera::updateCameraVectors() {
-    glm::quat q = glm::quat(glm::vec3(-Pitch, Yaw, -Roll));
+
+    glm::quat q = glm::quat(glm::vec3(-Pitch,Yaw,-Roll));
     Pitch = Yaw = Roll = 0;
 
     orientation = q * orientation;
@@ -106,8 +104,5 @@ void Camera::updateCameraVectors() {
     Front = glm::conjugate(orientation) * glm::vec3(0.0f, 0.0f, -1.0f);
     Right = glm::conjugate(orientation) * glm::vec3(1.0f, 0.0f, 0.0f);
     Up = glm::conjugate(orientation) * glm::vec3(0.0f, 1.0f, 0.0f);
-}
 
-void Camera::invertCameraPitch() {
-    invertPitch = !invertPitch;
 }

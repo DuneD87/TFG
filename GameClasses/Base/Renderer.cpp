@@ -62,11 +62,10 @@ void Renderer::drawEntities(std::vector<Entity*> worldEnts, glm::mat4 view, glm:
     {
         if (worldEnts[i]->getType() != 4)
         {
-            worldEnts[i]->draw(shader,false,depthMap);
+            worldEnts[i]->draw(shader);
             if (worldEnts[i]->getType() == 3)
             {
-                Planet * planet = dynamic_cast<Planet *>(worldEnts[i]);
-                planet->renderGui();
+                auto * planet = dynamic_cast<Planet *>(worldEnts[i]);
                 planet->setWaterTexture(reflexion);
                 planet->setNoDrawEffects(drawEffects);
             }
@@ -75,21 +74,18 @@ void Renderer::drawEntities(std::vector<Entity*> worldEnts, glm::mat4 view, glm:
 }
 
 void Renderer::render(vector<Entity *> worldEnts,bool wireframe) {
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
-    //Reflexion framebuffer pass and render to window
-    glm::mat4 view;
-    camera->invertCameraPitch();
-    glm::vec3 oldCamPos = this->camera->Position;
-    this->camera->Position = this->camera->Position + (this->camera->Up * -100.f);
-    view = this->camera->GetViewMatrix();
+    glm::mat4 view = camera->GetViewMatrix();
     //projection
     glm::mat4 projection;
-    projection = glm::perspective(glm::radians(this->camera->Zoom), (float)800/600, setting_near, setting_far);
+    projection = glm::perspective(glm::radians(camera->Zoom), (float)800/600, setting_near, setting_far);
     glBindFramebuffer(GL_FRAMEBUFFER,reflexionFBO);
     renderScene(worldEnts,wireframe,view,projection,800,600,false);
-    ImGui::Begin("Game Window");
+    ImGui::Begin("Water texture");
     ImGui::SetWindowFontScale(setting_fontSize);
     ImVec2 pos = ImGui::GetCursorScreenPos();
     ImDrawList* drawList = ImGui::GetWindowDrawList();
@@ -100,19 +96,13 @@ void Renderer::render(vector<Entity *> worldEnts,bool wireframe) {
                        ImVec2(1, 0));
     ImGui::End();
     glBindFramebuffer(GL_FRAMEBUFFER,0);
-    camera->invertCameraPitch();
-    this->camera->Position = oldCamPos;
-    view = this->camera->GetViewMatrix();
-    //Shadowmap framebuffer pass and render to window
-    glEnable(GL_DEPTH_TEST); // enable depth testing (is disabled for rendering screen-space quad)
-    glEnable(GL_CULL_FACE);
-    //render to main screen
-    if (!wireframe)
-        glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
-    projection = glm::perspective(glm::radians(this->camera->Zoom), (float)setting_scrWidth/setting_scrHeight, setting_near, setting_far);
-    renderScene(worldEnts,wireframe,view,projection,setting_scrWidth,setting_scrHeight,true);
+    camera->invertPitch = false;
+    view = camera->GetViewMatrix();
+    projection = glm::perspective(glm::radians(camera->Zoom), (float)setting_scrWidth/setting_scrHeight, setting_near, setting_far);
     if (!wireframe)
     {
+        glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
+        renderScene(worldEnts,wireframe,view,projection,setting_scrWidth,setting_scrHeight,true);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glDisable(GL_DEPTH_TEST); // disable depth test so screen-space quad isn't discarded due to depth test.
         // clear all relevant buffers
@@ -122,6 +112,10 @@ void Renderer::render(vector<Entity *> worldEnts,bool wireframe) {
         glBindVertexArray(quadVAO);
         glBindTexture(GL_TEXTURE_2D, textColorBuffer);	// use the color attachment texture as the texture of the quad plane
         glDrawArrays(GL_TRIANGLES, 0, 6);
+    }
+    else
+    {
+        renderScene(worldEnts,wireframe,view,projection,setting_scrWidth,setting_scrHeight,true);
     }
 }
 

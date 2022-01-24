@@ -18,7 +18,7 @@ public:
            bool hasWater, FastNoiseLite Noise, int seed);
 
     ~Planet();
-    void draw(Shader &shader, bool outlined = false, int depthMap = -1);
+    void draw(Shader &shader);
     void renderGui();
     void addCamera(Camera * cam);
     void addBiome(Biome bio);

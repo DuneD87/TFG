@@ -1,6 +1,6 @@
 <Scene>
 	<Camera type="cam">
-		<Orientation pitch="0.000000" yaw="0.000000" roll="0.000000"/>
+		<Orientation x="-0.213214" y="-0.755486" z="0.552462" w="0.280299"/>
 		<Position x="-5212.056641" y="94228.210938" z="97022.265625"/>
 	</Camera>
 	<Entities>
@@ -13,7 +13,7 @@
 			</Light>
 		</Entity>
 		<Entity type="Planet">
-			<Planet id="1" type="planet" hasAtmos="1" hasWater="1" radius="20000" nSeg="8">
+			<Planet id="1" type="planet" hasAtmos="1" hasWater="1" radius="20000" nSeg="10">
 				<Position x="0" y="0" z="0"/>
 				<NoiseSettings seed="1331" maxHeight="1290.32" noiseFreq="0.0001" octaves="8" lacunarity="2.3" fGain="0.5" fWeStr="0.6" fPinPonStr="3" cellJitter="1" domWarpAmp="50" minValue="0" noiseTypeSel="4" fractalTypeSel="4" cellDistTypeSel="3" cellReturnTypeSel="2" domWarpTypeSel="2"/>
 				<AtmosSettings radius="21000" k_r="0.166" k_m="0.0025" e="14.3" H="4" L="1" g_m="-0.85" numOutScatter="10" numInScatter="10" scale="1">
@@ -85,7 +85,7 @@
 			</Planet>
 		</Entity>
 		<Entity type="Planet">
-			<Planet id="2" type="planet" hasAtmos="1" hasWater="0" radius="20000" nSeg="8">
+			<Planet id="2" type="planet" hasAtmos="1" hasWater="0" radius="20000" nSeg="10">
 				<Position x="55000" y="0" z="0"/>
 				<NoiseSettings seed="1337" maxHeight="1827.96" noiseFreq="0.00011" octaves="8" lacunarity="2.3" fGain="0.5" fWeStr="0.6" fPinPonStr="3" cellJitter="1" domWarpAmp="50" minValue="0" noiseTypeSel="5" fractalTypeSel="4" cellDistTypeSel="3" cellReturnTypeSel="2" domWarpTypeSel="2"/>
 				<AtmosSettings radius="21000" k_r="0.166" k_m="0.0025" e="14.3" H="4" L="1" g_m="-0.85" numOutScatter="10" numInScatter="10" scale="1">
@@ -125,7 +125,7 @@
 			</Planet>
 		</Entity>
 		<Entity type="Planet">
-			<Planet id="3" type="planet" hasAtmos="1" hasWater="0" radius="20000" nSeg="8">
+			<Planet id="3" type="planet" hasAtmos="1" hasWater="0" radius="20000" nSeg="10">
 				<Position x="-55000" y="0" z="0"/>
 				<NoiseSettings seed="1330" maxHeight="1200" noiseFreq="0.0002" octaves="8" lacunarity="2.3" fGain="0.5" fWeStr="0.6" fPinPonStr="3" cellJitter="1" domWarpAmp="50" minValue="0" noiseTypeSel="2" fractalTypeSel="2" cellDistTypeSel="3" cellReturnTypeSel="3" domWarpTypeSel="2"/>
 				<AtmosSettings radius="21000" k_r="0.166" k_m="0.0025" e="14.3" H="4" L="1" g_m="-0.85" numOutScatter="10" numInScatter="10" scale="1">

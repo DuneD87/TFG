@@ -85,7 +85,7 @@ glm::vec2 Light::getDirection() {
     return this->orientation;
 }
 
-void Light::draw(Shader &shader,bool outlined, int depthMap) {
+void Light::draw(Shader &shader) {
     if (this->getSubType() == "pointLight") {
         shader.setVec3("pointLights["+std::to_string(this->lightIndex)+"].position", this->getPosition());
         shader.setVec3("pointLights["+std::to_string(this->lightIndex)+"].ambient",this->getAmbient());

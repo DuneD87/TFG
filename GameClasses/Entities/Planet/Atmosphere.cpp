@@ -21,10 +21,9 @@ Atmosphere::Atmosphere(float planetRadius, float atmosRadius, Camera *cam, float
     entityMesh = new Mesh(cubesphere.vertexList,cubesphere.getIndices());
     entityMesh->position = position;
     entityShader = Shader("../Shaders/skydomeVertex.shader", "../Shaders/skydomeFragment.shader");
-
 }
 
-void Atmosphere::draw(Shader &shader, bool outlined, int depthMap) {
+void Atmosphere::draw(Shader &shader) {
     //renderGui();
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA,GL_SRC_ALPHA);
@@ -53,9 +52,9 @@ void Atmosphere::draw(Shader &shader, bool outlined, int depthMap) {
     entityShader.setFloat("fNumOutScatter",numOutScatter);
     entityShader.setFloat("fNumInScatter",numInScatter);
     glFrontFace(GL_CW);
-    entityMesh->Draw(entityShader,outlined,depthMap,false,false);
+    entityMesh->Draw(entityShader);
     glFrontFace(GL_CCW);
-    entityMesh->Draw(entityShader,outlined,depthMap,false,false);
+    entityMesh->Draw(entityShader);
     glDisable(GL_BLEND);
     shader.use();
 }
@@ -64,10 +63,10 @@ void Atmosphere::renderGui() {
 
     // 2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
     {
-                             // Create a window called "Hello, world!" and append into it.
+        //ImGui::Begin("Atmospheric Settings",NULL,ImGuiWindowFlags_MenuBar);                          // Create a window called "Hello, world!" and append into it.
         ImGui::SetWindowFontScale(setting_fontSize);
         ImGui::PushItemWidth(200);
-        ImGui::Text("Planet id: %d",this->id);
+
         ImGui::SliderFloat("outterRadius", &atmosRadius, 0.0f, 100000.0f);
         ImGui::SliderFloat("innerRadius", &planetRadius, 0.0f, 100000.0f);
         ImGui::SliderFloat("MAX", &viewDistance, 0.0f, 10000000.0f);

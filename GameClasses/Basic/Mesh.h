@@ -101,7 +101,7 @@ public:
     float angle;
     glm::vec3 axis;
     glm::vec3 scale;
-
+    glm::mat4 transform;
     unsigned int VAO;
 
     ~Mesh();
@@ -109,8 +109,8 @@ public:
     Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures);
     Mesh& operator = (const Mesh& copy) noexcept;
     void setModel(glm::mat4 model);
-    void bindTextures(Shader &shader,unsigned int depthMap);
-    void Draw(Shader &shader, bool outlined, unsigned int depthMap, bool wireframe, bool patches);
+    void bindTextures(Shader &shader);
+    void Draw(Shader &shader);
 
     void outlineMesh(Shader &outline, glm::vec3 scale);
 

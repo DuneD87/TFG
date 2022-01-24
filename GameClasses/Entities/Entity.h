@@ -20,7 +20,7 @@ public:
     virtual glm::vec3 getScale();
     int getType();
 
-    virtual void draw(Shader &shader, bool outlined = false, int depthMap = -1) = 0;
+    virtual void draw(Shader &shader) = 0;
     virtual std::string toString() = 0;
     virtual void setPosition(glm::vec3 position);
     virtual void setRotation(glm::vec4 rotation);

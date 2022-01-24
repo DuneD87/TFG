@@ -27,7 +27,7 @@ WaterSphere::WaterSphere(float planetRadius, float waterRadius, Camera *cam, glm
     entityMesh->position = position;
 }
 
-void WaterSphere::draw(Shader &shader, bool outlined, int depthMap) {
+void WaterSphere::draw(Shader &shader) {
     glEnable(GL_BLEND);
     //glDisable(GL_CULL_FACE);
     glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
@@ -47,8 +47,8 @@ void WaterSphere::draw(Shader &shader, bool outlined, int depthMap) {
     else
         moveFactor = 0.0;
     entityShader.setFloat("waveSpeed",moveFactor);
-    entityMesh->Draw(entityShader,outlined,depthMap,false,false);
-    sun->draw(entityShader,outlined,depthMap);
+    entityMesh->Draw(entityShader);
+    sun->draw(entityShader);
     glDisable(GL_BLEND);
 }
 

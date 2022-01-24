@@ -21,8 +21,8 @@ Planet::Planet(float radius, int nSeg, bool hasAtmos, float maxHeight,const std:
     setupMesh();
 }
 
-void Planet::draw(Shader &shader, bool outlined, int depthMap) {
-
+void Planet::draw(Shader &shader) {
+    renderGui();
     shader.use();
     shader.setInt("isTerrain",1);
     shader.setFloat("hPoint",highestPoint + hPointOffset);
@@ -48,14 +48,14 @@ void Planet::draw(Shader &shader, bool outlined, int depthMap) {
     }
 
     shader.setInt("nTextures",path.size());
-    entityMesh->Draw(shader,outlined,depthMap,true,false);
+    entityMesh->Draw(shader);
     shader.setInt("isTerrain",0);
     if (drawEffects)
     {
         if (hasWater)
-            water->draw(shader,outlined,depthMap);
+            water->draw(shader);
         if (hasAtmos)
-            skyDome->draw(shader,outlined,-1);
+            skyDome->draw(shader);
     }
 }
 
@@ -72,40 +72,40 @@ void Planet::renderGui() {
     bool test = false;
     // 2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
     {
-        std::string windowId = "Planet Settings" + std::to_string(this->id);
-        ImGui::Begin(windowId.c_str(),NULL,ImGuiWindowFlags_MenuBar);// Create a window called "Hello, world!" and append into it.
+        std::string guiId = "Planet settings" + std::to_string(this->id);
+        ImGui::Begin(guiId.c_str(),NULL,ImGuiWindowFlags_MenuBar);                          // Create a window called "Hello, world!" and append into it.
         ImGui::SetWindowFontScale(setting_fontSize);
         ImGui::PushItemWidth(200);
-        ImGui::Text("Planet id: %d" , this->id);
+        ImGui::Text("Planet ID: %d",id);
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-        test = test + ImGui::SliderFloat("minValue", &minValue,-1.0f, 1.0f);
+        ImGui::SliderFloat("minValue", &minValue,-1.0f, 1.0f);
         ImGui::Text("Highest Point offset");
-        test = test + ImGui::SliderFloat("hPoint", &hPointOffset, -1000.0f, 1000.0f);
+        ImGui::SliderFloat("hPoint", &hPointOffset, -1000.0f, 1000.0f);
         ImGui::Text("Lowest Point offset");
-        test =test + ImGui::SliderFloat("lPoint", &lPointOffset, -1000.0f, 1000.0f);
+        ImGui::SliderFloat("lPoint", &lPointOffset, -1000.0f, 1000.0f);
         ImGui::NewLine();
-        test =test + ImGui::SliderFloat("Max height", &maxHeight, -10000.0f, 10000.0f);
-        test =test + ImGui::SliderFloat("Radius", &radius, 0.0f, 100000.0f);
-        test =test + ImGui::SliderInt("Num of divisions", &nSeg, 0.0f, 20);
-        test =test + ImGui::SliderFloat("DepthBlend", &depthBlend, -1.0f, 1.0f);
-        test =test + ImGui::SliderFloat("BlendFactor", &blendFactor, -1.0f, 1.0f);
+        ImGui::SliderFloat("Max height", &maxHeight, -10000.0f, 10000.0f);
+        ImGui::SliderFloat("Radius", &radius, 0.0f, 100000.0f);
+        ImGui::SliderInt("Num of divisions", &nSeg, 0.0f, 20);
+        ImGui::SliderFloat("DepthBlend", &depthBlend, -1.0f, 1.0f);
+        ImGui::SliderFloat("BlendFactor", &blendFactor, -1.0f, 1.0f);
         ImGui::NewLine();
-        test =test + ImGui::Combo("Noise Type",&noiseTypeSel,noiseTypes, IM_ARRAYSIZE(noiseTypes));
-        test =test + ImGui::InputInt("Seed",&seed);
-        test =test + ImGui::InputFloat("Frequency",&noiseFreq,0.0001);
+        ImGui::Combo("Noise Type",&noiseTypeSel,noiseTypes, IM_ARRAYSIZE(noiseTypes));
+        ImGui::InputInt("Seed",&seed);
+        ImGui::InputFloat("Frequency",&noiseFreq,0.0001);
         ImGui::NewLine();
-        test =test + ImGui::Combo("Fractal Type",&fractalTypeSel, fractalTypes,IM_ARRAYSIZE(fractalTypes));
-        test =test + ImGui::SliderInt("Octaves",&octaves,0.,64);
-        test =test + ImGui::SliderFloat("Lacunarity",&lacunarity,0.0,5.0f);
-        test =test + ImGui::SliderFloat("Fractal Gain",&fGain,0.0f,5.0f);
-        test =test + ImGui::SliderFloat("Fractal Weighted Strength",&fWeStr,0.0f,5.0f);
-        test =test +  ImGui::SliderFloat("Fractal Ping Pong Strength",&fPinPonStr,0.0f,5.0f);
+        ImGui::Combo("Fractal Type",&fractalTypeSel, fractalTypes,IM_ARRAYSIZE(fractalTypes));
+        ImGui::SliderInt("Octaves",&octaves,0.,64);
+        ImGui::SliderFloat("Lacunarity",&lacunarity,0.0,5.0f);
+        ImGui::SliderFloat("Fractal Gain",&fGain,0.0f,5.0f);
+        ImGui::SliderFloat("Fractal Weighted Strength",&fWeStr,0.0f,5.0f);
+        ImGui::SliderFloat("Fractal Ping Pong Strength",&fPinPonStr,0.0f,5.0f);
         ImGui::NewLine();
-        test =test +  ImGui::Combo("Cellular Distance Function",&cellDistTypeSel,cellDistFunc, IM_ARRAYSIZE(cellDistFunc));
-        test =test +  ImGui::Combo("Cellular Return Type",&cellReturnTypeSel,cellReturnType, IM_ARRAYSIZE(cellReturnType));
-        test =test +  ImGui::SliderFloat("Cellular Jitter",&cellJitter,0.0f,10.0f);
-        test =test +  ImGui::Combo("Domain Warp Type",&domWarpTypeSel,domainWarpType, IM_ARRAYSIZE(domainWarpType));
-        test =test +  ImGui::SliderFloat("Domain Warp Amplitude",&domWarpAmp,0.0f,50.0f);
+        ImGui::Combo("Cellular Distance Function",&cellDistTypeSel,cellDistFunc, IM_ARRAYSIZE(cellDistFunc));
+        ImGui::Combo("Cellular Return Type",&cellReturnTypeSel,cellReturnType, IM_ARRAYSIZE(cellReturnType));
+        ImGui::SliderFloat("Cellular Jitter",&cellJitter,0.0f,10.0f);
+        ImGui::Combo("Domain Warp Type",&domWarpTypeSel,domainWarpType, IM_ARRAYSIZE(domainWarpType));
+        ImGui::SliderFloat("Domain Warp Amplitude",&domWarpAmp,0.0f,50.0f);
         noise.SetNoiseType(_noiseTypes[noiseTypeSel]);
         noise.SetFrequency(noiseFreq);
         noise.SetCellularDistanceFunction(_cellDistFunc[cellDistTypeSel]);
@@ -120,12 +120,11 @@ void Planet::renderGui() {
         noise.SetFractalWeightedStrength(fWeStr);
         noise.SetFractalPingPongStrength(fPinPonStr);
         if (ImGui::Button("Rebuild")) setupMesh();
-        if (hasAtmos)
-            skyDome->renderGui();
-        else
+        if (!hasAtmos)
             ImGui::End();
+        else
+            skyDome->renderGui();
     }
-
 }
 
 void Planet::setupMesh() {
@@ -174,7 +173,7 @@ void Planet::setupEffects(float atmosRadius, float kr, float km, float e, float 
     for (int i = 0; i < 3; i++)
         colorAux[i] = color[i];
     skyDome = new Atmosphere(atmosRadius-lowestPoint,atmosRadius+highestPoint,cam,kr,km,e,h,l,colorAux,gm,numOutScatter,numInScatter,scale,_position);
-    skyDome->id = this->id;
+
     if (hasWater)
         water = new WaterSphere(radius,radius,cam,_position);
 }

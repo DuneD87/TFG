@@ -28,7 +28,7 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std:
 }
 
 
-void Mesh::bindTextures(Shader &shader,unsigned int depthMap) {
+void Mesh::bindTextures(Shader &shader) {
     // bind appropriate textures
     unsigned int diffuseNr  = 0;
     unsigned int specularNr = 0;
@@ -69,29 +69,18 @@ void Mesh::bindTextures(Shader &shader,unsigned int depthMap) {
             shader.setVec3("material.mDiffuse",textures[i].kd);
             shader.setVec3("material.mSpecular",textures[i].ks);
         }
-
-    }
-    // draw mesh
-    if (depthMap != -1)
-    {
-
-        glActiveTexture(GL_TEXTURE0+i);
-        glBindTexture(GL_TEXTURE_2D, depthMap);
-        shader.setInt("shadowMap",i);
     }
 }
 
 
-void Mesh::Draw(Shader &shader, bool outlined,unsigned int depthMap,bool wireframe, bool patches) {
+void Mesh::Draw(Shader &shader) {
 
-    bindTextures(shader,depthMap);
+    bindTextures(shader);
     glBindVertexArray(VAO);
-
-    glm::mat4 meshModel = glm::mat4(1.0f);
-    meshModel = glm::translate(meshModel,position);
-    meshModel = glm::rotate(meshModel,angle,axis);
-    meshModel = glm::scale(meshModel,scale);
-    shader.setMat4("model", meshModel);
+    transform = glm::translate(transform,position);
+    transform = glm::rotate(transform,angle,axis);
+    transform = glm::scale(transform,scale);
+    shader.setMat4("model", transform);
 
     glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
@@ -101,6 +90,7 @@ void Mesh::Draw(Shader &shader, bool outlined,unsigned int depthMap,bool wirefra
 }
 
 void Mesh::setupMesh() {
+    transform = glm::mat4(1.0f);
     // create buffers/arrays
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
@@ -143,11 +133,10 @@ void Mesh::outlineMesh(Shader &outlineShader, glm::vec3 scale) {
     glDisable(GL_DEPTH_TEST);
     outlineShader.use();
     glBindVertexArray(VAO);
-    glm::mat4 meshModel = glm::mat4(1.0f);
-    meshModel = glm::translate(meshModel,position);
-    meshModel = glm::rotate(meshModel,angle,axis);
-    meshModel = glm::scale(meshModel,scale);
-    outlineShader.setMat4("model", meshModel);
+    transform = glm::translate(transform,position);
+    transform = glm::rotate(transform,angle,axis);
+    transform = glm::scale(transform,scale);
+    outlineShader.setMat4("model", transform);
     glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
     glStencilMask(0xFF);
     glStencilFunc(GL_ALWAYS, 0, 0xFF);

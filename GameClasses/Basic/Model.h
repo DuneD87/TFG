@@ -33,7 +33,7 @@ std::vector<Mesh*>    meshes;
     Model(std::string const &path, bool gamma = false);
     Model();
     ~Model();
-    void Draw(Shader &shader, bool outlined = false, unsigned int depthMap = -1, bool wireframe = false, bool patches = false);
+    void Draw(Shader &shader);
     Mesh* processMesh(aiMesh *mesh, const aiScene *scene);
     std::vector<Texture> loadMaterialTextures(aiMaterial *mat, aiTextureType type, std::string typeName);
     void setPosition(glm::vec3 position);

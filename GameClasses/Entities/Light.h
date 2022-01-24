@@ -32,7 +32,7 @@ public:
     void setDirection(glm::vec2 orientation);
     void setCutOff(float cutOff);
     void setOuterCutOff(float outerCutOff);
-    void draw(Shader &shader,bool outlined, int depthMap);
+    void draw(Shader &shader);
     std::string toString();
 private:
     glm::vec3 position,ambient,diffuse,specular;

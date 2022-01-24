@@ -15,7 +15,7 @@ class WaterSphere : public Entity {
 public:
     WaterSphere(float planetRadius, float waterRadius, Camera *cam, glm::vec3 position);
     ~WaterSphere();
-    void draw(Shader &shader, bool outlined = false, int depthMap = -1);
+    void draw(Shader &shader);
     void setSun(Light * sun);
     void setWaterTexture(unsigned int waterText);
     std::string toString();

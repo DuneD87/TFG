@@ -79,6 +79,7 @@ void processInput(GLFWwindow *window,World *world)
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 {
+
     float xoffset = xpos - lastX;
     float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
     if (glfwGetMouseButton(window,GLFW_MOUSE_BUTTON_2))
@@ -94,8 +95,9 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
     }
     lastX = xpos;
     lastY = ypos;
-    if (!enableCursor)
+    if (!enableCursor) {
         cam->ProcessMouseMovement(xoffset, yoffset,true);
+    }
 
 }
 

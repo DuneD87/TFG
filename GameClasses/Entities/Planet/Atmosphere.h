@@ -16,17 +16,14 @@ public:
     Atmosphere(float planetRadius, float atmosRadius, Camera *cam, float kR, float kM, float e, float h, float l,
                float atmosColor[3], float gM, float numOutScatter, float numInScatter, float scale,glm::vec3 position);
     ~Atmosphere();
-    void draw(Shader &shader, bool outlined = false, int depthMap = -1);
+    void draw(Shader &shader);
     void setSun(Light* sun);
     std::string toString();
     void renderGui();
-    int id;
 private:
 
-    Model * skyDome;
     float planetRadius, atmosRadius;
     Camera *cam;
-    Shader atmosShader;
     float viewDistance = 1000000.0f;
     float k_r = 0.166;
     float k_m = 0.0025;

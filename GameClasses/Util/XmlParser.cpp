@@ -24,9 +24,10 @@ XmlParser::XmlParser(std::string path, Camera *cam) {
     xml_node<> * camOrient = cameraNode->first_node("Orientation");
 
     cam->Position = getValues3(camPosNode);
-    cam->Pitch = stof(camOrient->first_attribute("pitch")->value());
-    cam->Yaw = stof(camOrient->first_attribute("yaw")->value());
-    cam->Roll = stof(camOrient->first_attribute("roll")->value());
+    cam->orientation.x = stof(camOrient->first_attribute("x")->value());
+    cam->orientation.y = stof(camOrient->first_attribute("y")->value());
+    cam->orientation.z = stof(camOrient->first_attribute("z")->value());
+    cam->orientation.w = stof(camOrient->first_attribute("w")->value());
     cam->updateCameraVectors();
     xml_node<> * entities = _rootNode->first_node("Entities");
     for (xml_node<> * ent = entities->first_node("Entity");ent;ent = ent->next_sibling("Entity"))
@@ -216,12 +217,14 @@ void XmlParser::saveWorld() {
     camNodePos->first_attribute("z")->value(doc.allocate_string(z.c_str()));
     xml_node<> * camOrientation = camNode->first_node("Orientation");
     cam->updateCameraVectors();
-    std::string x1 = std::to_string(cam->oldPitch);
-    std::string y1 = std::to_string(cam->oldYaw);
-    std::string z1 = std::to_string(cam->oldRoll);
-    camOrientation->first_attribute("pitch")->value(doc.allocate_string(x1.c_str()));
-    camOrientation->first_attribute("yaw")->value(doc.allocate_string(y1.c_str()));
-    camOrientation->first_attribute("roll")->value(doc.allocate_string(z1.c_str()));
+    std::string x1 = std::to_string(cam->orientation.x);
+    std::string y1 = std::to_string(cam->orientation.y);
+    std::string z1 = std::to_string(cam->orientation.z);
+    std::string w1 = std::to_string(cam->orientation.w);
+    camOrientation->first_attribute("x")->value(doc.allocate_string(x1.c_str()));
+    camOrientation->first_attribute("y")->value(doc.allocate_string(y1.c_str()));
+    camOrientation->first_attribute("z")->value(doc.allocate_string(z1.c_str()));
+    camOrientation->first_attribute("w")->value(doc.allocate_string(w1.c_str()));
     xml_node<> * ents = _rootNode->first_node("Entities");
     for (xml_node<> * ent = ents->first_node("Entity");ent;ent = ent->next_sibling("Entity"))
     {
